@@ -190,13 +190,36 @@ d_{F}
 
 \begin{abstract}
 
-We present the \emph{simplicial sampler}, a class of parallel MCMC methods that generate and choose from multiple proposals at each iteration.  The algorithm's multiproposal randomly rotates a simplex connected to the current Markov chain state in a way that inherently preserves symmetry between proposals. As a result, the simplicial sampler does not require a proposal density term correction within its accept-reject step. It simply chooses from among the simplex nodes with probability proportional to their target density values.  While the algorithm enjoys natural parallelizability, we show that conventional implementations are sufficient to confer efficiency gains across an array of dimensions and a number of target distributions. 
+[abstract]
+
 
 
 \end{abstract}
 
 
+\section{Introduction}
 
+
+
+\section{Parallel MCMC}
+
+\subsection{Untangling computations}
+
+\begin{enumerate}
+	\item Challenge: proposal terms in acceptance
+	\item Challenge: normalization/marginalization
+\end{enumerate}
+
+\subsubsection{Simplicial sampler}
+
+\subsubsection{Gumbel-max}
+
+\section{Quantum optimization}
+
+
+\section{Algorithms}
+
+\section{Discussion}
 
 \bibliographystyle{sysbio}
 \bibliography{refs}
