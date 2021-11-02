@@ -1,0 +1,211 @@
+% !TeX document-id = {d42653b9-9ea4-48c2-860b-3d6e6e9d8ab0}
+% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
+\documentclass[12pt]{article} % For LaTeX2e
+%\usepackage{neurips_2021}
+\usepackage[colorlinks, citecolor={blue}]{hyperref}
+\usepackage{url}
+\usepackage{amsfonts,amscd,amssymb}
+\usepackage{amsthm,amsmath,natbib}
+\usepackage{algorithm,algorithmicx,algpseudocode}
+\usepackage{bm}
+\usepackage{bbm} %bb font numbers
+\usepackage[table]{xcolor}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{natbib}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+%\usepackage[nolists]{endfloat}
+\usepackage{listings}
+\usepackage[textsize=tiny]{todonotes}
+\usepackage{tikz}
+\usetikzlibrary{shapes.misc}
+\usepackage{etoolbox}
+\usepackage{appendix}
+\usepackage[format=plain,
+labelfont={it},
+textfont=it]{caption}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{xr}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{authblk}
+\usepackage{mathbbol}
+
+
+
+\usetikzlibrary{matrix}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows,shapes}
+\usetikzlibrary{decorations}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{fit}
+\usetikzlibrary{decorations.pathreplacing}
+
+\newtoggle{quickdraw}
+\toggletrue{quickdraw} % Uncomment this to render more quickly (non-random)
+
+
+\definecolor{lightgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{darkgreen}{rgb}{0,0.3,0}
+%\definecolor{darkred}{rgb}{0.3,0,0}
+
+\definecolorset{rgb}{}{}{darkred,0.8,0,0;darkgreen,0,0.5,0;darkblue,0,0,0.5}
+
+%\doublespacing
+
+\newtheorem{thm}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{cor}{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+\newtheorem{mydef}{Definition}
+\newtheorem*{assumption}{Assumption}
+\newtheorem{clm}{Claim}
+
+\newcommand{\argmax}{\operatornamewithlimits{arg\,max}}
+\newcommand{\argmin}{\operatornamewithlimits{arg\,min}}
+\newcommand*{\fplus}{\genfrac{}{}{0pt}{}{}{+}}
+\newcommand*{\fdots}{\genfrac{}{}{0pt}{}{}{\cdots}}
+\newcommand{\mb}{\mathbf}
+\newcommand{\mc}{\mathcal}
+\newcommand{\dx}{\mbox{d}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\numTaxa}{N}
+\newcommand{\numTraits}{D}
+\newcommand{\numDatasets}{M}
+%\newcommand{\numLatent}{D}
+\newcommand{\taxonIndex}{i}
+\newcommand{\traitIndex}{j}
+\newcommand{\traitData}{\vec{Y}}
+\newcommand{\traitDatum}{y}
+\newcommand{\datasetIndex}{m}
+\newcommand{\exemplar}{\text{e}}
+
+\newcommand{\sequences}{\vec{S}}
+\newcommand{\latentData}{\vec{X}}
+\newcommand{\latentdata}{\vec{x}}
+\newcommand{\latentDatum}{x}
+\newcommand{\phylogeneticParameters}{\boldsymbol{\phi}}
+\newcommand{\phylogeny}{{\cal G}}
+\newcommand{\tree}{\phylogeny}
+%\newcommand{\otherParameters}{\boldsymbol{\
+\newcommand{\transpose}{^{t}}
+
+\newcommand{\distanceMatrix}{\mathbf{Y}}
+\newcommand{\distance}{y}
+\newcommand{\summant}{r}
+
+
+
+\newcommand{\cdensity}[2]{\ensuremath{p(#1 \,|\,#2)}}
+\newcommand{\density}[1]{\ensuremath{p(#1 )}}
+
+\newcommand{\treeNode}{\nu}
+
+\newcommand{\traitVariance}{\mathbf{\Sigma}}
+\newcommand{\nodeIndex}{c}
+
+%\newcommand{\parent}[1]{\mbox{\tiny pa}(#1)}
+\newcommand{\parentBig}[1]{\mbox{pa}(#1)}
+
+\newcommand{\sibling}[1]{\mbox{\tiny sib}(#1)}
+\newcommand{\siblingBig}[1]{\mbox{sib}(#1)}
+
+\newcommand{\rootMean}{\boldsymbol{\mu}_0}
+\newcommand{\rootVarianceScalar}{\tau_0}
+\newcommand{\unsequencedVarianceScalar}{\tau_{\exemplar}}
+\newcommand{\treeVariance}{\vec{V}_{\tree}}
+\newcommand{\hatTreeVariance}{\hat{\vec{V}}_{\tree}}
+\newcommand{\mdsSD}{\sigma}
+\newcommand{\mdsVariance}{\mdsSD^2}
+\newcommand{\residual}{\hat{\traitDatum}}
+\newcommand{\modelDistance}{\delta}
+\newcommand{\cdf}{\phi}
+\newcommand{\normalCDF}[1]{\Phi \left( #1 \right)}
+
+\newcommand{\order}[1]{{\cal O}\hspace{-0.2em}\left( #1 \right)}
+
+\newcommand{\rootNode}{\nu^{\datasetIndex}_{2 \numTaxa_{\datasetIndex} -1 }}
+\newcommand{\pathLength}[1]{d(F, #1 )}
+\newcommand{\pathLengthNew}[2]{
+d_{F}
+(
+{#1}, {#2}
+)
+}
+\newcommand{\J}{\vec{J}}
+\newcommand{\pprime}{^{\prime}}
+\newcommand{\otherIndex}{i \pprime}
+\def\kronecker{\raisebox{1pt}{\ensuremath{\:\otimes\:}}}
+
+\definecolor{trevorblue}{rgb}{0.330, 0.484, 0.828}
+\definecolor{trevoryellow}{rgb}{0.829, 0.680, 0.306}
+
+%\input{make-edits}
+%\makeatletter
+%\def\title@font{\Huge}
+%\let\ltx@maketitle\@maketitle
+%\def\@maketitle{\bgroup%
+%	\let\ltx@title\@title%
+%	\def\@title{\resizebox{\textwidth}{!}{%
+%			\mbox{\title@font\ltx@title}%
+%	}}%
+%	\ltx@maketitle%
+%	\egroup}
+%\makeatother
+
+
+\title{Quantum parallel Markov chain Monte Carlo}
+\date{}
+
+
+
+\author{Andrew J.~Holbrook}
+
+
+\affil{UCLA Biostatistics}
+
+
+
+
+
+\renewcommand\Authands{ and }
+
+
+\graphicspath{{figures/}}
+
+\begin{document}
+
+
+\maketitle
+
+
+
+
+\begin{abstract}
+
+We present the \emph{simplicial sampler}, a class of parallel MCMC methods that generate and choose from multiple proposals at each iteration.  The algorithm's multiproposal randomly rotates a simplex connected to the current Markov chain state in a way that inherently preserves symmetry between proposals. As a result, the simplicial sampler does not require a proposal density term correction within its accept-reject step. It simply chooses from among the simplex nodes with probability proportional to their target density values.  While the algorithm enjoys natural parallelizability, we show that conventional implementations are sufficient to confer efficiency gains across an array of dimensions and a number of target distributions. 
+
+
+\end{abstract}
+
+
+
+
+\bibliographystyle{sysbio}
+\bibliography{refs}
+
+\appendix
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
