@@ -190,7 +190,7 @@ d_{F}
 
 \begin{abstract}
 
-We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by untangling the generalized accept-reject step in a way that combines the Gumbel-max trick with the recent simplicial sampler proposal mechanism.  Next, we embed this classical routine within a well-known extension of Grover's search algorithm to select our next Markov chain state.  Letting $D$ denote both the number of proposals and the target dimension, the combined strategy reduces the number of target evaluations required from $\order{D}$ to $\order{D^{1/2}}$  and reduces the proposal cost from $\order{D^3}$ to $\order{D^{5/2}}$.  Notably, these speedups do not preclude classical parallelization within the target evaluations and the matrix-vector multiplications of the simplicial sampler proposal.
+We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by untangling the generalized accept-reject step in a way that combines the Gumbel-max trick with the recent simplicial sampler proposal mechanism.  Next, we embed this classical routine within a well-known extension of Grover's quantum search algorithm to select our next Markov chain state.  Letting $D$ denote both the number of proposals and the target dimension, the combined strategy reduces the number of target evaluations required from $\order{D}$ to $\order{D^{1/2}}$  and reduces the proposal cost from $\order{D^3}$ to $\order{D^{5/2}}$.  Notably, these speedups do not preclude classical parallelization within the target evaluations and the matrix-vector multiplications of the simplicial sampler proposal.
 
 
 
@@ -199,7 +199,21 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 
 \section{Introduction}
 
+\newcommand{\ttheta}{\boldsymbol{\theta}}
+\newcommand{\dd}{\mbox{d}}
 
+Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select from among them.  \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number (say, $K$) of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
+\begin{align}\label{eq:fixes}
+\pi(A) = \int \pi(\dd \ttheta_0) P(\ttheta_0,A) \, 
+\end{align} 
+for all  $A \subset \mathbb{R}^D$ for which $\pi(A) > 0$.  Letting $\ttheta_0$ denote the current state of the Markov chain, \citet{tjelmeland2004using} proposes sampling from such a kernel $P(\ttheta_0,\cdot)$ by drawing $K$ proposals $\ttheta_1,\dots,\ttheta_K$ from a distribution $Q(\ttheta_0,\dd \ttheta) =: q(\ttheta_0,\ttheta)\dd \ttheta$ and selecting the next Markov chain state from among the current and proposed states with probabilities
+\begin{align}
+\pi_j = \frac{\pi(\ttheta_j) \prod_{k \neq j} q(\ttheta_j,\ttheta_k)}{\sum_{i=0}^K \pi(\ttheta_j) \prod_{k \neq i} q(\ttheta_i,\ttheta_k)} \, , \quad j=0,\dots,K \, .
+\end{align}
+\citet{tjelmeland2004using} shows that the kernel $P(\ttheta_0,\cdot)$ constructed in such a manner maintains detailed balance and hence satisfies Equation \eqref{eq:fixes}.  Others have since built on this work, developing parallel MCMC methods that generate or recycle multiple proposals \citep{frenkel2004speed,delmas2009does,calderhead2014general,yang2018parallelizable,luo2019multiple,schwedes2021rao}.  
+These developments demonstrate the ability of parallel MCMC methods to alleviate inferential challenges (such as multimodality) and to deliver performance gains over single-proposal competitors as measured by reduced autocorrelation between samples.
+
+Nonetheless, all of them require PARALLEL COMPUTE
 
 \section{Parallel MCMC}
 
