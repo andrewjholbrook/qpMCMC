@@ -190,7 +190,7 @@ d_{F}
 
 \begin{abstract}
 
-We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by untangling the generalized accept-reject step in a way that combines the Gumbel-max trick with the recent simplicial sampler proposal mechanism.  Next, we embed this classical routine within a well-known extension of Grover's search algorithm to select our next Markov chain state.  Letting $D$ denote both the number of proposals and the target dimension, the combined strategy reduces the number of target evaluations required from $\order{D}$ to $\order{D^{1/2}}$  and reduces the proposal cost from $\order{D^3}$ to $\order{D^{5/2}}$.  
+We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by untangling the generalized accept-reject step in a way that combines the Gumbel-max trick with the recent simplicial sampler proposal mechanism.  Next, we embed this classical routine within a well-known extension of Grover's search algorithm to select our next Markov chain state.  Letting $D$ denote both the number of proposals and the target dimension, the combined strategy reduces the number of target evaluations required from $\order{D}$ to $\order{D^{1/2}}$  and reduces the proposal cost from $\order{D^3}$ to $\order{D^{5/2}}$.  Notably, these speedups do not preclude classical parallelization within the target evaluations and the matrix-vector multiplications of the simplicial sampler proposal.
 
 
 
