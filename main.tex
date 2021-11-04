@@ -33,6 +33,7 @@ textfont=it]{caption}
 \usepackage{multirow}
 \usepackage{authblk}
 \usepackage{mathbbol}
+\usepackage{braket}
 
 
 
@@ -161,7 +162,7 @@ d_{F}
 %\makeatother
 
 
-\title{Quantum parallel Markov chain Monte Carlo}
+\title{A quantum parallel Markov chain Monte Carlo}
 \date{}
 
 
@@ -219,12 +220,31 @@ While parallel MCMC algorithms are increasingly well-suited for developing many-
 
 \emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and target evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
 
-A quantum computer acts on complex data vectors of magnitude 1 called qubits with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
+Quantum computers perform operations on unit-length vectors of complex data called \emph{qubits} or quantum bits.  One may write any qubit $\ket{\psi}$ as a linear combination of the \emph{computational basis} states $\ket{0}$ and $\ket{1}$.  In symbols,
+\begin{align*}
+\ket{\psi} = \alpha \ket{0} + \beta \ket{1} \quad \mbox{for} \quad \alpha, \, \beta \in \mathbb{C} \quad \mbox{and} \quad  |\alpha|^2 + |\beta|^2 = 1\, .
+\end{align*}
+This formula makes use of \emph{Dirac} or \emph{bra-ket} notation and thinly obscures ideas that are commonplace in the realm of applied statistics: we may make the unit-vector specification of $\ket{\psi}$ clear by writing
+\begin{align*}
+\ket{0}=\begin{bmatrix}
+1 \\ 0
+\end{bmatrix} \, ,  \quad \ket{1}=\begin{bmatrix}
+0 \\ 1
+\end{bmatrix} \quad \mbox{or} \quad \ket{\psi} = \alpha \begin{bmatrix}
+1 \\ 0
+\end{bmatrix} + \beta  \begin{bmatrix}
+0 \\ 1
+\end{bmatrix}\, .
+\end{align*} 
+As one might expect, the full machinery of linear algebra is also available. The conjugate transpose of $\ket{\psi}$ is $\bra{\psi}$. The inner product of $\ket{\psi}$ and $\ket{\phi}$ is $\braket{\phi|\psi}$. The outer product is $\ket{\psi}\bra{\phi}$.
+
+
+ with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
 
 \section{Quantum search and quantum minimization}
 
 
-\section{Parallel MCMC}
+\section{Parallel MCMC subroutines}
 
 \subsection{Untangling computations}
 
