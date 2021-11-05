@@ -202,6 +202,10 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 
 \newcommand{\ttheta}{\boldsymbol{\theta}}
 \newcommand{\dd}{\mbox{d}}
+\newcommand{\ppsi}{\boldsymbol{\psi}}
+\newcommand{\U}{\mathbf{U}}
+\newcommand{\I}{\mathbf{I}}
+\renewcommand{\H}{\mathbf{H}}
 
 Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select from among them.  \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number (say, $K$) of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
 \begin{align}\label{eq:fixes}
@@ -220,7 +224,7 @@ While parallel MCMC algorithms are increasingly well-suited for developing many-
 
 \emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and target evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
 
-Quantum computers perform operations on unit-length vectors of complex data called \emph{qubits} or quantum bits.  One may write any qubit $\ket{\psi}$ as a linear combination of the \emph{computational basis} states $\ket{0}$ and $\ket{1}$.  In symbols,
+Quantum computers perform operations on unit-length vectors of complex data called \emph{qubits} or quantum bits.  One may write any qubit $\ppsi$ as a linear combination of the \emph{computational basis states} $\ket{0}$ and $\ket{1}$.  In symbols,
 \begin{align*}
 \ket{\psi} = \alpha \ket{0} + \beta \ket{1} \quad \mbox{for} \quad \alpha, \, \beta \in \mathbb{C} \quad \mbox{and} \quad  |\alpha|^2 + |\beta|^2 = 1\, .
 \end{align*}
@@ -236,10 +240,30 @@ This formula makes use of \emph{Dirac} or \emph{bra-ket} notation and thinly obs
 0 \\ 1
 \end{bmatrix}\, .
 \end{align*} 
-As one might expect, the full machinery of linear algebra is also available. The conjugate transpose of $\ket{\psi}$ is $\bra{\psi}$. The inner product of $\ket{\psi}$ and $\ket{\phi}$ is $\braket{\phi|\psi}$. The outer product is $\ket{\psi}\bra{\phi}$.
+As one might expect, the full machinery of linear algebra is also available within this notation. The conjugate transpose of $\ket{\psi}$ is $\bra{\psi}$. The inner product of $\ket{\psi}$ and $\ket{\phi}$ is $\braket{\phi|\psi}$. The outer product is $\ket{\psi}\bra{\phi}$. Naturally, we can write $\ppsi$ as a linear combination of any other such basis elements. Consider instead the vectors
+\begin{align*}
+\ket{+} = \frac{1}{\sqrt{2}} \ket{0} + \frac{1}{\sqrt{2}} \ket{1} \quad \mbox{and} \quad \ket{-} = \frac{1}{\sqrt{2}} \ket{0} - \frac{1}{\sqrt{2}} \ket{1} \, .
+\end{align*}
+A little algebra shows that $\ket{+}$ and $\ket{-}$ are indeed unit-length and orthogonal to each other. A little more algebra reveals that, with respect to this basis, $\ppsi$ has coefficients $\alpha'$ and $\beta'$ given by $(\alpha + \beta)/\sqrt{2}$ and $(\alpha - \beta)/\sqrt{2}$, respectively. A last bit of algebra shows that this representation is consistent with $\ppsi$'s unit length.
 
+But linear algebra is not the only aspect of quantum computing that should come easily to applied statisticians. In addition to thinking of $\ppsi$ as a vector, it is also useful to think of $\ppsi$ as a (discrete) probability distribution over the computational basis states $\ket{0}$ and $\ket{1}$. The constraints on coefficients $\alpha$ and $\beta$ mean that we can think of $|\alpha|^2$ and $|\beta|^2$ as probabilities that $\ppsi$ is in state $\ket{0}$ or $\ket{1}$, respectively.  Accordingly, $\ket{+}$ and $\ket{-}$ encode uniform distributions over the computational basis states.  In the parlance of quantum mechanics, $\alpha$, $\beta$ and $\pm1/\sqrt{2}$ are all \emph{probability amplitudes}, and $\ppsi$, $\ket{+}$ and $\ket{-}$ are all \emph{superpositions} of the computational basis states. Quantum \emph{measurement} of $\ppsi$ results in $\ket{0}$ with probability $|\alpha|^2$, but---in the following---we can safely think of this physical procedure as drawing a single discrete sample from $\ppsi$'s implied probability distribution.
+
+==============================
+
+Quantum logic gates perform linear operations on qubits and take the form of unitary matrices $\U$ satisfying $\U^\dagger \U=\I$ for $\U^\dagger$ the conjugate transpose of $\U$. One terrifically important quantum gate is the \emph{Hadamard gate}
+\begin{align}
+\H = \frac{1}{\sqrt{2}} \begin{bmatrix}
+1 & 1 \\
+1 & -1 \end{bmatrix} \, .
+\end{align}
+We invite the Reader to check for themselves that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  
+
+
+=============================
 
  with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
+
+=============================
 
 \section{Quantum search and quantum minimization}
 
@@ -257,10 +281,7 @@ As one might expect, the full machinery of linear algebra is also available. The
 
 \subsubsection{Gumbel-max}
 
-\section{Quantum optimization}
 
-
-\section{Algorithms}
 
 \section{Discussion}
 
