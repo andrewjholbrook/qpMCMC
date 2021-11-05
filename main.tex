@@ -252,19 +252,33 @@ But linear algebra is not the only aspect of quantum computing that should come 
 
 Quantum logic gates perform linear operations on qubits like $\ppsi$ and take the form of unitary matrices $\U$ satisfying $\U^\dagger \U=\I$ for $\U^\dagger$ the conjugate transpose of $\U$. One terrifically important single-qubit quantum gate is the \emph{Hadamard gate}
 \begin{align}
-\H = \frac{1}{\sqrt{2}} \begin{bmatrix}
+\H = \frac{1}{\sqrt{2}} \left[\begin{array}{rr}
 1 & 1 \\
-1 & -1 \end{bmatrix} \, .
+1 & -1 \end{array}\right] \, .
 \end{align}
 The Reader may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  Uncountably many single-qubit quantum gates exist, and some of them are useful. But the real power of quantum computing stems from the development of complex quantum gates that act on multiple qubits simultaneously.   To access this power, we need one more tool that appears in the statistics literature, albeit less frequently.  The Kronecker product between an $L$-by-$M$ matrix $\A$ and an $N$-by-$O$ matrix $\B$ is the $LN$-by-$MO$ matrix
-\begin{align}
+\begin{align}\label{eq:kron}
 \A \otimes \B = \begin{bmatrix}
 A_{11} \B & \dots & A_{1M} \B \\
 \vdots & \ddots & \vdots \\
 A_{L1}\B & \cdots & A_{LM}  \B
 \end{bmatrix} \, .
 \end{align} 
-In statistics, the Kronecker product features in the definition of a matrix normal distribution and is sometimes helpful when specifying the kernel function of a multivariate Gaussian process \citep{werner2008estimation}. Here, we use the product to 
+In statistics, the Kronecker product features in the definition of a matrix normal distribution and is sometimes helpful when specifying the kernel function of a multivariate Gaussian process \citep{werner2008estimation}. Here, the product is equivalent to the parallel action of individual quantum gates on individual qubits.  Simple application of Formula \eqref{eq:kron} shows that
+\begin{align}
+\H \otimes \H = \frac{1}{2} \left[\begin{array}{rrrr}
+1 & 1 & 1 & 1 \\
+1 &  -1& 1 & -1 \\
+1 & 1 & -1 & -1 \\
+1 & -1 & -1 & 1
+\end{array}\right] \quad \mbox{and} \quad \ket{0}\otimes\ket{0}=\begin{bmatrix}
+1 \\ 0
+\end{bmatrix} \otimes \begin{bmatrix}
+1 \\ 0
+\end{bmatrix} = \begin{bmatrix}
+1 \\ 0 \\ 0 \\ 0
+\end{bmatrix} \, .
+\end{align} 
 
 =============================
 
