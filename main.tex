@@ -206,6 +206,8 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 \newcommand{\U}{\mathbf{U}}
 \newcommand{\I}{\mathbf{I}}
 \renewcommand{\H}{\mathbf{H}}
+\newcommand{\A}{\mathbf{A}}
+\newcommand{\B}{\mathbf{B}}
 
 Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select from among them.  \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number (say, $K$) of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
 \begin{align}\label{eq:fixes}
@@ -248,14 +250,21 @@ A little algebra shows that $\ket{+}$ and $\ket{-}$ are indeed unit-length and o
 
 But linear algebra is not the only aspect of quantum computing that should come easily to applied statisticians. In addition to thinking of $\ppsi$ as a vector, it is also useful to think of $\ppsi$ as a (discrete) probability distribution over the computational basis states $\ket{0}$ and $\ket{1}$. The constraints on coefficients $\alpha$ and $\beta$ mean that we can think of $|\alpha|^2$ and $|\beta|^2$ as probabilities that $\ppsi$ is in state $\ket{0}$ or $\ket{1}$, respectively.  Accordingly, $\ket{+}$ and $\ket{-}$ encode uniform distributions over the computational basis states.  In the parlance of quantum mechanics, $\alpha$, $\beta$ and $\pm1/\sqrt{2}$ are all \emph{probability amplitudes}, and $\ppsi$, $\ket{+}$ and $\ket{-}$ are all \emph{superpositions} of the computational basis states. Quantum \emph{measurement} of $\ppsi$ results in $\ket{0}$ with probability $|\alpha|^2$, but---in the following---we can safely think of this physical procedure as drawing a single discrete sample from $\ppsi$'s implied probability distribution.
 
-Quantum logic gates perform linear operations on qubits like $\ppsi$ and take the form of unitary matrices $\U$ satisfying $\U^\dagger \U=\I$ for $\U^\dagger$ the conjugate transpose of $\U$. One terrifically important quantum gate is the \emph{Hadamard gate}
+Quantum logic gates perform linear operations on qubits like $\ppsi$ and take the form of unitary matrices $\U$ satisfying $\U^\dagger \U=\I$ for $\U^\dagger$ the conjugate transpose of $\U$. One terrifically important single-qubit quantum gate is the \emph{Hadamard gate}
 \begin{align}
 \H = \frac{1}{\sqrt{2}} \begin{bmatrix}
 1 & 1 \\
 1 & -1 \end{bmatrix} \, .
 \end{align}
-The Reader may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  
-
+The Reader may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  Uncountably many single-qubit quantum gates exist, and some of them are useful. But the real power of quantum computing stems from the development of complex quantum gates that act on multiple qubits simultaneously.   To access this power, we need one more tool that appears in the statistics literature, albeit less frequently.  The Kronecker product between an $L$-by-$M$ matrix $\A$ and an $N$-by-$O$ matrix $\B$ is the $LN$-by-$MO$ matrix
+\begin{align}
+\A \otimes \B = \begin{bmatrix}
+A_{11} \B & \dots & A_{1M} \B \\
+\vdots & \ddots & \vdots \\
+A_{L1}\B & \cdots & A_{LM}  \B
+\end{bmatrix} \, .
+\end{align} 
+In statistics, the Kronecker product features in the definition of a matrix normal distribution and is sometimes helpful when specifying the kernel function of a multivariate Gaussian process \citep{werner2008estimation}. Here, we use the product to 
 
 =============================
 
