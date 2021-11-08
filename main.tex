@@ -256,7 +256,13 @@ Quantum logic gates perform linear operations on qubits like $\ppsi$ and take th
 1 & 1 \\
 1 & -1 \end{array}\right] \, .
 \end{align}
-The Reader may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  Uncountably many single-qubit quantum gates exist, and some of them are useful. But the real power of quantum computing stems from the development of complex quantum gates that act on multiple qubits simultaneously.   To access this power, we need one more tool that appears in the statistics literature, albeit less frequently.  The Kronecker product between an $L$-by-$M$ matrix $\A$ and an $N$-by-$O$ matrix $\B$ is the $LN$-by-$MO$ matrix
+The Reader may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  In fact, the reverse is also true on account of the symmetry of $\H$.  The Hadamard gate thus takes the computational basis states in and out of superposition, facilitating a phenomenon called \emph{quantum parallelism}. Given a function $f: \{0,1\} \rightarrow \{0,1\}$, consider the two-qubit quantum \emph{oracle} gate $\U_f$ which takes $\ket{x}\ket{y}$ as input and returns $\ket{x}\ket{y\oplus f(x)}$ as output, where $\oplus$ denotes addition modulo 2.  Importantly, the output simplifies to $\ket{x}\ket{f(x)}$ for $y=0$. We now consider a quantum circuit that acts on two qubits by first applying the Hadamard transform $\H$ to the first qubit and then applying the oracle gate $\U_f$ to both. Using the state $\ket{0}\ket{0}$ as input, we have
+\begin{align}\label{eq:quantparallel}
+\ket{0}\ket{0} \longrightarrow \frac{1}{\sqrt{2}} \ket{0}\ket{0} + \frac{1}{\sqrt{2}} \ket{1}\ket{0}  \longrightarrow \frac{1}{\sqrt{2}} \ket{0}\ket{f(0)} + \frac{1}{\sqrt{2}} \ket{1}\ket{f(1)} \, .
+\end{align}
+The quantum circuit evaluates $f(\cdot)$ simultaneously over both inputs!  Unfortunately, the scientist who implements this circuit cannot directly access $\U_f$'s output, and measurement will provide only $\ket{0}\ket{f(0)}$ or $\ket{1}\ket{f(1)}$ with probability $1/2$ each.  Unlocking the potential of quantum parallelism will require a bit of ingenuity indeed.
+
+Uncountably many single- and two-qubit quantum gates exist, but the real power of quantum computing stems from the development of complex quantum gates that act on multiple qubits simultaneously.   To access this power, we need one more tool that appears in the statistics literature, albeit less frequently.  The Kronecker product between an $L$-by-$M$ matrix $\A$ and an $N$-by-$O$ matrix $\B$ is the $LN$-by-$MO$ matrix
 \begin{align}\label{eq:kron}
 \A \otimes \B = \begin{bmatrix}
 A_{11} \B & \dots & A_{1M} \B \\
@@ -279,27 +285,31 @@ In statistics, the Kronecker product features in the definition of a matrix norm
 1 \\ 0 \\ 0 \\ 0
 \end{bmatrix} \, .
 \end{align} 
-We may also denote the left product $\H^{\otimes2}$ and the right product $\ket{0}\ket{0}$ or $\ket{00}$. Letting $\ket{10}$, $\ket{01}$ and $\ket{11}$ take on analogous meanings, an immediate result of Equation \eqref{eq:twoqubits} is that
+We may also denote the left product $\H^{\otimes2}$ and the right product $\ket{00}$ or $\ket{0}\ket{0}$. One may therefore express Equation \eqref{eq:quantparallel} as a series of transformations applied to the 4-vector on the very right. Letting $\ket{10}$, $\ket{01}$ and $\ket{11}$ take on analogous meanings to $\ket{00}$, an immediate result of Equation \eqref{eq:twoqubits} is that
 \begin{align}\label{eq:twodmult}
 \H^{\otimes2} \ket{00} = \frac{1}{2}\Big(\ket{00} + \ket{01} + \ket{10} + \ket{11}\Big) \, .
 \end{align}
 The action of $\H^{\otimes2}$ transforms $\ket{00}$ into a superposition of the states $\ket{00}$, $\ket{10}$, $\ket{01}$ and $\ket{11}$, where the probability of selecting each is a uniform $(1/2)^2=1/4$. Writing so many $0$s and $1$s can be tedious, so an alternative notation becomes preferable. Exchanging $\ket{0}$ for $\ket{00}$, $\ket{1}$ for $\ket{01}$, $\ket{2}$ for $\ket{10}$, and $\ket{3}$ for $\ket{11}$, Equation \eqref{eq:twodmult} becomes the slightly more succinct
-\begin{align}
+\begin{align*}
 \H^{\otimes2} \ket{0} = \frac{1}{2}\Big(\ket{0} + \ket{1} + \ket{2} + \ket{3}\Big) \, .
-\end{align}
+\end{align*}
 This formula extends generally to operations over $n$ qubits.  Now letting $N=2^n$, we have
-\begin{align}
-\H^{\otimes n} \ket{0} = \frac{1}{\sqrt{N}}\Big(\ket{0} + \ket{1} + \dots + \ket{N-1}\Big) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \, .
+\begin{align}\label{eq:superpos}
+\H^{\otimes n} \ket{0} = \frac{1}{\sqrt{N}}\Big(\ket{0} + \ket{1} + \dots + \ket{N-1}\Big) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \, ,
 \end{align}
+and the many-qubit analogue for Equation \eqref{eq:quantparallel} is
+\begin{align}\label{eq:quantparallel2}
+\ket{0}^{\otimes n}\ket{0} \longrightarrow \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right) \ket{0}  \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{f(x)} \, .
+\end{align}
+In the next section, we review established quantum algorithms that leverage such many-qubit quantum parallelism for search and minimization.
+
+\section{Quantum search and quantum minimization}
 
 =============================
 
- with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
+with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
 
 =============================
-
-\section{Quantum parallelism, search and minimization}
-
 
 \section{Parallel MCMC subroutines}
 
