@@ -226,6 +226,9 @@ While parallel MCMC algorithms are increasingly well-suited for developing many-
 
 \emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and target evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
 
+
+\section{Bare-bones quantum computing}
+
 Quantum computers perform operations on unit-length vectors of complex data called \emph{qubits} or quantum bits.  One may write any qubit $\ppsi$ as a linear combination of the \emph{computational basis states} $\ket{0}$ and $\ket{1}$.  In symbols,
 \begin{align*}
 \ket{\psi} = \alpha \ket{0} + \beta \ket{1} \quad \mbox{for} \quad \alpha, \, \beta \in \mathbb{C} \quad \mbox{and} \quad  |\alpha|^2 + |\beta|^2 = 1\, .
@@ -301,7 +304,7 @@ and the many-qubit analogue for Equation \eqref{eq:quantparallel} is
 \begin{align}\label{eq:quantparallel2}
 \ket{0}^{\otimes n}\ket{0} \longrightarrow \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right) \ket{0}  \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{f(x)} \, .
 \end{align}
-In the next section, we review established quantum algorithms that leverage such many-qubit quantum parallelism for search and minimization.
+In the next section, we review established quantum algorithms that leverage such many-qubit quantum parallelism for search and minimization.  Following this, we embed parallel MCMC iterations as subroutines within quantum minimization.
 
 \section{Quantum search and quantum minimization}
 
