@@ -226,6 +226,12 @@ While parallel MCMC algorithms are increasingly well-suited for developing many-
 
 \emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and target evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
 
+=============================
+
+with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
+
+=============================
+
 
 \section{Bare-bones quantum computing}
 
@@ -308,11 +314,25 @@ In the next section, we review established quantum algorithms that leverage such
 
 \section{Quantum search and quantum minimization}
 
-=============================
+Given a set of $N$ items and a function $f:\{0,1,\dots,N-1\}\rightarrow \{0,1\}$ that evaluates to $1$ for a single element, \citet{grover1996fast} develops an algorithm that uses quantum parallelism to score \emph{quadratic} speedups over its classical counterparts. After only $\order{\sqrt{N}}$ evaluations of $f(\cdot)$, Grover's algorithm returns the $x\in \{0,1,\dots,N-1\}$ satisfying $f(x) =1$ with probability at least $1/2$.  Compare this to $\order{N}$ requirement for the randomized classical algorithm that must evaluate $f(\cdot)$ over at least $N/2$ items to obtain the same probability of detecting $x$.  The algorithm takes the state $\ket{0}^{\otimes N}\ket{1}$ as input and applies Hadamard gates to each of the individual $N+1$ input qubits.  The resulting state is 
+\begin{align*}
+ \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right)  \frac{1}{\sqrt{2}}\left(\ket{0} -\ket{1}\right) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{-} \, .
+\end{align*}
+Next, we apply the oracle gate $\U_f: \ket{x}\ket{y} \rightarrow \ket{x}\ket{y\oplus f(x)}$ and note that 
+\begin{align*}
+\U_f \ket{x} \ket{-} &= \U_f \ket{x} \frac{1}{\sqrt{2}}\left(\ket{0} -\ket{1}\right) 
+= \frac{1}{\sqrt{2}} \big(\ket{x} \ket{0\oplus f(x)} - \ket{x}\ket{1\oplus f(x)} \big) \\
+&= -1^{f(x)} \ket{x}\ket{-}  \, .
+\end{align*}
+Thus, $\U_f$ flips the sign for the state $\ket{x_0}$ for which $f(x_0)=1$ but leaves the other states unchanged.  If we suppress the ancillary qubit $\ket{-}$, then $\U_f$ is equivalent to the gate $\U_{x_0}$ defined as $\U_{x_0} \ket{x} = -1^{\delta_{x_0}}\ket{x}$. We may succinctly write this gate as the Householder matrix that reflects vectors about the unique hyperplane through the origin that has $\ket{x_0}$ for a normal vector:
+\begin{align*}
+\U_{x_0}= \I - 2 \ket{x_0}\bra{x_0} \, .
+\end{align*}
+Finally, the action of $\U_{x_0}$ on the superposition takes the form
+\begin{align*}
+\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} -1^{\delta_{x_0}(x)} \ket{x} \, .
+\end{align*}
 
-with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
-
-=============================
 
 \section{Parallel MCMC subroutines}
 
@@ -329,7 +349,7 @@ with gates that are mathematically equivalent to unitary operators \citep{nielse
 
 
 
-\section{Discussion}
+\section{Reading the fine print}
 
 \bibliographystyle{sysbio}
 \bibliography{refs}
