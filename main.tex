@@ -304,9 +304,9 @@ The action of $\H^{\otimes2}$ transforms $\ket{00}$ into a superposition of the 
 \end{align*}
 This formula extends generally to operations over $n$ qubits.  Now letting $N=2^n$, we have
 \begin{align}\label{eq:superpos}
-\H^{\otimes n} \ket{0} = \frac{1}{\sqrt{N}}\Big(\ket{0} + \ket{1} + \dots + \ket{N-1}\Big) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \, ,
+\H^{\otimes n} \ket{0} = \frac{1}{\sqrt{N}}\Big(\ket{0} + \ket{1} + \dots + \ket{N-1}\Big) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x}=:\ket{h} \, ,
 \end{align}
-and the many-qubit analogue for Equation \eqref{eq:quantparallel} is
+where the state $\ket{h}$ is so important in what follows that it earns its own notation. The many-qubit analogue of Equation \eqref{eq:quantparallel} becomes
 \begin{align}\label{eq:quantparallel2}
 \ket{0}^{\otimes n}\ket{0} \longrightarrow \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right) \ket{0}  \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{f(x)} \, .
 \end{align}
@@ -316,7 +316,7 @@ In the next section, we review established quantum algorithms that leverage such
 
 Given a set of $N$ items and a function $f:\{0,1,\dots,N-1\}\rightarrow \{0,1\}$ that evaluates to $1$ for a single element, \citet{grover1996fast} develops an algorithm that uses quantum parallelism to score \emph{quadratic} speedups over its classical counterparts. After only $\order{\sqrt{N}}$ evaluations of $f(\cdot)$, Grover's algorithm returns the $x\in \{0,1,\dots,N-1\}$ satisfying $f(x) =1$ with probability at least $1/2$.  Compare this to $\order{N}$ requirement for the randomized classical algorithm that must evaluate $f(\cdot)$ over at least $N/2$ items to obtain the same probability of detecting $x$.  The algorithm takes the state $\ket{0}^{\otimes N}\ket{1}$ as input and applies Hadamard gates to each of the individual $N+1$ input qubits.  The resulting state is 
 \begin{align*}
- \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right)  \frac{1}{\sqrt{2}}\left(\ket{0} -\ket{1}\right) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{-} \, .
+\ket{h}\ket{-}= \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right)  \frac{1}{\sqrt{2}}\left(\ket{0} -\ket{1}\right) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{-} \, .
 \end{align*}
 Next, we apply the oracle gate $\U_f: \ket{x}\ket{y} \rightarrow \ket{x}\ket{y\oplus f(x)}$ and note that 
 \begin{align*}
@@ -328,11 +328,16 @@ Thus, $\U_f$ flips the sign for the state $\ket{x_0}$ for which $f(x_0)=1$ but l
 \begin{align*}
 \U_{x_0}= \I - 2 \ket{x_0}\bra{x_0} \, .
 \end{align*}
-Finally, the action of $\U_{x_0}$ on the superposition takes the form
+The action of this gate on the state $\ket{h}$ takes the form
 \begin{align*}
 \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} -1^{\delta_{x_0}(x)} \ket{x} \, .
 \end{align*}
-
+Next, the algorithm reflects the current state about the hyperplane that has $\ket{h}$ as a normal vector and negates the resulting state:
+\begin{align*}
+\Big(2\ket{h}\bra{h}-\I \Big) \left( \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} -1^{\delta_{x_0}(x)} \ket{x}  \right)
+&= \frac{1}{\sqrt{N}}\sum_{x} \left( (-1)^{1-\delta_{x_0}(x)} + 2 \frac{(N-1)}{N} \right)\ket{x}\\ &= \frac{(3N-2)}{N^{3/2}} \ket{x_0} + \sum_{x\neq x_0} \frac{(N-2)}{N^{3/2}}  \ket{x} \, .
+\end{align*}
+The scientist who measures the state at this moment would obtain the desired state $\ket{x_0}$ with slightly higher probability than the other individual states.
 
 \section{Parallel MCMC subroutines}
 
