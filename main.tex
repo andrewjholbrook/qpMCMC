@@ -162,7 +162,7 @@ d_{F}
 %\makeatother
 
 
-\title{A quantum parallel Markov chain Monte Carlo}
+\title{A quantum parallel parallel Markov chain Monte Carlo}
 \date{}
 
 
@@ -208,6 +208,7 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 \renewcommand{\H}{\mathbf{H}}
 \newcommand{\A}{\mathbf{A}}
 \newcommand{\B}{\mathbf{B}}
+\newcommand{\G}{\mathbf{G}}
 
 Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select from among them.  \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number (say, $K$) of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
 \begin{align}\label{eq:fixes}
@@ -337,20 +338,18 @@ Next, the algorithm reflects the current state about the hyperplane that has $\k
 \Big(2\ket{h}\bra{h}-\I \Big) \left( \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} -1^{\delta_{x_0}(x)} \ket{x}  \right)
 &= \frac{1}{\sqrt{N}}\sum_{x} \left( (-1)^{1-\delta_{x_0}(x)} + 2 \frac{(N-2)}{N} \right)\ket{x}\\ &= \frac{(3N-4)}{N^{3/2}} \ket{x_0} + \sum_{x\neq x_0} \frac{(N-4)}{N^{3/2}}  \ket{x} \, .
 \end{align*}
-The scientist who measures the state at this moment would obtain the desired state $\ket{x_0}$ with a slightly higher probability of $(3N-4)^2/N^3$  than the individual probabilities of $(N-4)^2/N^3$ for the other states.
+The scientist who measures the state at this moment would obtain the desired state $\ket{x_0}$ with a slightly higher probability of $(3N-4)^2/N^3$  than the individual probabilities of $(N-4)^2/N^3$ for the other states. It turns out that each additional application of the \emph{Grover iteration}
+\begin{align*}
+\G := - \U_h \U_{x_0} := \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)
+\end{align*}
+increases the probability of obtaining $\ket{x_0}$ at the time of measurement in the computational basis and $R>\pi\sqrt{N}/4$ iterations guarantees a probability of success that is greater than $1-1/N$.
 
-\section{Parallel MCMC subroutines}
+\section{Parallel MCMC}
 
-\subsection{Untangling computations}
+With the rudiments of quantum minimization in hand, we present our quantum parallel parallel MCMC (qp$^2$MCMC). The general structure of the algorithm is the same as that of other parallel MCMC algorithms: the algorithm generates a Markov chain by iterating between proposing and selecting new Markov chain states.  Unlike classical single-proposal MCMC, parallel MCMC proposes many states and chooses one according to the generalized acceptance probabilities of Equation \eqref{eq:probs}. In general MCMC, evaluation of the target density function $\pi(\cdot)$ is the rate-limiting computational step, becoming particularly onerous in big data scenarios.  While parallel MCMC benefits from improved mixing as a function of MCMC iterations, the increased computational burden of $P$ target evaluations at each step can lead to less favorable comparisons when accounting for elapsed wall-clock time. 
+qp$^2$MCMC uses quantum minimization to limit the number of target evaluations within the generalized acceptance step with the help of the Gumbel-max trick, which transforms the discrete sampling task $\theta^{(s+1)} \sim$ Discrete$(\pi_0,\pi_1,\dots,\pi_P)$ into a search problem over discrete set of real numbers.  
 
-\begin{enumerate}
-	\item Challenge: proposal terms in acceptance
-	\item Challenge: normalization/marginalization
-\end{enumerate}
-
-\subsubsection{Simplicial sampler}
-
-\subsubsection{Gumbel-max}
+\subsection{Gumbel-max}
 
 
 
