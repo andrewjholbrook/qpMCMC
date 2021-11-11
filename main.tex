@@ -209,6 +209,7 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 \newcommand{\A}{\mathbf{A}}
 \newcommand{\B}{\mathbf{B}}
 \newcommand{\G}{\mathbf{G}}
+\newcommand{\ppi}{\boldsymbol{\pi}}
 
 Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select from among them.  \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number (say, $K$) of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
 \begin{align}\label{eq:fixes}
@@ -346,12 +347,25 @@ increases the probability of obtaining $\ket{x_0}$ at the time of measurement in
 
 \section{Parallel MCMC}
 
-With the rudiments of quantum minimization in hand, we present our quantum parallel parallel MCMC (qp$^2$MCMC). The general structure of the algorithm is the same as that of other parallel MCMC algorithms: the algorithm generates a Markov chain by iterating between proposing and selecting new Markov chain states.  Unlike classical single-proposal MCMC, parallel MCMC proposes many states and chooses one according to the generalized acceptance probabilities of Equation \eqref{eq:probs}. In general MCMC, evaluation of the target density function $\pi(\cdot)$ is the rate-limiting computational step, becoming particularly onerous in big data scenarios.  While parallel MCMC benefits from improved mixing as a function of MCMC iterations, the increased computational burden of $P$ target evaluations at each step can lead to less favorable comparisons when accounting for elapsed wall-clock time. 
-qp$^2$MCMC uses quantum minimization to limit the number of target evaluations within the generalized acceptance step with the help of the Gumbel-max trick, which transforms the discrete sampling task $\theta^{(s+1)} \sim$ Discrete$(\pi_0,\pi_1,\dots,\pi_P)$ into a search problem over discrete set of real numbers.  
+With the rudiments of quantum minimization in hand, we present our quantum parallel parallel MCMC (qp$^2$MCMC). The general structure of the algorithm is the same as that of other parallel MCMC algorithms: the algorithm generates a Markov chain by iterating between proposing and selecting new Markov chain states.  Unlike classical single-proposal MCMC, parallel MCMC proposes many states and chooses one according to the generalized acceptance probabilities of Equation \eqref{eq:probs}:
+\begin{align*}
+\pi_j = \frac{\pi(\ttheta_j) \prod_{k \neq j} q(\ttheta_j,\ttheta_k)}{\sum_{i=0}^K \pi(\ttheta_i) \prod_{k \neq i} q(\ttheta_i,\ttheta_k)} \, , \quad j=0,\dots,K \, .
+\end{align*}
+ In general MCMC, evaluation of the target density function $\pi(\cdot)$ is the rate-limiting computational step, becoming particularly onerous in big data scenarios.  While parallel MCMC benefits from improved mixing as a function of MCMC iterations, the increased computational burden of $P$ target evaluations at each step can lead to less favorable comparisons when accounting for elapsed wall-clock time.
+ 
+ \emph{Having successfully generated proposals $\ttheta_j,$ $j=1,\dots,P$ and evaluated the corresponding densities $q(\cdot,\cdot)$, we would like to use quantum parallelism and an oracle gate (say, $\U_\pi$) to efficiently compute the $\pi(\ttheta_j)$s but immediately encounter a Catch-22 when we seek to draw a sample $\ttheta^{(s+1)} \sim$ \emph{Discrete}$(\pi_0,\pi_1,\dots,\pi_P)$.  We can use neither a quantum nor a classical circuit to draw the sample! On the one hand, drawing the sample within a quantum circuit would somehow require that all superposed states have access to all the $\pi(\ttheta_j)$s at once to perform the required normalization.  On the other hand, drawing the sample within the classical circuit would require access to all the $\pi(\ttheta_j)$s, but measurement in the computational basis can only return one.}  
+ 
+ In light of this dilemma, we propose to use the Gumbel-max trick to transform the generalized accept-reject step into a discrete optimization procedure.  From there, we use quantum minimization to efficiently sample from $\ppi$. Crucially, we get away with quantum parallel evaluation of the target $\pi(\cdot)$ over all superposed states because the Gumbel-max trick does not rely on a normalization step: each superposed state requires no knowledge of any target evaluation other than its own.  
+ 
+ 
+%qp$^2$MCMC uses quantum minimization to limit the number of target evaluations within the generalized acceptance step with the help of the Gumbel-max trick, which transforms the discrete sampling task $\ttheta^{(s+1)} \sim$ Discrete$(\pi_0,\pi_1,\dots,\pi_P)$ into a search problem over a discrete set of real numbers. 
 
 \subsection{Gumbel-max}
 
+We need
 
+
+\subsection{qp$^2$MCMC}
 
 \section{Reading the fine print}
 
