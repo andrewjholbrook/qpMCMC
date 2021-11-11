@@ -366,7 +366,7 @@ With the rudiments of quantum minimization in hand, we present our quantum paral
 
 We wish to randomly select a single element from the set $\{0,1,\dots,P\}$ with probability proportional to the unnormalized probabilities $\ppi^*=(\pi_0^*,\pi_1^*,\dots,\pi_P^*)$.  That is, there exists a $c>0$ such that $\ppi^* = c \ppi$, for $\ppi$ a valid probability vector, but we only have access to $\ppi^*$.  Define $\llambda:= \log \ppi$ and $\llambda^*:= \log \ppi^*=\log\ppi + \log c$,  and assume that $z_0,\dots,z_P\stackrel{iid}{\sim}Gumbel(0,1)$. Then, the probability density function $g(\cdot)$ and cumulative distribution function $G(\cdot)$ for each individual $z_p$ are
 \begin{align}
-g(z_p) = \exp\big(-z_p+ \exp(-z_p)\big) \, , \quad \mbox{and} \quad G(z_p) = \exp \big( -\exp(-z_p) \big)\, .
+g(z_p) = \exp\big(-z_p- \exp(-z_p)\big) \, , \quad \mbox{and} \quad G(z_p) = \exp \big( -\exp(-z_p) \big)\, .
 \end{align}
 Now, defining the random variables $\alpha^*_p:=\lambda^*_p+z_p$, $\alpha_p:=\lambda_p+z_p$ and  
 \begin{align}
@@ -378,18 +378,20 @@ we have the result
 \end{align}
 In words, the procedure of adding Gumbel noise to unnormalized log-probabilities and taking the index of the maximum produces a random variable that follows the discrete distribution over $\ppi$.  Moving from left to right:
 \begin{align*}
-\mbox{Pr} (\hat{p} = p) &= \mbox{Pr} (\alpha^*_p > \alpha^*_{p'}, \, \forall p' \neq p ) = \mbox{Pr} (\alpha_p > \alpha_{p'}, \, \forall p' \neq p ) \\
-&= \int_{-\infty}^\infty \prod_{p'\neq p} \mbox{Pr} (\alpha_p > \alpha_{p'}| \alpha_p) \p(\alpha_p) \, \dd \alpha_p 
-= \int_{-\infty}^\infty \prod_{p'\neq p} \mbox{Pr} (z_{p'} \leq \alpha_p-\lambda_{p'}| \alpha_p) \p(\alpha_p) \, \dd \alpha_p \\
-&=  \int_{-\infty}^\infty  \prod_{p'\neq p} \exp\big( -\exp(\lambda_{p'}-\alpha_p)\big) \exp\big(-\alpha_p+\lambda_p + \exp(-\alpha_p+\lambda_p) \big) \, \dd \alpha_p \, .
+\mbox{Pr} (\hat{p} = p) &= \mbox{Pr} (\alpha^*_p > \alpha^*_{p'}, \, \forall p' \neq p ) \\
+&= \mbox{Pr} (\alpha_p +\log c > \alpha_{p'} + \log c, \, \forall p' \neq p ) 
+= \mbox{Pr} (\alpha_p  > \alpha_{p'} , \, \forall p' \neq p ) \\
+&= \int_{-\infty}^\infty \prod_{p'\neq p} \mbox{Pr} (\alpha_p > \alpha_{p'}| \alpha_p) g(\alpha_p-\lambda_p) \, \dd \alpha_p 
+= \int_{-\infty}^\infty \prod_{p'\neq p} G(\alpha_p-\lambda_{p'}) g(\alpha_p-\lambda_p) \, \dd \alpha_p \\
+&=  \int_{-\infty}^\infty  \prod_{p'\neq p} \exp\big( -\exp(\lambda_{p'}-\alpha_p)\big) \exp\big(-\alpha_p+\lambda_p - \exp(-\alpha_p+\lambda_p) \big) \, \dd \alpha_p \, .
 \end{align*}
-Recalling that $\lambda_p=\log \pi_p$, we exponentiate the logarithms, and the integral becomes
+Recalling that $\lambda_{p'}=\log \pi_{p'}$, we exponentiate the logarithms, and the integral becomes
 \begin{align*}
-& \pi_p \int_{-\infty}^\infty  \prod_{p'\neq p} \exp\big( -\pi_{p'}\exp(-\alpha_p)\big) \exp  \big(-\alpha_p + \pi_p\exp(-\alpha_p) \big) \, \dd \alpha_p \\
-&= \pi_p \int_{-\infty}^\infty \exp  (-\alpha_p ) \exp\big( -\sum_{p=0}^P\pi_{p}\exp(-\alpha_p)\big)  \, \dd \alpha_p  \\
+& \pi_p \int_{-\infty}^\infty  \prod_{p'\neq p} \exp\big( -\pi_{p'}\exp(-\alpha_p)\big) \exp  \big(-\alpha_p - \pi_p\exp(-\alpha_p) \big) \, \dd \alpha_p \\
+&= \pi_p \int_{-\infty}^\infty \exp  (-\alpha_p ) \exp\big( -\sum_{p'=0}^P\pi_{p'}\exp(-\alpha_p)\big)  \, \dd \alpha_p  \\
 &= \pi_p \int_{-\infty}^\infty \exp  (-\alpha_p ) \exp\big( -\exp(-\alpha_p)\big)  \, \dd \alpha_p  = \pi_p \, ,
 \end{align*}
-where the final equality follows easily from the change of variables $u=\exp(-\alpha_p)$.
+where the final equality follows easily from the change of variables $u=\exp(-\alpha_p)$.  
 
 \subsection{qp$^2$MCMC}
 
