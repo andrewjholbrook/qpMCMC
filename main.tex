@@ -355,6 +355,11 @@ In the next section, we review established quantum algorithms that leverage such
 	\Return{$x_0$}\ .
 \end{algorithm}
 
+\begin{figure}[!t]
+	\centering
+	\includegraphics[width=0.9\linewidth]{groverCurves.pdf}
+	\caption{curves}
+\end{figure}
 
 Given a set of $N$ items and a function $f:\{0,1,\dots,N-1\}\rightarrow \{0,1\}$ that evaluates to $1$ for a single element, \citet{grover1996fast} develops an algorithm that uses quantum parallelism to score \emph{quadratic} speedups over its classical counterparts. After only $\order{\sqrt{N}}$ evaluations of $f(\cdot)$, Grover's algorithm returns the $x\in \{0,1,\dots,N-1\}$ satisfying $f(x) =1$ with probability at least $1/2$.  Compare this to $\order{N}$ requirement for the randomized classical algorithm that must evaluate $f(\cdot)$ over at least $N/2$ items to obtain the same probability of detecting $x$.  The algorithm takes the state $\ket{0}^{\otimes N}\ket{1}$ as input and applies Hadamard gates to each of the individual $N+1$ input qubits.  The resulting state is 
 \begin{align*}

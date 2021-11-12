@@ -18,7 +18,7 @@ selectionProbs <- function(N=2^10,M=1) {
 ################################################################################
 
 N <- 2^14
-M <- c(512,256,128,64,32,16,12,8:1)
+M <- c(256,128,64,32,16,12,8:1)
 probSucceed <- selectionProbs(N=N,M=M[1])
 df <- data.frame(Iterations=1:(ceiling(pi*sqrt(N/M[1])/4)),M=M[1],SuccessProb=probSucceed)
 
