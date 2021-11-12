@@ -6,6 +6,8 @@
 \usepackage{url}
 \usepackage{amsfonts,amscd,amssymb}
 \usepackage{amsthm,amsmath,natbib}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \usepackage{algorithm2e}
 \usepackage{bm}
 \usepackage{bbm} %bb font numbers
@@ -358,7 +360,7 @@ In the next section, we review established quantum algorithms that leverage such
 \begin{figure}[!t]
 	\centering
 	\includegraphics[width=0.9\linewidth]{groverCurves.pdf}
-	\caption{curves}
+	\caption{curves}\label{fig:grov}
 \end{figure}
 
 Given a set of $N$ items and a function $f:\{0,1,\dots,N-1\}\rightarrow \{0,1\}$ that evaluates to $1$ for a single element, \citet{grover1996fast} develops an algorithm that uses quantum parallelism to score \emph{quadratic} speedups over its classical counterparts. After only $\order{\sqrt{N}}$ evaluations of $f(\cdot)$, Grover's algorithm returns the $x\in \{0,1,\dots,N-1\}$ satisfying $f(x) =1$ with probability at least $1/2$.  Compare this to $\order{N}$ requirement for the randomized classical algorithm that must evaluate $f(\cdot)$ over at least $N/2$ items to obtain the same probability of detecting $x$.  The algorithm takes the state $\ket{0}^{\otimes N}\ket{1}$ as input and applies Hadamard gates to each of the individual $N+1$ input qubits.  The resulting state is 
@@ -384,11 +386,17 @@ Next, the algorithm reflects the current state about the hyperplane that has $\k
 \Big(2\ket{h}\bra{h}-\I \Big) \left( \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} -1^{\delta_{x_0}(x)} \ket{x}  \right)
 &= \frac{1}{\sqrt{N}}\sum_{x} \left( (-1)^{1-\delta_{x_0}(x)} + 2 \frac{(N-2)}{N} \right)\ket{x}\\ &= \frac{(3N-4)}{N^{3/2}} \ket{x_0} + \sum_{x\neq x_0} \frac{(N-4)}{N^{3/2}}  \ket{x} \, .
 \end{align*}
-The scientist who measures the state at this moment would obtain the desired state $\ket{x_0}$ with a slightly higher probability of $(3N-4)^2/N^3$  than the individual probabilities of $(N-4)^2/N^3$ for the other states. It turns out that each additional application of the \emph{Grover iteration}
+The scientist who measures the state at this moment would obtain the desired state $\ket{x_0}$ with a slightly higher probability of $(3N-4)^2/N^3$  than the individual probabilities of $(N-4)^2/N^3$ for the other states. Each additional application of the \emph{Grover iteration}
 \begin{align*}
 \G := - \U_h \U_{x_0} := \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)
 \end{align*}
 increases the probability of obtaining $\ket{x_0}$ at the time of measurement in the computational basis and $R>\pi\sqrt{N}/4$ iterations guarantees a probability of success that is greater than $1-1/N$.
+
+In general, we may use Grover's search algorithm to find single solutions when the number of solutions $M$ is greater than 1. While the algorithmic details change little, the number of required Grover iterations
+\begin{align*}
+R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
+\end{align*}
+ and the probability of success after those $R$ iterations \emph{do} change.  When $M$ is much smaller than $N$, the success rate is greater than $1-M/N$, and even for large $M$ the success rate is more than $1/2$. Lower-bounds are useful for establishing mathematical guarantees, but it is also helpful to understand the quality of algorithmic performance as a function of $M$ and $R$. Figure \ref{fig:grov} shows success curves for as a function of the number of Grover iterations (or oracle calls) applied.  The search field contains $2^{14} \approx 16$k elements, and the number of solutions $M$ varies. Each curve represents an individual search task.  The algorithm requires more iterations for smaller numbers and fewer iterations for larger numbers of solutions.  Remarkably, the upper-bound on error $M/N$ appears loose: the final probability of success for $M=256$ is 0.997 compared to the bound of 0.984.
 
 \section{Parallel MCMC}
 
