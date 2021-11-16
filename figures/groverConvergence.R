@@ -53,26 +53,3 @@ system2(command = "pdfcrop",
                     "~/qpMCMC/figures/groverCurves.pdf")
 )
 
-# N <- 2^10
-# M <- c(511,256,128,64,32,16,12,8:1)
-# probSucceed <- selectionProbs(N=N,M=M[1])
-# df <- data.frame(Iterations=1:(ceiling(pi*sqrt(N/M[1])/4)),M=M[1],SuccessProb=probSucceed)
-# 
-# for(i in 2:length(M)) {
-#   probSucceed <- selectionProbs(N=N,M=M[i])
-#   dfTemp <- data.frame(Iterations=1:(ceiling(pi*sqrt(N/M[i])/4)),M=M[i],SuccessProb=probSucceed)
-#   df <- rbind(df,dfTemp)
-# }
-# 
-# library(ggplot2)
-# 
-# df$Solutions <- factor(df$M)
-# 
-# gg2 <- ggplot(df,aes(x=Iterations,y=SuccessProb,color=Solutions)) +
-#   geom_line() +
-#   ylab("Probability of success") +
-#   xlab("Oracle evaluations") +
-#   ggtitle("Grover search over 16k+ items") +
-#   theme_bw()
-# 
-# gg2

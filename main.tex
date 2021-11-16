@@ -167,7 +167,7 @@ d_{F}
 %\makeatother
 
 
-\title{A quantum parallel parallel Markov chain Monte Carlo}
+\title{Quantum parallel parallel Markov chain Monte Carlo}
 \date{}
 
 
@@ -347,9 +347,11 @@ In the next section, we review established quantum algorithms that leverage such
 
 \section{Quantum search and quantum minimization}
 
+\subsection{Quantum search}
+
 \begin{algorithm}[t!]
-	\caption{Grover's algorithm for quantum search}\label{alg:grover}
-	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ that satisfies $f(x_0)=1$ for a single $x_0$; $n+1=\log_2(N)+1$ quantum states initialized to $\ket{0}^{\otimes n} \ket{1}$; an integer $R>\pi\sqrt{N}/4$ denoting the number of Grover iterations.}
+	\caption{Quantum search algorithm \citep{grover1996fast}}\label{alg:grover}
+	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ that satisfies $f(x_0)=1$ for a single $x_0$; $n+1=\log_2(N)+1$ quantum states initialized to $\ket{0}^{\otimes n} \ket{1}$; an integer $R=\ceil{\pi\sqrt{N}/4}$ denoting the number of Grover iterations.}
 	\KwResult{An $n$-bit binary string $x_0$ satisfying $f(x_0)=1$ with error less than $1/N$.}
 	$\H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1} \longrightarrow \ket{h}\ket{-}$; \hspace{11.5em} \Comment{\hspace{0.3em}$\ket{h}=\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x}$.} 
 	$\ket{h}\ket{-} \longrightarrow \G^R \ket{h}\ket{-} \approx \ket{x_0}\ket{-}$;    \hspace{3em}         \Comment{$\G= \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)$}
@@ -397,6 +399,27 @@ In general, we may use Grover's search algorithm to find single solutions when t
 R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
 \end{align*}
  and the probability of success after those $R$ iterations \emph{do} change.  When $M$ is much smaller than $N$, the success rate is greater than $1-M/N$, and even for large $M$ the success rate is more than $1/2$. Lower-bounds are useful for establishing mathematical guarantees, but it is also helpful to understand the quality of algorithmic performance as a function of $M$ and $R$. Figure \ref{fig:grov} shows success curves for as a function of the number of Grover iterations (or oracle calls) applied.  The search field contains $2^{14} \approx 16$k elements, and the number of solutions $M$ varies. Each curve represents an individual search task.  The algorithm requires more iterations for smaller numbers and fewer iterations for larger numbers of solutions.  Remarkably, the upper-bound on error $M/N$ appears loose: the final probability of success for $M=256$ is 0.997 compared to the bound of 0.984.
+ 
+ \begin{algorithm}[t!]
+ 	\caption{Quantum exponential searching algorithm \citep{boyer1998tight}}\label{alg:expoSearch}
+ 	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ with unknown number of solutions; $n=\log_2(N)$.}
+ 	\KwResult{An $n$-bit binary string $x_0$ satisfying $f(x_0)=1$.}
+ 	$m \gets 1$\;
+ 	$\lambda \gets 6/5$\;
+ 	success $\gets$ \textcolor{blue}{FALSE}\;
+ 	\While{\emph{success}$\neq$\emph{\textcolor{blue}{TRUE}}}{
+ 	$j \gets Uniform \{0,\cdots,m-1\}$\;
+ 	$\H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1} \longrightarrow \ket{h}\ket{-}$\; 
+ 	$\ket{h}\ket{-} \longrightarrow \G^j \ket{h}\ket{-} = \ket{x}\ket{-}$;\hspace{1em}  \Comment{$j$ Grover iterations from Alg \ref{alg:grover}.}  
+ 	$\ket{x} \longrightarrow x$; \hspace{16em} \Comment{Measure and check.}  
+ 	\uIf{$f(x)=1$}{$x_0 \gets x$\;
+ 		success $\gets$  \textcolor{blue}{TRUE}\;}
+ 	\Else{$m \gets \min\left( \lambda m, \sqrt{N}\right)$;\hspace{4em}  \Comment{Increase $m$ in case of failure.}
+ }}
+ 	\Return{$x_0$}
+ \end{algorithm}
+ 
+ \subsection{Quantum minimization}
 
 \section{Parallel MCMC}
 
