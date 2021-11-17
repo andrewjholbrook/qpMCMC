@@ -353,7 +353,7 @@ In the next section, we review established quantum algorithms that leverage such
 	\caption{Quantum search algorithm \citep{grover1996fast}}\label{alg:grover}
 	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ that satisfies $f(x_0)=1$ for a single $x_0$; $n+1=\log_2(N)+1$ quantum states initialized to $\ket{0}^{\otimes n} \ket{1}$; an integer $R=\ceil{\pi\sqrt{N}/4}$ denoting the number of Grover iterations.}
 	\KwResult{An $n$-bit binary string $x_0$ satisfying $f(x_0)=1$ with error less than $1/N$.}
-	$\H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1} \longrightarrow \ket{h}\ket{-}$; \hspace{11.5em} \Comment{\hspace{0.3em}$\ket{h}=\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x}$.} 
+	$\ket{0}^{\otimes n}\ket{1} \longrightarrow \H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1}=\ket{h}\ket{-}$; \hspace{5em} \Comment{\hspace{0.3em}$\ket{h}=\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x}$.} 
 	$\ket{h}\ket{-} \longrightarrow \G^R \ket{h}\ket{-} \approx \ket{x_0}\ket{-}$;    \hspace{3em}         \Comment{$\G= \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)$}
 	$\ket{x_0} \longrightarrow x_0$\;
 	\Return{$x_0$}\ .
@@ -401,7 +401,7 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  and the probability of success after those $R$ iterations \emph{do} change.  When $M$ is much smaller than $N$, the success rate is greater than $1-M/N$, and even for large $M$ the success rate is more than $1/2$. Lower-bounds are useful for establishing mathematical guarantees, but it is also helpful to understand the quality of algorithmic performance as a function of $M$ and $R$. Figure \ref{fig:grov} shows success curves for as a function of the number of Grover iterations (or oracle calls) applied.  The search field contains $2^{14} \approx 16$k elements, and the number of solutions $M$ varies. Each curve represents an individual search task.  The algorithm requires more iterations for smaller numbers and fewer iterations for larger numbers of solutions.  Remarkably, the upper-bound on error $M/N$ appears loose: the final probability of success for $M=256$ is 0.997 compared to the bound of 0.984.
  
  While Grover's algorithm delivers impressive speedups over classical search algorithms, it has a major weakness.
- Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monatinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}), which returns a solution with total expected number of Grover iterations bounded above by $\approx\sqrt{3N/2M}$.  This algorithm plays a central role in quantum minimization.
+ Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monatinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}), which returns a solution with expected total number of Grover iterations bounded above by $\frac{9}{2}\sqrt{N/M}$.  This algorithm plays a central role in quantum minimization.
  
  \begin{algorithm}[t!]
  	\caption{Quantum exponential searching algorithm \citep{boyer1998tight}}\label{alg:expoSearch}
@@ -412,7 +412,7 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  	success $\gets$ \textcolor{blue}{FALSE}\;
  	\While{\emph{success}$\neq$\emph{\textcolor{blue}{TRUE}}}{
  	$j \gets Uniform \{0,\cdots,m-1\}$\;
- 	$\H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1} \longrightarrow \ket{h}\ket{-}$\; 
+ 	$\ket{0}^{\otimes n}\ket{1} \longrightarrow \H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1}= \ket{h}\ket{-}$\; 
  	$\ket{h}\ket{-} \longrightarrow \G^j \ket{h}\ket{-} = \ket{x}\ket{-}$;\hspace{1em}  \Comment{$j$ Grover iterations from Alg \ref{alg:grover}.}  
  	$\ket{x} \longrightarrow x$; \hspace{16em} \Comment{Measure and check.}  
  	\uIf{$f(x)=1$}{$x_0 \gets x$\;
@@ -423,6 +423,35 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  \end{algorithm}
  
  \subsection{Quantum minimization}
+
+ \begin{algorithm}[t!]
+	\caption{Quantum minimum searching algorithm \citep{durr1996quantum}}\label{alg:min}
+	\KwData{An unordered database $T[0,\dots,N-1]$ with unique integer elements; a maximum error tolerance $err\in(0,1)$; expected time to success $m_0=\frac{45}{4}\sqrt{N}+\frac{7}{10}\log_2(N)$.}
+	\KwResult{An $n$-bit binary string $x_0$ satisfying $T[x_0] = \min T$ with probability greater than $1-\epsilon$.}
+	$s \gets 0$\;
+	$x_0 \gets Uniform\{0,\dots,N-1\}$\;
+	\While{$s< m_0/\epsilon$}{
+		Prepare initial state $\frac{1}{\sqrt{N}}\sum_x\ket{x}\ket{x_0}$\;
+		Mark all items $x$ satisfying $T[x]<T[x_0]$\;
+		$s\gets s+ \log_2(N)$\;
+		Apply quantum exponential searching algorithm (Alg \ref{alg:expoSearch}); \Comment{$I$ timesteps}
+		$s\gets s+ I$\;
+		Obtain $x'$ by measuring first register\;
+		\If{$T[x']<T[x_0]$}{$x_0 \gets x'$}
+	}
+	\Return{$x_0$}
+\end{algorithm}
+
+Given a function $f(\cdot)$ that maps the discrete set $\{0,\dots,N-1\}$ to the integers, we wish to find the minimizer
+\begin{align*}
+x_0 = \argmin_{x\in\{0,\dots,N-1\}} f(x) \, .
+\end{align*}
+ \citet{durr1996quantum} propose a quantum algorithm for finding $x_0$ that iterates between updating a running minimum $F\in f(\{0,\dots,N-1\})$ and applying the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}) to find an element $x$ such that $f(x)<F$.  Having run these iterations a set number of times, the algorithm returns the minimizer $x_0$ with high probability. 
+ To this end, \citet{durr1996quantum} show that their algorithm takes an expected total time of $m_0=\frac{45}{4}\sqrt{N}+\frac{7}{10}\log_2(N)$ to find the minimizer, where marking items with values less than the threshold value (Algorithm \ref{alg:min}) requires $\log_2(N)$ time steps and each Grover iteration within the quantum exponential search algorithm requires one time step. From there, Markov's inequality says
+ \begin{align*}
+ \mbox{Pr}\left( \mbox{total time to success} \geq \frac{m_0}{\epsilon}\right) \leq \frac{\mbox{E}\left(\mbox{total time to success}\right)}{m_0/\epsilon}=\epsilon \, ,
+ \end{align*}
+ or that we must scale the minimization procedure's time steps by a factor of $1/\epsilon$ to reach a failure rate less than $\epsilon$.
 
 \section{Parallel MCMC}
 
