@@ -235,18 +235,15 @@ But the real promise and power of parallel MCMC comes from its natural paralleli
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and from a $P+1$ discrete distribution $Discrete(\ppi)$ given some probability vector $\ppi=(\pi_0,\dots,\pi_P)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
-		$\sigma_\pi \gets 0$\;
-		\For{$p' \in \{0,\dots,P\}$}{
-			\uIf{$p'=0$}{$\ttheta_{p'} \gets \ttheta^{(s-1)} $}
-			\Else{	$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;}
-			\For{$p'' \in \{0,\dots,p'-1,p'+1,\dots,P\}$}{
-				$q_{p'p''} \gets q(\ttheta_{p'},\ttheta_{p''})$\;
-			}
-			$\pi_{p'} \gets \pi(\ttheta_{p'}) \prod_{p''\neq p'} q_{p'p''}$\;
-			$\sigma_\pi \gets \sigma_\pi + \pi_{p'}$\;
+		%$\sigma_\pi \gets 0$\;
+		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
+		\For{$p' \in \{1,\dots,P\}$}{
+				$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;
 		}
-		$\ppi \gets \ppi / \sigma_\pi$\;
-		$p \gets Discrete(\ppi)$\;
+			\For{$p' \in \{0,\dots,P\}$}{
+		$\pi_{p'} \gets \pi(\ttheta_{p'}) \prod_{p''\neq p'}q(\ttheta_{p'},\ttheta_{p''})$\; 
+	}
+		$p \gets Discrete(\ppi/\ppi^T\mathbb{1})$\;
 		$\ttheta^{(s)} \gets \ttheta_p$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
@@ -474,7 +471,9 @@ x_0 = \argmin_{x\in\{0,\dots,N-1\}} f(x) \, .
 	An upper bound for the expected total number of time steps preparing the initial state and marking items $T[x]<T[x_0]$ follows in a similar manner.
 \end{proof}
 
-Lemma \ref{lem:warm} shows that, e.g., if Algorithm \ref{alg:min} begins at the item with second lowest value, then the expected total time to success is bounded above by $m_0^2=\frac{9}{4}\sqrt{N}+\frac{7}{10}\log_2(N)$, reducing the generic upper bound by $9\sqrt{N}-\frac{7}{10}\log_2\left( \frac{2}{N}\right)\log_2(N)$ time steps.  When $N$ equals 1000, say, the expected total time steps is $m_0^2< 78.2$.  Keeping $N=1000$ but letting the algorithm begin at the third lowest value ($K=3$), the expected total time steps before success is $m_0^3<165.6$.  These warm-starting upper bounds on the expected total time needed to obtain the minimum are especially useful in the context of parallel MCMC, when the current state $\ttheta^{(s)}$ inhabits the high-density region of the target distribution but the \emph{vast} majority of proposals do not. Raising $N$ to 10,000, the two numbers increase to $m_0^2< 234.4$ and $m_0^3<503.4$.
+Lemma \ref{lem:warm} shows that, e.g., if Algorithm \ref{alg:min} begins at the item with second lowest value, then the expected total time to success is bounded above by $m_0^2=\frac{9}{4}\sqrt{N}+\frac{7}{10}\log_2(N)$, reducing the generic upper bound by $9\sqrt{N}-\frac{7}{10}\log_2\left( \frac{2}{N}\right)\log_2(N)$ time steps.  When $N$ equals 1000, say, the expected total time steps is $m_0^2< 78.2$.  Keeping $N=1000$ but letting the algorithm begin at the third lowest value ($K=3$), the expected total time steps before success is $m_0^3<165.6$. Raising $N$ to 10,000, the two numbers increase to $m_0^2< 234.4$ and $m_0^3<503.4$. These warm-starting upper bounds on the expected total time needed to obtain the minimum are especially useful in the context of parallel MCMC, when the current state $\ttheta^{(s)}$ inhabits the high-density region of the target distribution but the \emph{vast} majority of proposals do not.  
+
+%Indeed, the empirically optimal rejection rate for, e.g., the simplicial sampler of \citet{holbrook2021generating} reaches a \emph{minimum} of approximately 0.35 in high-dimensions: for roughly a third of the MCMC iterations, the current state 
 
 \section{Parallel MCMC}
 
@@ -551,6 +550,27 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 \end{algorithm}
 
 \subsection{qp$^2$MCMC}
+
+\begin{algorithm}[t!]
+	\caption{Quantum parallel parallel MCMC}\label{alg:qpMCMC}
+	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and the standard Gumbel distribution $Gumbel(0,1)$.}
+	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
+	\For{$s \in\{1,\dots,S\}$}{
+		%$\sigma_\pi \gets 0$\;
+		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
+		\For{$p' \in \{1,\dots,P\}$}{
+			$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;
+		}
+		\For{$p' \in \{0,\dots,P\}$}{
+			$q_{p'} \gets  \prod_{p''\neq p'}q(\ttheta_{p'},\ttheta_{p''})$\; 
+			$z_{p'} \gets Gumbel(0,1)$\;
+		}
+		$p \gets \argmin_{p'=0,\dots,P}f(p')= -\left(\log \big(\pi(\ttheta_{p'}) q_{p'}\big) + z_{p'}\right)$; \hspace{2em} \Comment{$\order{\sqrt{P}}$ Alg \ref{alg:min}}
+		$\ttheta^{(s)} \gets \ttheta_p$\;
+	}
+	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
+\end{algorithm}
+
 
 \section{Reading the fine print}
 
