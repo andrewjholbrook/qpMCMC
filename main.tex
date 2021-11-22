@@ -419,7 +419,13 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  	\Return{$x_0$}
  \end{algorithm}
  
- \todo{Adequate thought the no solution case}
+ \begin{figure}[!t]
+ 	\centering
+ 	\includegraphics[width=0.9\linewidth]{expoSearch.pdf}
+ 	\caption{Curves depict the probability that Grover's quantum search algorithm returns a solution as a function of the number of oracle evaluations. For the ranges depicted, the number of iterations required and the number of solutions inversely relate, but increasing the number of iterations past \emph{R} (Equation \ref{eq:R}) can backfire and lead to extremely small probabilities of success.  }\label{fig:expo}
+ \end{figure}
+ 
+ \todo{caption}
  
  \subsection{Quantum minimization}
 
