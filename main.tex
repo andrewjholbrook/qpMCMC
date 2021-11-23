@@ -429,6 +429,12 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  
  \subsection{Quantum minimization}
 
+ \begin{figure}[!t]
+	\centering
+	\includegraphics[width=0.9\linewidth]{qMinAlg.pdf}
+	\caption{Total number of oracle evaluations required by quantum minimization algorithm \citep{durr1996quantum} for different starting ranks and search set sizes $N$ from 500 independent simulations each.  Less than 1\% of the 12,500 instances failed to recover the true minimum.}\label{fig:qMinAlg}
+\end{figure}
+
  \begin{algorithm}[t!]
 	\caption{Quantum minimum searching algorithm \citep{durr1996quantum}}\label{alg:min}
 	\KwData{An unordered database $T[0,\dots,N-1]$ with unique integer elements; a maximum error tolerance $err\in(0,1)$; expected time to success $m_0=\frac{45}{4}\sqrt{N}+\frac{7}{10}\log_2(N)$.}

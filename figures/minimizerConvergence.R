@@ -14,13 +14,18 @@ groverProbs <- function(N=2^10,M=1) {
   return(probSucceed)
 }
 
-expoSearch <- function(N=2^10,M=1) {
+expoSearch <- function(N=2^10,M=1,marks=NULL) {
   success <- FALSE
   m <- 1
   grovIter <- 0
   lmbd <- 6/5
-  marks <- c(rep(1,M),rep(0,N-M))
-  while(!success & grovIter<sqrt(N)) {
+  if(is.null(marks)) {
+    marks <- c(rep(1,M),rep(0,N-M))
+  } else {
+    M <- sum(marks==1)
+    N <- length(marks)
+  }
+  while(!success & grovIter<(9*sqrt(N)/4)) {
     j <- sample(size=1,x=0:(m-1))
     sqrtProbs <- rep(1/sqrt(N),N)
     i <- 1
@@ -38,6 +43,26 @@ expoSearch <- function(N=2^10,M=1) {
     }
   }
   return(list(grovIter,draw,success))
+}
+
+quantumMin <- function(field, y=NULL) {
+  N <- length(field)
+  done <- FALSE
+  if(is.null(y)) {
+    y <- sample(size=1,x=1:N)
+  }
+  oracleCalls <- 0
+  while (!done) {
+    marks <- as.numeric(field < field[y])
+    res <- expoSearch(marks = marks)
+    oracleCalls <- oracleCalls + res[[1]]
+    if (res[[3]]) {
+      y <- res[[2]]
+    } else {
+      done <- TRUE
+    }
+  }
+  return(list(y,oracleCalls))
 }
 
 proposal <- function(currentState, sigma=1, nProps=100) {
@@ -118,10 +143,44 @@ system2(command = "pdfcrop",
         args    = c("~/qpMCMC/figures/expoSearch.pdf",
                     "~/qpMCMC/figures/expoSearch.pdf")
 )
+################################################################################
+set.seed(1)
+N <- 2^c(10:14)
+df <- data.frame()
+for(n in N) {
+  for (k in 1:500) {
+    for(y in 1:5) {
+      qmin <- quantumMin(field=1:n,y=y)
+      df <- rbind(df,c(n,y,qmin[[1]],qmin[[2]]))
+    }
+    if(k %% 100==0)   cat(k,"\n")
+  }  
+}
+# mean(df[,3]!=1) = 0.00928
+saveRDS(df,file="qpMCMC/quantMinExp.rds")
 
+colnames(df) <- c("N","StartingRank","Success","GroverIts")
+df$N <- factor(df$N)
+df$N <- fct_rev(df$N)
 
+df$StartingRank <- factor(df$StartingRank)
+gg <- ggplot(df,aes(x=StartingRank,y=GroverIts,fill=N)) +
+  geom_boxplot() +
+  scale_color_manual(values = pal) +
+  scale_fill_manual(values = pal) +
+  ylab("Oracle evaluations")+
+  xlab("Starting rank") +
+  ggtitle("Quantum minimization algorithm") +
+  theme_bw()
+gg
 
+ggsave(gg,filename = "qMinAlg.pdf",device = "pdf",path = "qpMCMC/figures/",dpi = "retina",
+       width=8.14,height=4)
 
+system2(command = "pdfcrop",
+        args    = c("~/qpMCMC/figures/qMinAlg.pdf",
+                    "~/qpMCMC/figures/qMinAlg.pdf")
+)
 ################################################################################
 out <- bubbleBath(nIts=1000,nProps = 2000)
 N <- 2^16
