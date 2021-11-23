@@ -226,7 +226,7 @@ df$`Target\ndimension` <- factor(df$Dimension)
 
 gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target\ndimension`)) +
   geom_line(alpha=0.1) +
-  geom_smooth(se=FALSE) +
+  geom_smooth(method = lm, formula = y ~ splines::bs(x, 5), se = FALSE)+
   scale_color_manual(values = pal) +
   ggtitle("Target evaluations and burn-in for parallel MCMC with 2000 proposals") +
   ylab("Oracle evaluations") +
@@ -235,6 +235,7 @@ gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target\ndimension`)) +
 gg
 
 mean(df$Rank!=1) # 0.0054
+sum(df$GroverIts)/(2000*2000*5)#  0.07212715
 
 ggsave(gg,filename = "mcmcIterations.pdf",device = "pdf",path = "qpMCMC/figures/",dpi = "retina",
        width=8.14,height=4)

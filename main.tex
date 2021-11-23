@@ -563,7 +563,14 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 %	}
 \end{algorithm}
 
+
 \subsection{qp$^2$MCMC}
+
+ \begin{figure}[!t]
+	\centering
+	\includegraphics[width=0.9\linewidth]{mcmcIterations.pdf}
+	\caption{Total number of oracle evaluations required for each of 2,000 parallel MCMC iterations. In total, the combined MCMC runs required roughly $7$\% of the usual 20 million target evaluations. Over  99.4\% of the 10,000 MCMC iterations successfully sampled from the discrete distribution with probabilities of Equation \eqref{eq:probs}.}\label{fig:mcmcIterations}
+\end{figure}
 
 \begin{algorithm}[t!]
 	\caption{Quantum parallel parallel MCMC}\label{alg:qpMCMC}
