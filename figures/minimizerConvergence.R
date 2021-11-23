@@ -78,25 +78,51 @@ target <- function(state,tau=1) {
   return( -sum(state^2)/(2*tau^2) )
 }
 
-bubbleBath <- function (nIts=100,nProps=100,dims=2,sigma=1) {
+delta <- function(n) {
+  return( n^(-0.5) )
+}
+
+pMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
   
   states <- matrix(0,nIts,dims)
-  states[1,] <- 3
-  numberGreater <- rep(0,nIts)
+  states[1,] <- 100
+  numberLess <- rep(0,nIts)
+  batches    <- 1
+  
+  Acceptances = 0 # total acceptances within adaptation run (<= SampBound)
+  SampBound = 20   # current total samples before adapting radius
+  SampCount = 0   # number of samples collected (adapt when = SampBound)
   
   for(i in 2:nIts) {
     props           <- proposal(states[i-1,], nProps=nProps, sigma = sigma)
     currentAndProps <- rbind(states[i-1,],props)
     targetVals      <- apply(currentAndProps,MARGIN = 1,FUN=target)
-    prpPrbs         <- propProbsProd(currentAndProps, sigma = sigma)
-    selectionProbs  <- targetVals + prpPrbs
+    selectionProbs  <- targetVals
     lambdas         <- selectionProbs - log(rexp(n=nProps+1))
-    numberGreater[i]<- sum(lambdas > lambdas[1])
+    numberLess[i]   <- sum(lambdas < lambdas[1])
     propIndex       <- which(lambdas==max(lambdas))  #sample(1:length(selectionProbs),size=1,prob=selectionProbs)
     states[i,]      <- currentAndProps[propIndex,]
-    cat(i,"\n")
+    SampCount       <- SampCount + 1
+    
+    if(propIndex != 1) {
+      Acceptances <- Acceptances + 1
+    }    
+    if(i %% 100 == 0) cat("Iteration ", i, " complete.\n")
+    if (SampCount == SampBound) { 
+      AcceptRatio <- Acceptances / SampBound
+      if ( AcceptRatio > targetAccept ) {
+        sigma <- sigma * (1 + delta(batches))
+      } else {
+        sigma <- sigma * (1 - delta(batches))
+      }
+      batches <- batches + 1
+      cat("Acceptance ratio: ", AcceptRatio, ". sigma: ", sigma, "\n")
+      
+      SampCount <- 0
+      Acceptances <- 0
+    }
   }
-  return(list(states,numberGreater))
+  return(list(states,numberLess))
 }
 
 ################################################################################
@@ -182,43 +208,38 @@ system2(command = "pdfcrop",
                     "~/qpMCMC/figures/qMinAlg.pdf")
 )
 ################################################################################
-out <- bubbleBath(nIts=1000,nProps = 2000)
-N <- 2^16
-#M <- c(256,128,64,32,16,12,8:1)
-probSucceed <- groverProbs(N=N,M=M[1])
-# df <- data.frame(Iterations=1:(ceiling(pi*sqrt(N/M[1])/4)),M=M[1],SuccessProb=probSucceed)
-# 
-# for(i in 2:length(M)) {
-#   probSucceed <- selectionProbs(N=N,M=M[i])
-#   dfTemp <- data.frame(Iterations=1:(ceiling(pi*sqrt(N/M[i])/4)),M=M[i],SuccessProb=probSucceed)
-#   df <- rbind(df,dfTemp)
-# }
+set.seed(1)
+D <- c(150,300,600,1200,2400)
+df  <- data.frame()
+for(d in D) {
+  out <- pMCMC(nIts=2000,nProps = 2000, dims = D)
+  for(i in 2:2000){
+    qmin <- quantumMin(field=1:2000,y=2001-out[[2]][i])
+    df <- rbind(df,c(i,d,qmin[[1]],qmin[[2]]))
+  }
+  if(i %% 100==0)   cat(i,"\n")
+}
+saveRDS(df,"qpMCMC/mcmcIsLessThan.rds")
 
-initialState <- c(10,10)
+colnames(df) <- c("Iteration","Dimension","Rank","GroverIts")
+df$`Target\ndimension` <- factor(df$Dimension)
 
-
-library(ggplot2)
-library(wesanderson)
-library(forcats)
-pal <- wes_palette("Zissou1", length(M), type = "continuous")
-
-df$Solutions <- fct_rev(factor(df$M,ordered = TRUE))
-
-gg <- ggplot(df,aes(x=Iterations,y=SuccessProb,color=Solutions)) +
-  geom_line() +
+gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target\ndimension`)) +
+  geom_line(alpha=0.1) +
+  geom_smooth(se=FALSE) +
   scale_color_manual(values = pal) +
-  ylab("Probability of success") +
-  xlab("Oracle evaluations") +
-  ggtitle("Grover search over ~16k items") +
+  ggtitle("Target evaluations and burn-in for parallel MCMC with 2000 proposals") +
+  ylab("Oracle evaluations") +
+  xlab("MCMC iteration") +
   theme_bw()
-
 gg
 
-ggsave(gg,filename = "groverCurves2.pdf",device = "pdf",path = "qpMCMC/figures/",dpi = "retina",
+mean(df$Rank!=1) # 0.0054
+
+ggsave(gg,filename = "mcmcIterations.pdf",device = "pdf",path = "qpMCMC/figures/",dpi = "retina",
        width=8.14,height=4)
 
 system2(command = "pdfcrop",
-        args    = c("~/qpMCMC/figures/groverCurves2.pdf",
-                    "~/qpMCMC/figures/groverCurves2.pdf")
+        args    = c("~/qpMCMC/figures/mcmcIterations.pdf",
+                    "~/qpMCMC/figures/mcmcIterations.pdf")
 )
-
