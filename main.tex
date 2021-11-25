@@ -593,6 +593,12 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 \end{algorithm}
 
 
+ \begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.5\linewidth]{qqPlot.png}
+	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
+\end{figure}
+
 \section{Reading the fine print}
 
 \bibliographystyle{sysbio}
