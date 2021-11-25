@@ -125,6 +125,54 @@ pMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
   return(list(states,numberLess))
 }
 
+qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
+  
+  states <- matrix(0,nIts,dims)
+  states[1,] <- 100
+  numberLess <- rep(0,nIts)
+  batches    <- 1
+  oracleCalls <- 0
+  
+  Acceptances = 0 # total acceptances within adaptation run (<= SampBound)
+  SampBound = 20   # current total samples before adapting radius
+  SampCount = 0   # number of samples collected (adapt when = SampBound)
+  
+  for(i in 2:nIts) {
+    props           <- proposal(states[i-1,], nProps=nProps, sigma = sigma)
+    currentAndProps <- rbind(states[i-1,],props)
+    targetVals      <- apply(currentAndProps,MARGIN = 1,FUN=target)
+    selectionProbs  <- targetVals
+    lambdas         <- -selectionProbs + log(rexp(n=nProps+1))
+    currentAndProps <- currentAndProps[order(lambdas),]
+    rank1           <- rank(lambdas)[1]
+    qmin            <- quantumMin(field=1:(nProps+1),y=rank1)
+    propIndex       <- qmin[[1]]
+    oracleCalls     <- oracleCalls + qmin[[2]]
+    states[i,]      <- currentAndProps[propIndex,]
+    SampCount       <- SampCount + 1
+    
+    if(any(states[i,] != states[i-1,])) {
+      Acceptances <- Acceptances + 1
+    }    
+    if(i %% 100 == 0) cat("Iteration ", i, " complete.\n")
+    if (SampCount == SampBound) { 
+      AcceptRatio <- Acceptances / SampBound
+      if ( AcceptRatio > targetAccept ) {
+        sigma <- sigma * (1 + delta(batches))
+      } else {
+        sigma <- sigma * (1 - delta(batches))
+      }
+      batches <- batches + 1
+      cat("Acceptance ratio: ", AcceptRatio, ". sigma: ", sigma, "\n")
+      
+      SampCount <- 0
+      Acceptances <- 0
+    }
+  }
+  return(list(states,oracleCalls))
+}
+
+
 ################################################################################
 set.seed(1)
 N <- 2^c(10:14)
@@ -244,3 +292,41 @@ system2(command = "pdfcrop",
         args    = c("~/qpMCMC/figures/mcmcIterations.pdf",
                     "~/qpMCMC/figures/mcmcIterations.pdf")
 )
+
+#################################################################################
+set.seed(1)
+out <- qpMCMC(nIts = 100000,nProps = 2000, dims = 100)
+out[[2]]/(100000*2000) # 0.07
+#saveRDS(out,file="qpMCMC/qqplotExample.rds")
+out <- readRDS(file="qpMCMC/qqplotExample.rds")
+out[[1]] <- out[[1]][floor(seq(from=2000,to=100000,by=10)),]
+
+# qqnorm(out[[1]][2000:100000,3])
+# qqline(out[[1]][2000:100000,3],col="red")
+y <- c()
+for (d in 1:100) {
+  out[[1]][,d] <- out[[1]][order(out[[1]][,d]),d]
+  ytemp <- qnorm(p=((1:9801-0.5)/9801)) + d
+  #ytemp <- ytemp[order(ytemp)]
+  y <- c(y,ytemp)
+}
+
+pal <- wes_palette("Zissou1", 5, type = "discrete")
+
+df1 <- data.frame(Samples=as.vector(out[[1]]), DirectSamples=y,
+                  Dimension=rep(1:100,each=9801))
+df1$Dimension <- factor(df1$Dimension)
+
+gg <- ggplot(df1,aes(x=Samples,y=DirectSamples,color=Dimension),alpha=0.7) +
+  geom_abline(slope=1,intercept = 1:100,color="grey")  + 
+  geom_point() +
+  scale_color_manual(values=rep(c(pal[1],pal[3],pal[5],pal[2],pal[4]),20)) +
+  xlim(c(-5,5)) + ylim(c(-5,105)) +
+  ylab("Theoretical quantiles plus target dimension") + xlab("Sample quantiles") + 
+  ggtitle("QQ plot for 100D Gaussian target") +
+  theme_bw() +
+  theme(legend.position="none")
+gg
+
+ggsave(gg,filename = "qqPlot.png",device = "png",path = "qpMCMC/figures/",dpi = "retina",
+       width=5,height=12)
