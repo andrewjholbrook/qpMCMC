@@ -61,7 +61,7 @@ textfont=it]{caption}
 %\doublespacing
 
 \SetKwComment{Comment}{/* }{ */}
-\RestyleAlgo{ruled}
+%\RestyleAlgo{ruled}
 
 \newtheorem{thm}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -167,7 +167,7 @@ d_{F}
 %\makeatother
 
 
-\title{Quantum parallel parallel Markov chain Monte Carlo}
+\title{A quantum parallel Markov chain Monte Carlo}
 \date{}
 
 
@@ -196,8 +196,7 @@ d_{F}
 
 \begin{abstract}
 
-We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by untangling the generalized accept-reject step in a way that combines the Gumbel-max trick with the recent simplicial sampler proposal mechanism.  Next, we embed this classical routine within a well-known extension of Grover's quantum search algorithm to select our next Markov chain state.  Letting $K$ denote the number of proposals in a single MCMC iteration, the combined strategy reduces the number of target evaluations required from $\order{K}$ to $\order{K^{1/2}}$.  Notably, these speedups do not preclude classical parallelization of target evaluations and proposal generations.
-
+We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by using the Gumbel-max trick to turn the generalized accept-reject step into a discrete optimization problem.  This allows us to embed target density evaluations within a well-known extension of Grover's quantum search algorithm.  Letting $P$ denote the number of proposals in a single MCMC iteration, the combined strategy reduces the number of target evaluations required from $\order{P}$ to $\order{P^{1/2}}$.  In the following, we review both the rudiments of quantum computing and the Gumbel-max trick in order to elucidate their combination for as wide a readership as possible. 
 
 
 \end{abstract}
@@ -217,48 +216,51 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 \newcommand{\ppi}{\boldsymbol{\pi}}
 \newcommand{\llambda}{\boldsymbol{\lambda}}
 
-Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select from among them.  \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number (say, $K$) of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
+Parallel MCMC techniques use multiple proposals to obtain efficiency gains over MCMC algorithms such as Metropolis-Hastings \citep{metropolis1953equation,hastings1970monte} and its progeny that use only a single proposal.  \citet{neal2003markov} first develops efficient MCMC transitions for inferring the states of hidden Markov models by proposing a `pool' of candidate states and using dynamic programming to select among them. Next, \citet{tjelmeland2004using} considers inference in the general setting and shows how to maintain detailed balance for an arbitrary number $P$ of proposals.  Consider a probability distribution $\pi(\dd\ttheta)$ defined on $\mathbb{R}^D$ that admits a probability density $\pi(\ttheta)$ with respect to the Lebesgue measure, i.e., $\pi(\dd \ttheta)=:\pi(\ttheta)\dd\ttheta$. To generate samples from the target distribution $\pi$, we craft a kernel $P(\ttheta_0,\dd \ttheta)$ that satisfies
 \begin{align}\label{eq:fixes}
-\pi(A) = \int \pi(\dd \ttheta_0) P(\ttheta_0,A) \, 
+\pi(A) = \int \pi(\dd \ttheta_0) P(\ttheta_0,A) \, \quad a.s.
 \end{align} 
-for all  $A \subset \mathbb{R}^D$ for which $\pi(A) > 0$.  Letting $\ttheta_0$ denote the current state of the Markov chain, \citet{tjelmeland2004using} proposes sampling from such a kernel $P(\ttheta_0,\cdot)$ by drawing $K$ proposals $\ttheta_1,\dots,\ttheta_K$ from a distribution $Q(\ttheta_0,\dd \ttheta) =: q(\ttheta_0,\ttheta)\dd \ttheta$ and selecting the next Markov chain state from among the current and proposed states with probabilities
+for  $A \subset \mathbb{R}^D$ for which $\pi(A) > 0$.  Letting $\ttheta_0$ denote the current state of the Markov chain, \citet{tjelmeland2004using} proposes sampling from such a kernel $P(\ttheta_0,\cdot)$ by drawing $P$ proposals $\ttheta_1,\dots,\ttheta_P$ from a distribution $Q(\ttheta_0,\dd \ttheta) =: q(\ttheta_0,\ttheta)\dd \ttheta$ and selecting the next Markov chain state from among the current and proposed states with probabilities
 \begin{align}\label{eq:probs}
-\pi_j = \frac{\pi(\ttheta_j) \prod_{k \neq j} q(\ttheta_j,\ttheta_k)}{\sum_{i=0}^K \pi(\ttheta_i) \prod_{k \neq i} q(\ttheta_i,\ttheta_k)} \, , \quad j=0,\dots,K \, .
+\pi_p = \frac{\pi(\ttheta_p) \prod_{p' \neq p} q(\ttheta_p,\ttheta_{p'})}{\sum_{p''=0}^P \pi(\ttheta_{p''}) \prod_{p' \neq p''} q(\ttheta_{p''},\ttheta_{p'})} \, , \quad p=0,\dots,P \, .
 \end{align}
 \citet{tjelmeland2004using} shows that the kernel $P(\ttheta_0,\cdot)$ constructed in such a manner maintains detailed balance and hence satisfies Equation \eqref{eq:fixes}.  Others have since built on this work, developing parallel MCMC methods that generate or recycle multiple proposals \citep{frenkel2004speed,delmas2009does,calderhead2014general,yang2018parallelizable,luo2019multiple,schwedes2021rao,holbrook2021generating}.  
-These developments demonstrate the ability of parallel MCMC methods to alleviate inferential challenges such as multimodality and to deliver performance gains over single-proposal competitors as measured by reduced autocorrelation between samples.
-
-But the real promise and power of parallel MCMC comes from its natural parallelizability \citep{calderhead2014general}.  Contemporary hardware design emphasizes architectures that enable execution of multiple mathematical operations simultaneously. Parallel MCMC techniques stand to leverage technological developments that keep modern computation on track with Moore's Law, which predicts that processing power doubles every two years.  For example, the algorithm of \citet{tjelmeland2004using} generates $K$ conditionally independent proposals and then evaluates the probabilities of Equation \eqref{eq:probs}.  One may parallelize the proposal generation step using parallel pseudorandom number generators (PRNG) such as those advanced in \citet{salmon2011parallel}. The computational complexity of the target evaluations $\pi(\ttheta_j)$ is linear in the number of proposals. This presents a significant burden when $\pi(\cdot)$ is computationally expensive, e.g., in big data settings, but evaluation of the target density over the $K$ proposals is again a naturally parallelizable task.  Moreover, widely available machine learning software such as \textsc{TensorFlow} allows users to easily parallelize both random number generation and target evaluations on general purpose graphics processing units (GPU) \citep{lao2020tfp}. Finally, the pairwise evaluations of the proposal density $q(\cdot,\cdot)$ in Equation \eqref{eq:probs} are $\order{K^2}$, but \citet{massive} demonstrate the natural parallelizability of such pairwise operations, obtaining multiple orders-of-magnitude speedups with contemporary GPUs.
+These developments demonstrate the ability of parallel MCMC methods to alleviate inferential challenges such as multimodality and to deliver performance gains over single-proposal competitors as measured by reduced autocorrelation between samples.  In the following, we focus on the specification presented in Algorithm \ref{alg:pMCMC} but note that the techniques we present may also be effective for generalizations of this basic algorithm.
 
 \begin{algorithm}[t!]
-	\caption{Parallel MCMC}\label{alg:pMCMC}
+	\caption{Parallel MCMC \citep{tjelmeland2004using}}\label{alg:pMCMC}
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and from a $P+1$ discrete distribution $Discrete(\ppi)$ given some probability vector $\ppi=(\pi_0,\dots,\pi_P)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
 		%$\sigma_\pi \gets 0$\;
 		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
 		\For{$p' \in \{1,\dots,P\}$}{
-				$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;
+			$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;
 		}
-			\For{$p' \in \{0,\dots,P\}$}{
-		$\pi_{p'} \gets \pi(\ttheta_{p'}) \prod_{p''\neq p'}q(\ttheta_{p'},\ttheta_{p''})$\; 
-	}
+		\For{$p' \in \{0,\dots,P\}$}{
+			$\pi_{p'} \gets \pi(\ttheta_{p'}) \prod_{p''\neq p'}q(\ttheta_{p'},\ttheta_{p''})$\; 
+		}
 		$p \gets Discrete(\ppi/\ppi^T\mathbb{1})$\;
 		$\ttheta^{(s)} \gets \ttheta_p$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
+	\vspace{0.5em}
+	
 \end{algorithm}
 
+But the real promise and power of parallel MCMC comes from its natural parallelizability \citep{calderhead2014general}.  Contemporary hardware design emphasizes architectures that enable execution of multiple mathematical operations simultaneously. Parallel MCMC techniques stand to leverage technological developments that keep modern computation on track with Moore's Law, which predicts that processing power doubles every two years.  For example, the algorithm of \citet{tjelmeland2004using} generates $P$ conditionally independent proposals and then evaluates the probabilities of Equation \eqref{eq:probs}.  One may parallelize the proposal generation step using parallel pseudorandom number generators (PRNG) such as those advanced in \citet{salmon2011parallel}. The computational complexity of the target evaluations $\pi(\ttheta_p)$ is linear in the number of proposals. This presents a significant burden when $\pi(\cdot)$ is computationally expensive, e.g., in big data settings or for Bayesian inversion, but evaluation of the target density over the $P$ proposals is again a naturally parallelizable task.  Moreover, widely available machine learning software such as \textsc{TensorFlow} allows users to easily parallelize both random number generation and target evaluations on general purpose graphics processing units (GPU) \citep{lao2020tfp}. Finally, the pairwise evaluations of the proposal density $q(\cdot,\cdot)$ in Equation \eqref{eq:probs} are $\order{P^2}$, but \citet{massive} demonstrate the natural parallelizability of such pairwise operations, obtaining orders-of-magnitude speedups with contemporary GPUs.
 
-While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described above.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{holbrook2021viral,massive,holbrook2021scalable} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
 
-\emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and target evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
 
-=============================
 
+While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described in the previous paragraph.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{holbrook2021viral,massive,holbrook2021scalable} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
+
+\emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and density evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
+
+Quantum computers 
 with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
 
-=============================
+
 
 
 
@@ -354,6 +356,8 @@ In the next section, we review established quantum algorithms that leverage such
 	$\ket{h}\ket{-} \longrightarrow \G^R \ket{h}\ket{-} \approx \ket{x_0}\ket{-}$;    \hspace{3em}         \Comment{$\G= \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)$}
 	$\ket{x_0} \longrightarrow x_0$\;
 	\Return{$x_0$}\ .
+		\vspace{0.5em}
+		
 \end{algorithm}
 
 \begin{figure}[!t]
@@ -416,7 +420,9 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  		success $\gets$  \textcolor{blue}{TRUE}\;}
  	\Else{$m \gets \min\left( \lambda m, \sqrt{N}\right)$;\hspace{4em}  \Comment{Increase $m$ in case of failure.}
  }}
- 	\Return{$x_0$}
+ 	\Return{$x_0$}\ .
+ 	
+ 		\vspace{0.5em}
  \end{algorithm}
  
  \begin{figure}[!t]
@@ -450,7 +456,9 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
 		Obtain $x'$ by measuring first register\;
 		\If{$T[x']<T[x_0]$}{$x_0 \gets x'$}
 	}
-	\Return{$x_0$}
+	\Return{$x_0$} \ .
+		\vspace{0.5em}
+		
 \end{algorithm}
 
 Given a function $f(\cdot)$ that maps the discrete set $\{0,\dots,N-1\}$ to the integers, we wish to find the minimizer
@@ -548,19 +556,7 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 	$p \gets \argmax_{p'=0,\dots,P}\alpha^*_{p'}$\;
 	\Return{p}\ .
 	
-%	$y \gets 1$\;
-%	$X \gets x$\;
-%	$N \gets n$\;
-%	\While{$N \neq 0$}{
-%		\eIf{$N$ is even}{
-%			$X \gets X \times X$\;
-%			$N \gets \frac{N}{2}$ %\Comment*[r]{This is a comment}
-%		}{\If{$N$ is odd}{
-%				$y \gets y \times X$\;
-%				$N \gets N - 1$\;
-%			}
-%		}
-%	}
+	\vspace{0.5em}
 \end{algorithm}
 
 
@@ -590,6 +586,8 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 		$\ttheta^{(s)} \gets \ttheta_p$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
+	
+		\vspace{0.5em}
 \end{algorithm}
 
 
