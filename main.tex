@@ -255,17 +255,17 @@ But the real promise and power of parallel MCMC comes from its natural paralleli
 
 While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described in the previous paragraph.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{holbrook2021viral,massive,holbrook2021scalable} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
 
-\emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining parallel computing resources for computational bottlenecks such as proposal generations and density evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
+\emph{In the presence of these trade-offs, we seek to enjoy the benefits of parallel MCMC while (\textcolor{red}{a}) limiting the total amount of computing necessary and (\textcolor{red}{b})  retaining conventional parallel computing resources for secondary computational bottlenecks such as proposal generations and proposal density evaluations. Here, we assert that established quantum algorithms can help achieve these twin goals.}
 
-Quantum computers 
-with gates that are mathematically equivalent to unitary operators \citep{nielsen2002quantum}.  Assuming that engineers overcome the tremendous difficulties involved in building a practical quantum computer (where practicality entails simultaneous use of many quantum gates with little additional noise), 21st century statisticians might have access to quadratic or even exponential speedups for extremely specific statistical tasks.  We are particularly interested in the following four quantum algorithms: quantum search \citep{grover1996fast}, or finding a single 1 amid a collection of 0s, only requires $\order{\sqrt{N}}$ queries, delivering a quadratic speedup over classical search; quantum counting \citep{boyer1998tight}, or finding the number of 1s amid a collection of 0s, only requires $\order{\sqrt{N/M}}$ (where $M$ is the number of 1s) and could be useful for generating p-values within Monte Carlo simulation from a null distribution; to obtain the gradient of a function (e.g., the log-likelihood for Fisher scoring or HMC) with a quantum computer, one only needs to evaluate the function once \citep{jordan2005fast} as opposed to $\order(P)$ times for numerical differentiation, and there is nothing stopping the statistician from using, say, a GPU for this single function call; finally, the HHL algorithm \citep{harrow2009quantum} obtains the scalar value 
+Quantum computers use quantum mechanics to store information and manipulate data. By leveraging the idiosyncracies of quantum physics, these computers are able to deliver speedups over conventional computing for a relatively small number of computational problems. Some of these speedups are very large. Quantum computers can achieve logarithmic complexity for some classically linear time algorithms, turning $\order{N}$ into $\order{\log N}$.  Shor's quantum algorithm for integer factorization \citep{shor} and the HHL algorithm for linear system solving \citet{harrow2009quantum} deliver just such an \emph{exponential} speedup \citep{shor}. Other algorithms deliver a still impressive \emph{polynomial} speedup.  For example, the algorithms considered in the following (Section \ref{sec:qmin}) achieve quadratic speedups over conventional computing, turning  $\order{N}$ runtimes into $\mathcal{O}(\sqrt{ N})$.  
+ Both the magnitude of quantum computing's successes and the relative rarity of those successes mean that there is a general interest in leveraging quantum algorithms for previously unconsidered computational problems.  We will show that---with the help of the Gumbel-max trick (Section \ref{sec:gm})---established quantum optimization techniques are actually useful for sampling from computationally expensive discrete distributions and apply this insight to achieving quadratic speedups for parallel MCMC. 
 
-
-
-
+In the following section, we provide a \emph{very} short introduction to a few of the basic elements of quantum computing. The interested reader may look to \citet{nielsen2002quantum} for a canonical introduction to quantum algorithms and their implementation.
 
 
-\section{Bare-bones quantum computing}
+
+
+\section{Bare-bones quantum computing}\label{sec:shortIntro}
 
 Quantum computers perform operations on unit-length vectors of complex data called \emph{qubits} or quantum bits.  One may write any qubit $\ppsi$ as a linear combination of the \emph{computational basis states} $\ket{0}$ and $\ket{1}$.  In symbols,
 \begin{align*}
@@ -344,7 +344,7 @@ where the state $\ket{h}$ is so important in what follows that it earns its own 
 \end{align}
 In the next section, we review established quantum algorithms that leverage such many-qubit quantum parallelism for search and minimization.  Following this, we embed parallel MCMC iterations as subroutines within quantum minimization.
 
-\section{Quantum search and quantum minimization}
+\section{Quantum search and quantum minimization}\label{sec:qmin}
 
 \subsection{Quantum search}
 
@@ -497,7 +497,7 @@ Lemma \ref{lem:warm} shows that, e.g., if Algorithm \ref{alg:min} begins at the 
 
 %Indeed, the empirically optimal rejection rate for, e.g., the simplicial sampler of \citet{holbrook2021generating} reaches a \emph{minimum} of approximately 0.35 in high-dimensions: for roughly a third of the MCMC iterations, the current state 
 
-\section{Parallel MCMC}
+\section{Quantum parallel MCMC}
 
 With the rudiments of quantum minimization in hand, we present our quantum parallel parallel MCMC (qp$^2$MCMC). The general structure of the algorithm is the same as that of other parallel MCMC algorithms: the algorithm generates a Markov chain by iterating between proposing and selecting new Markov chain states.  Unlike classical single-proposal MCMC, parallel MCMC proposes many states and chooses one according to the generalized acceptance probabilities of Equation \eqref{eq:probs}:
 \begin{align*}
@@ -512,7 +512,7 @@ With the rudiments of quantum minimization in hand, we present our quantum paral
  
 %qp$^2$MCMC uses quantum minimization to limit the number of target evaluations within the generalized acceptance step with the help of the Gumbel-max trick, which transforms the discrete sampling task $\ttheta^{(s+1)} \sim$ Discrete$(\pi_0,\pi_1,\dots,\pi_P)$ into a search problem over a discrete set of real numbers. 
 
-\subsection{Gumbel-max}
+\subsection{Gumbel-max}\label{sec:gm}
 \newcommand{\p}{\mbox{p}}
 
 We wish to randomly select a single element from the set $\{0,1,\dots,P\}$ with probability proportional to the unnormalized probabilities $\ppi^*=(\pi_0^*,\pi_1^*,\dots,\pi_P^*)$.  That is, there exists a $c>0$ such that $\ppi^* = c \ppi$, for $\ppi$ a valid probability vector, but we only have access to $\ppi^*$.  Define $\llambda:= \log \ppi$ and $\llambda^*:= \log \ppi^*=\log\ppi + \log c$,  and assume that $z_0,\dots,z_P\stackrel{iid}{\sim}Gumbel(0,1)$. Then, the probability density function $g(\cdot)$ and cumulative distribution function $G(\cdot)$ for each individual $z_p$ are
@@ -560,7 +560,7 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 \end{algorithm}
 
 
-\subsection{qp$^2$MCMC}
+\subsection{QPMCMC}
 
  \begin{figure}[!t]
 	\centering
