@@ -369,7 +369,7 @@ In the next section, we review established quantum algorithms that leverage such
 	\caption{Curves depict the probability that Grover's quantum search algorithm returns a solution as a function of the number of oracle evaluations. For the ranges depicted, the number of iterations required and the number of solutions inversely relate, but increasing the number of iterations past \emph{R} (Equation \ref{eq:R}) can backfire and lead to extremely small probabilities of success.  }\label{fig:grov}
 \end{figure}
 
-Given a set of $N$ items and a function $f:\{0,1,\dots,N-1\}\rightarrow \{0,1\}$ that evaluates to $1$ for a single element, \citet{grover1996fast} develops an algorithm that uses quantum parallelism to score \emph{quadratic} speedups over its classical counterparts. After only $\order{\sqrt{N}}$ evaluations of $f(\cdot)$, Grover's algorithm returns the $x\in \{0,1,\dots,N-1\}$ satisfying $f(x) =1$ with probability at least $1/2$.  Compare this to $\order{N}$ requirement for the randomized classical algorithm that must evaluate $f(\cdot)$ over at least $N/2$ items to obtain the same probability of detecting $x$.  The algorithm takes the state $\ket{0}^{\otimes N}\ket{1}$ as input and applies Hadamard gates to each of the individual $N+1$ input qubits.  The resulting state is 
+Given a set of $N$ items and a function $f:\{0,1,\dots,N-1\}\rightarrow \{0,1\}$ that evaluates to $1$ for a single element, \citet{grover1996fast} develops an algorithm that uses quantum parallelism to score quadratic speedups over its classical counterparts. After only $\mathcal{O}(\sqrt{N})$ evaluations of $f(\cdot)$, Grover's algorithm returns the $x\in \{0,1,\dots,N-1\}$ satisfying $f(x) =1$ with high probability.  Compare this to $\order{N}$ requirement for the randomized classical algorithm that must evaluate $f(\cdot)$ over at least $N/2$ items to obtain the same probability of detecting $x$.  The algorithm takes the state $\ket{0}^{\otimes N}\ket{1}$ as input and applies Hadamard gates to each of the individual $N+1$ input qubits.  The resulting state is 
 \begin{align*}
 \ket{h}\ket{-}= \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right)  \frac{1}{\sqrt{2}}\left(\ket{0} -\ket{1}\right) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{-} \, .
 \end{align*}
@@ -396,37 +396,41 @@ The scientist who measures the state at this moment would obtain the desired sta
 \begin{align*}
 \G := - \U_h \U_{x_0} := \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)
 \end{align*}
-increases the probability of obtaining $\ket{x_0}$ at the time of measurement in the computational basis and $R>\pi\sqrt{N}/4$ iterations guarantees a probability of success that is greater than $1-1/N$.
+increases the probability of obtaining $\ket{x_0}$ at the time of measurement in the computational basis and $R=\ceil{\pi\sqrt{N}/4}$ iterations guarantees a probability of success that is greater than $1-1/N$.
 
-In general, we may use Grover's search algorithm to find single solutions when the number of solutions $M$ is greater than 1. While the algorithmic details change little, the number of required Grover iterations
+  \begin{algorithm}[th!]
+	\caption{Quantum exponential searching algorithm \citep{boyer1998tight}}\label{alg:expoSearch}
+	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ with unknown number of solutions; $n=\log_2(N)$.}
+	\KwResult{If a solution exists, an $n$-bit binary string $x_0$ satisfying $f(x_0)=1$; if no solution exists, the algorithm runs forever.}
+	$m \gets 1$\;
+	$\gamma \gets 6/5$\;
+	success $\gets$ \textcolor{blue}{FALSE}\;
+	\While{\emph{success}$\neq$\emph{\textcolor{blue}{TRUE}}}{
+		$j \gets Uniform \{0,\cdots,m-1\}$\;
+		$\ket{0}^{\otimes n}\ket{1} \longrightarrow \H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1}= \ket{h}\ket{-}$\; 
+		$\ket{h}\ket{-} \longrightarrow \G^j \ket{h}\ket{-} = \ket{x}\ket{-}$;\hspace{1em}  \Comment{$j$ Grover iterations from Alg \ref{alg:grover}.}  
+		$\ket{x} \longrightarrow x$; \hspace{16em} \Comment{Measure and check.}  
+		\uIf{$f(x)=1$}{$x_0 \gets x$\;
+			success $\gets$  \textcolor{blue}{TRUE}\;}
+		\Else{$m \gets \min\left( \gamma m, \sqrt{N}\right)$;\hspace{4em}  \Comment{Increase $m$ in case of failure.}
+	}}
+	\Return{$x_0$}\ .
+	
+	\vspace{0.5em}
+\end{algorithm}
+
+In general, we may use Grover's search algorithm to find a solution when the number of solutions $M$ is greater than 1. While the algorithmic details change little, the number of required Grover iterations
 \begin{align}\label{eq:R}
 R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
 \end{align}
- and the probability of success after those $R$ iterations \emph{do} change.  When $M$ is much smaller than $N$, the success rate is greater than $1-M/N$, and even for large $M$ the success rate is more than $1/2$. Lower-bounds are useful for establishing mathematical guarantees, but it is also helpful to understand the quality of algorithmic performance as a function of $M$ and $R$. Figure \ref{fig:grov} shows success curves for as a function of the number of Grover iterations (or oracle calls) applied.  The search field contains $2^{14} \approx 16$k elements, and the number of solutions $M$ varies. Each curve represents an individual search task.  The algorithm requires more iterations for smaller numbers and fewer iterations for larger numbers of solutions.  Remarkably, the upper-bound on error $M/N$ appears loose: the final probability of success for $M=256$ is 0.997 compared to the bound of 0.984.
+ and the probability of success after those $R$ iterations \emph{do} change \citep{boyer1998tight}.  When $M$ is much smaller than $N$, the success rate is greater than $1-M/N$, and even for large $M$ the success rate is more than $1/2$. Lower-bounds are useful for establishing mathematical guarantees, but it is also helpful to understand the quality of algorithmic performance as a function of $M$ and $R$. Figure \ref{fig:grov} shows success curves as a function of the number of Grover iterations (or oracle calls) applied.  The search field contains $2^{14} \approx 16$k elements, and the number of solutions $M$ varies. Each curve represents an individual search task.  The algorithm requires more iterations for smaller numbers and fewer iterations for larger numbers of solutions.  The upper bound on error $M/N$ is only an upper bound: the final probability of success for, e.g., $M=256$ is 0.997 compared to the bound of 0.984.
+ 
+
  
  While Grover's algorithm delivers impressive speedups over classical search algorithms, it has a major weakness.
- Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monatinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}), which returns a solution with expected total number of Grover iterations bounded above by $\frac{9}{2}\sqrt{N/M}$.  This algorithm plays a central role in quantum minimization.
+ Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monotinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}).  When a solution exists, the algorithm returns a solution with expected total number of Grover iterations bounded above by $\frac{9}{2}\sqrt{N/M}$.  Still better, this upper bound reduces to $\frac{9}{4}\sqrt{N/M}$ for the special case $M\ll N$, and simulations presented in Figure \ref{fig:expo} show that even this bound is large.  Such results come in handy when deciding whether to halt the algorithm's progress if one believes it possible that no solutions exist.  Indeed, this turns out to be useful in the context of quantum minimization.
  
- \begin{algorithm}[t!]
- 	\caption{Quantum exponential searching algorithm \citep{boyer1998tight}}\label{alg:expoSearch}
- 	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ with unknown number of solutions; $n=\log_2(N)$.}
- 	\KwResult{An $n$-bit binary string $x_0$ satisfying $f(x_0)=1$.}
- 	$m \gets 1$\;
- 	$\lambda \gets 6/5$\;
- 	success $\gets$ \textcolor{blue}{FALSE}\;
- 	\While{\emph{success}$\neq$\emph{\textcolor{blue}{TRUE}}}{
- 	$j \gets Uniform \{0,\cdots,m-1\}$\;
- 	$\ket{0}^{\otimes n}\ket{1} \longrightarrow \H^{\otimes n+1}\ket{0}^{\otimes n}\ket{1}= \ket{h}\ket{-}$\; 
- 	$\ket{h}\ket{-} \longrightarrow \G^j \ket{h}\ket{-} = \ket{x}\ket{-}$;\hspace{1em}  \Comment{$j$ Grover iterations from Alg \ref{alg:grover}.}  
- 	$\ket{x} \longrightarrow x$; \hspace{16em} \Comment{Measure and check.}  
- 	\uIf{$f(x)=1$}{$x_0 \gets x$\;
- 		success $\gets$  \textcolor{blue}{TRUE}\;}
- 	\Else{$m \gets \min\left( \lambda m, \sqrt{N}\right)$;\hspace{4em}  \Comment{Increase $m$ in case of failure.}
- }}
- 	\Return{$x_0$}\ .
- 	
- 		\vspace{0.5em}
- \end{algorithm}
+
  
  \begin{figure}[!t]
  	\centering
@@ -434,7 +438,7 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  	\caption{Total number of oracle evaluations required by quantum exponential searching algorithm \citep{boyer1998tight} for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.  Horizontal lines at $\frac{9}{4}\sqrt{N}$ represent upper bounds on expected total number of evaluations to obtain a solution for the $M=1$ problem.}\label{fig:expo}
  \end{figure}
  
- \todo{caption}
+
  
  \subsection{Quantum minimization}
 
