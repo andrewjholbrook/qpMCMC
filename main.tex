@@ -347,7 +347,7 @@ In the next section, we review established quantum algorithms that leverage such
 
 \section{Quantum search and quantum minimization}\label{sec:qmin}
 
-
+\citet{grover1996fast} demonstrates how use a quantum computer to find a single marked element within a finite set of $N$ items with only $\mathcal{O}(\sqrt{N})$ queries, and a result from \citet{bennett1997strengths} shows that Grover's algorithm is optimal up to a multiplicative constant. \citet{boyer1998tight} extend Grover's algorithm to multiple marked items or solutions, further extend it to the case when the number of solutions is unknown and provide a rigorous bounds on the algorithms' error rates.  Finally, \citet{durr1996quantum} use the results of \citet{boyer1998tight} to obtain the minimum value within a discrete ordered set.  Here, we briefly review these advances and provide illustrative simulations.  In Section \ref{sec:gm}, the Gumbel-max trick allows us to extend these results to the problem of sampling from a discrete distribution.
 
 \subsection{Quantum search}
 
