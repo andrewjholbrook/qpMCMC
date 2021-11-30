@@ -268,6 +268,7 @@ for(d in D) {
   if(i %% 100==0)   cat(i,"\n")
 }
 saveRDS(df,"qpMCMC/mcmcIsLessThan.rds")
+df <- readRDS("qpMCMC/mcmcIsLessThan.rds")
 
 colnames(df) <- c("Iteration","Dimension","Rank","GroverIts")
 df$`Target\ndimension` <- factor(df$Dimension)
@@ -276,7 +277,7 @@ gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target\ndimension`)) +
   geom_line(alpha=0.1) +
   geom_smooth(method = lm, formula = y ~ splines::bs(x, 5), se = FALSE)+
   scale_color_manual(values = pal) +
-  ggtitle("Target evaluations and burn-in for parallel MCMC with 2000 proposals") +
+  ggtitle("Evaluations and burn-in for quantum parallel MCMC") +
   ylab("Oracle evaluations") +
   xlab("MCMC iteration") +
   theme_bw()

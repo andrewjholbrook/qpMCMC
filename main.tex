@@ -522,23 +522,37 @@ With the rudiments of quantum minimization in hand, we present a quantum paralle
  
  \emph{Having successfully generated proposals $\ttheta_p,$ $p=1,\dots,P$ and evaluated the corresponding proposal densities $q(\cdot,\cdot)$, we would like to use quantum parallelism and an appropriate oracle gate to efficiently compute the $\pi(\ttheta_p)$s but immediately encounter a Catch-22 when we seek to draw a sample $\ttheta^{(s+1)} \sim$ \emph{Discrete}$(\ppi)$ for $\ppi$ the vector of probabilities $\pi_0,\pi_1,\dots,\pi_P$ defined in Equation \eqref{eq:probs}.  We can use neither a quantum nor a classical circuit to draw the sample! On the one hand, drawing the sample within a quantum circuit would somehow require that all superposed states have access to all the $\pi(\ttheta_p)$s at once to perform the required normalization.  On the other hand, drawing the sample within the classical circuit would require access to all the $\pi(\ttheta_p)$s, but measurement in the computational basis can only return one.}  
  
- In light of this dilemma, we propose to use the Gumbel-max trick to transform the generalized accept-reject step into a discrete optimization procedure.  From there, we use quantum minimization to efficiently sample from $Discrete(\ppi)$. Crucially, we get away with quantum parallel evaluation of the target $\pi(\cdot)$ over all superposed states because the Gumbel-max trick does not rely on a normalization step: each superposed state requires no knowledge of any target evaluation other than its own.  
+ In light of this dilemma, we propose to use the Gumbel-max trick \citep{papandreou2011perturb} to transform the generalized accept-reject step into a discrete optimization procedure.  From there, we use quantum minimization to efficiently sample from $Discrete(\ppi)$. Crucially, we get away with quantum parallel evaluation of the target $\pi(\cdot)$ over all superposed states because the Gumbel-max trick does not rely on a normalization step: each superposed state requires no knowledge of any target evaluation other than its own.  
 
 \subsection{Gumbel-max}\label{sec:gm}
 \newcommand{\p}{\mbox{p}}
 
+\begin{algorithm}[!t]
+	\caption{The Gumbel-max trick}\label{alg:gm}
+	\KwData{A vector of unnormalized log-probabilities $\llambda^*=\log \ppi +\log c$, for $\ppi$ a discrete probability vector with $P+1$ elements.}
+	\KwResult{A single sample $p \sim$ \emph{Discrete}$(\ppi)$ satisfying $p\in\{0,1,\dots,P\}$.}
+	\For{$p' \in\{0,1,\dots,P\}$}{
+		$z_{p'} \gets Gumbel(0,1)$\;
+		$\alpha^*_{p'} \gets \lambda_{p'}^* + z_{p'}$\;
+	}
+	$p \gets \argmax_{p'=0,\dots,P}\alpha^*_{p'}$\;
+	\Return{p}\ .
+	
+	\vspace{0.5em}
+\end{algorithm}
+
 We wish to randomly select a single element from the set $\{0,1,\dots,P\}$ with probability proportional to the unnormalized probabilities $\ppi^*=(\pi_0^*,\pi_1^*,\dots,\pi_P^*)$.  That is, there exists a $c>0$ such that $\ppi^* = c \ppi$, for $\ppi$ a valid probability vector, but we only have access to $\ppi^*$.  Define $\llambda:= \log \ppi$ and $\llambda^*:= \log \ppi^*=\log\ppi + \log c$,  and assume that $z_0,\dots,z_P\stackrel{iid}{\sim}Gumbel(0,1)$. Then, the probability density function $g(\cdot)$ and cumulative distribution function $G(\cdot)$ for each individual $z_p$ are
-\begin{align}
-g(z_p) = \exp\big(-z_p- \exp(-z_p)\big) \, , \quad \mbox{and} \quad G(z_p) = \exp \big( -\exp(-z_p) \big)\, .
-\end{align}
+\begin{align*}
+g(z_p) = \exp\big(-z_p- \exp(-z_p)\big)  \quad \mbox{and} \quad G(z_p) = \exp \big( -\exp(-z_p) \big)\, .
+\end{align*}
 Now, defining the random variables $\alpha^*_p:=\lambda^*_p+z_p$, $\alpha_p:=\lambda_p+z_p$ and  
-\begin{align}
+\begin{align*}
 \hat{p} = \argmax_{p=0,\dots,P}\: \alpha^*_p \, ,
-\end{align}
+\end{align*}
 we have the result
-\begin{align}
+\begin{align*}
 \mbox{Pr} (\hat{p} = p) = \pi_p \, .
-\end{align}
+\end{align*}
 In words, the procedure of adding Gumbel noise to unnormalized log-probabilities and taking the index of the maximum produces a random variable that follows the discrete distribution over $\ppi$.  Moving from left to right:
 \begin{align*}
 \mbox{Pr} (\hat{p} = p) &= \mbox{Pr} (\alpha^*_p > \alpha^*_{p'}, \, \forall p' \neq p ) \\
@@ -554,34 +568,16 @@ Recalling that $\lambda_{p'}=\log \pi_{p'}$, we exponentiate the logarithms, and
 &= \pi_p \int_{-\infty}^\infty \exp  (-\alpha_p ) \exp\big( -\sum_{p'=0}^P\pi_{p'}\exp(-\alpha_p)\big)  \, \dd \alpha_p  \\
 &= \pi_p \int_{-\infty}^\infty \exp  (-\alpha_p ) \exp\big( -\exp(-\alpha_p)\big)  \, \dd \alpha_p  = \pi_p \, ,
 \end{align*}
-where the final equality follows easily from the change of variables $u=\exp(-\alpha_p)$.  
+where the final equality follows easily from a change of variables.  QPMCMC combines this trick with the quantum minimization algorithm presented in Section \ref{sec:qmin}.
 
 
-\begin{algorithm}
-	\caption{The Gumbel-max trick}\label{alg:gm}
-	\KwData{A vector of unnormalized log-probabilities $\llambda^*=\log \ppi +\log c$, for $\ppi$ a discrete probability vector with $P+1$ elements.}
-	\KwResult{A single sample $p \sim$ \emph{Discrete}$(\ppi)$ satisfying $p\in\{0,1,\dots,P\}$.}
-	\For{$p' \in\{0,1,\dots,P\}$}{
-		$z_{p'} \gets Gumbel(0,1)$\;
-		$\alpha^*_{p'} \gets \lambda_{p'}^* + z_{p'}$\;
-	}
-	$p \gets \argmax_{p'=0,\dots,P}\alpha^*_{p'}$\;
-	\Return{p}\ .
-	
-	\vspace{0.5em}
-\end{algorithm}
+
 
 
 \subsection{QPMCMC}
 
- \begin{figure}[!t]
-	\centering
-	\includegraphics[width=0.9\linewidth]{mcmcIterations.pdf}
-	\caption{Total number of oracle evaluations required for each of 2,000 parallel MCMC iterations. In total, the combined MCMC runs required roughly $7$\% of the usual 20 million target evaluations. Over  99.4\% of the 10,000 MCMC iterations successfully sampled from the discrete distribution with probabilities of Equation \eqref{eq:probs}.}\label{fig:mcmcIterations}
-\end{figure}
-
 \begin{algorithm}[t!]
-	\caption{Quantum parallel parallel MCMC}\label{alg:qpMCMC}
+	\caption{Quantum parallel MCMC}\label{alg:qpMCMC}
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and the standard Gumbel distribution $Gumbel(0,1)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
@@ -599,8 +595,17 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
 	
-		\vspace{0.5em}
+	\vspace{0.5em}
 \end{algorithm}
+
+ \begin{figure}[!t]
+ 	\vspace{3em}
+	\centering
+	\includegraphics[width=0.9\linewidth]{mcmcIterations.pdf}
+	\caption{Total number of oracle evaluations required for each of 2,000 parallel MCMC iterations. In total, the combined MCMC runs required roughly $7$\% of the usual 20 million target evaluations. Over  99.4\% of the 10,000 MCMC iterations successfully sampled from the discrete distribution with probabilities of Equation \eqref{eq:probs}.}\label{fig:mcmcIterations}
+\end{figure}
+
+
 
 
  \begin{figure}[!h]
@@ -609,7 +614,15 @@ where the final equality follows easily from the change of variables $u=\exp(-\a
 	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
 \end{figure}
 
-\section{Reading the fine print}
+Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. This sub-routine seeks to find the minimizer of the function
+\begin{align*}
+f(p')= -\left(\log \big(\pi(\ttheta_{p'}) q_{p'}\big) + z_{p'}\right) \quad \mbox{over} \quad p'=0,1,\dots, P,
+\end{align*} 
+which combines the numerators of Equation \eqref{eq:probs}, the Gumbel-max trick and a trivial negation.  As discussed in Section \ref{sec:qmin}, the sub-routine requires only $\mathcal{O}(\sqrt{P})$ oracle evaluations and, therefore, only $\mathcal{O}(\sqrt{P})$ evaluations of the target density $\pi(\cdot)$ using a quantum circuit.  In theory, a quantum computer can perform the same computations as a classical computer, but the efficiency of the target evaluations would depend on a number of factors related to the structure of the density itself, the availability of fast quantum random access memory \citep{giovannetti2008quantum} and the ability of large numbers of quantum gates to act in concert with negligible noise \citep{kielpinski2002architecture,erhard2019characterizing}.
+
+In general MCMC, one often calibrates the scaling of a proposal kernel to balance between exploring the target's domain and remaining within high-density regions.  Optimal scaling strategies may lead to a large number of rejected proposals \citep{roberts2001optimal}.  Indeed, \citet{holbrook2021generating} shows that parallel MCMC algorithms are no exception. When using the Gumbel-max trick to sample from proposals, this means that the current state is often quite near optimality, representing a warm start.  Figure \ref{fig:mcmcIterations} shows how this warm-starting effects the number of oracle calls (and hence target evaluations) within the quantum minimization sub-routine over the course of an MCMC trajectory.  We target multi-dimensional standard normal distributions of differing dimensions using the vector $(100,\dots,100)$ as starting position. We fix the number of Gaussian proposals to be 2,000 and use standard adaptation procedures to target a 50\% acceptance rate while guaranteeing convergence \citep{rosenthal2011optimal}. Across iterations, QPMCMC requires relatively few oracle calls compared to the 2,000 target evaluations of parallel MCMC. We also witness the expected drop in the number of oracle evaluations as the chain approaches the target's high-density region. Remarkably, the algorithm succeeds in sampling from the true discrete distribution in 99.5\% of the MCMC iterations. An independent simulation obtains similar results, requiring roughly 7\% of the usual number of target evaluations. Figure \ref{fig:qq} shows a quantile-quantile plot for all 100 dimensions of a multi-dimensional standard normal distribution. We see no appreciable impact from the rare failure of the quantum minimization sub-routine.
+
+\section{Discussion}
 
 \bibliographystyle{sysbio}
 \bibliography{refs}
