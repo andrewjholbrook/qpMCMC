@@ -36,6 +36,7 @@ textfont=it]{caption}
 \usepackage{authblk}
 \usepackage{mathbbol}
 \usepackage{braket}
+\usepackage{minted}
 
 
 
@@ -393,9 +394,9 @@ Next, the algorithm reflects the current state about the hyperplane that has $\k
 &= \frac{1}{\sqrt{N}}\sum_{x} \left( (-1)^{1-\delta_{x_0}(x)} + 2 \frac{(N-2)}{N} \right)\ket{x}\\ &= \frac{(3N-4)}{N^{3/2}} \ket{x_0} + \sum_{x\neq x_0} \frac{(N-4)}{N^{3/2}}  \ket{x} \, .
 \end{align*}
 The scientist who measures the state at this moment would obtain the desired state $\ket{x_0}$ with a slightly higher probability of $(3N-4)^2/N^3$  than the individual probabilities of $(N-4)^2/N^3$ for the other states. Each additional application of the \emph{Grover iteration}
-\begin{align*}
+\begin{align}\label{eq:grov}
 \G := - \U_h \U_{x_0} := \Big(2\ket{h}\bra{h}-\I \Big) \Big( \I - 2 \ket{x_0}\bra{x_0} \Big)
-\end{align*}
+\end{align}
 increases the probability of obtaining $\ket{x_0}$ at the time of measurement in the computational basis and $R=\ceil{\pi\sqrt{N}/4}$ iterations guarantees a probability of success that is greater than $1-1/N$.
 
   \begin{algorithm}[th!]
@@ -608,7 +609,7 @@ where the final equality follows easily from a change of variables.  QPMCMC comb
 
 
 
- \begin{figure}[!h]
+ \begin{figure}[ph!]
 	\centering
 	\includegraphics[width=0.5\linewidth]{qqPlot.png}
 	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
@@ -621,6 +622,20 @@ f(p')= -\left(\log \big(\pi(\ttheta_{p'}) q_{p'}\big) + z_{p'}\right) \quad \mbo
 which combines the numerators of Equation \eqref{eq:probs}, the Gumbel-max trick and a trivial negation.  As discussed in Section \ref{sec:qmin}, the sub-routine requires only $\mathcal{O}(\sqrt{P})$ oracle evaluations and, therefore, only $\mathcal{O}(\sqrt{P})$ evaluations of the target density $\pi(\cdot)$ using a quantum circuit.  In theory, a quantum computer can perform the same computations as a classical computer, but the efficiency of the target evaluations would depend on a number of factors related to the structure of the density itself, the availability of fast quantum random access memory \citep{giovannetti2008quantum} and the ability of large numbers of quantum gates to act in concert with negligible noise \citep{kielpinski2002architecture,erhard2019characterizing}.
 
 In general MCMC, one often calibrates the scaling of a proposal kernel to balance between exploring the target's domain and remaining within high-density regions.  Optimal scaling strategies may lead to a large number of rejected proposals \citep{roberts2001optimal}.  Indeed, \citet{holbrook2021generating} shows that parallel MCMC algorithms are no exception. When using the Gumbel-max trick to sample from proposals, this means that the current state is often quite near optimality, representing a warm start.  Figure \ref{fig:mcmcIterations} shows how this warm-starting effects the number of oracle calls (and hence target evaluations) within the quantum minimization sub-routine over the course of an MCMC trajectory.  We target multi-dimensional standard normal distributions of differing dimensions using the vector $(100,\dots,100)$ as starting position. We fix the number of Gaussian proposals to be 2,000 and use standard adaptation procedures to target a 50\% acceptance rate while guaranteeing convergence \citep{rosenthal2011optimal}. Across iterations, QPMCMC requires relatively few oracle calls compared to the 2,000 target evaluations of parallel MCMC. We also witness the expected drop in the number of oracle evaluations as the chain approaches the target's high-density region. Remarkably, the algorithm succeeds in sampling from the true discrete distribution in 99.5\% of the MCMC iterations. An independent simulation obtains similar results, requiring roughly 7\% of the usual number of target evaluations. Figure \ref{fig:qq} shows a quantile-quantile plot for all 100 dimensions of a multi-dimensional standard normal distribution. We see no appreciable impact from the rare failure of the quantum minimization sub-routine.
+
+\subsection{Note on simulations}
+
+We use the \textsc{R} programming language \citep{rlang} for all simulations and the \textsc{ggplot2} package to generate all figures \citep{ggplot}.  All simulations rely on the fact that the Grover iterations of Equation \eqref{eq:grov} manipulate the probability amplitudes in a deterministic manner. For example, the following \textsc{R} code specifies $N$ uniform probability amplitudes (\verb|sqrtProbs|), performs $I$ Grover iterations and measures a single state according to the resulting probabilities.
+\begin{minted}{R}
+sqrtProbs <- rep(1/sqrt(N),N); i <- 1
+while (i <= I) {
+	sqrtProbs  <- -marks*sqrtProbs + (1-marks)*sqrtProbs
+	sqrtProbs  <- -sqrtProbs + 2*mean(sqrtProbs)
+	i <- i + 1
+}
+measurement <- sample(size=1, x=1:N, prob=sqrtProbs^2)
+\end{minted}
+Of course, simulating these iterations on a classical computer, requires precomputing the values of \verb|marks| beforehand.
 
 \section{Discussion}
 
