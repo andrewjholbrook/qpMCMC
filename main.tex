@@ -36,7 +36,7 @@ textfont=it]{caption}
 \usepackage{authblk}
 \usepackage{mathbbol}
 \usepackage{braket}
-\usepackage{minted}
+\usepackage[cache=false]{minted}
 
 
 
@@ -603,7 +603,7 @@ where the final equality follows easily from a change of variables.  QPMCMC comb
  	\vspace{3em}
 	\centering
 	\includegraphics[width=0.9\linewidth]{mcmcIterations.pdf}
-	\caption{Total number of oracle evaluations required for each of 2,000 parallel MCMC iterations. In total, the combined MCMC runs required roughly $7$\% of the usual 20 million target evaluations. Over  99.4\% of the 10,000 MCMC iterations successfully sampled from the discrete distribution with probabilities of Equation \eqref{eq:probs}.}\label{fig:mcmcIterations}
+	\caption{Total number of oracle evaluations required for each of 2,000 parallel MCMC iterations. In total, the combined MCMC runs required roughly $7$\% of the usual 20 million target evaluations. Over  99.4\% of the 10,000 MCMC iterations successfully sampled from the discrete distribution with probabilities of Equation \eqref{eq:probs}. Burn-in evaluations require moderately more evaluations because the current state occupies a lower density region and represents a `less good' warm-start.}\label{fig:mcmcIterations}
 \end{figure}
 
 
