@@ -1,3 +1,11 @@
+library(ggplot2)
+library(ggplot2)
+library(wesanderson)
+library(forcats)
+pal <- wes_palette("Zissou1", 5, type = "discrete")
+
+################################################################################
+
 groverProbs <- function(N=2^10,M=1) {
   Iter  <- ceiling(pi*sqrt(N/M)/4)
   marks <- c(rep(1,M),rep(0,N-M))
@@ -66,9 +74,10 @@ quantumMin <- function(field, y=NULL) {
 }
 
 proposal <- function(currentState, sigma=1, nProps=100) {
-  # multiproposal from normal distribution centered at current state
+  # centered Gaussian multiproposal
   dimensions <- length(currentState)
-  props <- matrix(currentState,nProps,dimensions,byrow=TRUE)
+  center <- currentState + rnorm(dimensions,sd=sigma)
+  props <- matrix(center,nProps,dimensions,byrow=TRUE)
   props <- props + rnorm(n=nProps*dimensions,sd=sigma)
   return(props)
 }
@@ -192,11 +201,6 @@ colnames(df) <- c("N","Solutions","GroverIts")
 df$Solutions <- factor(df$Solutions)
 df$N <- factor(df$N)
 
-library(ggplot2)
-library(wesanderson)
-library(forcats)
-pal <- wes_palette("Zissou1", 5, type = "discrete")
-
 df$N <- fct_rev(df$N)
 
 gg <- ggplot(df,aes(x=Solutions,y=GroverIts,fill=N)) +
@@ -267,13 +271,15 @@ for(d in D) {
   }
   if(i %% 100==0)   cat(i,"\n")
 }
-saveRDS(df,"qpMCMC/mcmcIsLessThan.rds")
-df <- readRDS("qpMCMC/mcmcIsLessThan.rds")
+saveRDS(df,"~/qpMCMC/mcmcIsLessThan.rds")
+df <- readRDS("~/qpMCMC/mcmcIsLessThan.rds")
 
 colnames(df) <- c("Iteration","Dimension","Rank","GroverIts")
-df$`Target\ndimension` <- factor(df$Dimension)
+df$`Target dimension` <- factor(df$Dimension)
 
-gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target\ndimension`)) +
+gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target dimension`)) +
+  geom_hline(yintercept = 2000,linetype=2) +
+  annotate("text", x = 400, y = 1950, label = "Conventional implementation") +
   geom_line(alpha=0.1) +
   geom_smooth(method = lm, formula = y ~ splines::bs(x, 5), se = FALSE)+
   scale_color_manual(values = pal) +
@@ -283,11 +289,24 @@ gg <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target\ndimension`)) +
   theme_bw()
 gg
 
-mean(df$Rank!=1) # 0.0054
-sum(df$GroverIts)/(2000*2000*5)#  0.07212715
+gg2 <- ggplot(df,aes(x=Iteration,y=GroverIts,color=`Target dimension`)) +
+  geom_line(alpha=0.1) +
+  geom_smooth(method = lm, formula = y ~ splines::bs(x, 5), se = FALSE)+
+  scale_color_manual(values = pal) +
+  ggtitle("") +
+  ylab(NULL) +
+  xlab("MCMC iteration") +
+  theme_bw()
+gg2
 
-ggsave(gg,filename = "mcmcIterations.pdf",device = "pdf",path = "qpMCMC/figures/",dpi = "retina",
-       width=8.14,height=4)
+mean(df$Rank!=1) # 0.0053
+sum(df$GroverIts)/(2000*2000*5)#  0.074
+
+library(ggpubr)
+
+ggsave(ggarrange(gg, gg2, ncol = 2, nrow = 1, common.legend = TRUE, 
+                 legend = "bottom"),filename = "mcmcIterations.pdf",device = "pdf",path = "~/qpMCMC/figures/",dpi = "retina",
+       width=12,height=5)
 
 system2(command = "pdfcrop",
         args    = c("~/qpMCMC/figures/mcmcIterations.pdf",
@@ -298,8 +317,8 @@ system2(command = "pdfcrop",
 set.seed(1)
 out <- qpMCMC(nIts = 100000,nProps = 2000, dims = 100)
 out[[2]]/(100000*2000) # 0.07
-#saveRDS(out,file="qpMCMC/qqplotExample.rds")
-out <- readRDS(file="qpMCMC/qqplotExample.rds")
+saveRDS(out,file="~/qpMCMC/qqplotExample.rds")
+out <- readRDS(file="~/qpMCMC/qqplotExample.rds")
 out[[1]] <- out[[1]][floor(seq(from=2000,to=100000,by=10)),]
 
 # qqnorm(out[[1]][2000:100000,3])
@@ -329,5 +348,7 @@ gg <- ggplot(df1,aes(x=Samples,y=DirectSamples,color=Dimension),alpha=0.7) +
   theme(legend.position="none")
 gg
 
-ggsave(gg,filename = "qqPlot.png",device = "png",path = "qpMCMC/figures/",dpi = "retina",
+ggsave(gg,filename = "qqPlot.png",device = "png",path = "~/qpMCMC/figures/",dpi = "retina",
        width=5,height=12)
+
+
