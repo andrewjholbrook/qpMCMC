@@ -28,12 +28,14 @@ expoSearch <- function(N=2^10,M=1,marks=NULL) {
   grovIter <- 0
   lmbd <- 6/5
   if(is.null(marks)) {
+    cutoff <- sqrt(N)
     marks <- c(rep(1,M),rep(0,N-M))
   } else {
     M <- sum(marks==1)
     N <- length(marks)
+    cutoff <- 9*sqrt(N)/4 # in mcmc apps
   }
-  while(!success & grovIter<(9*sqrt(N)/4)) {
+  while((!success) & (grovIter<cutoff)) {
     j <- sample(size=1,x=0:(m-1))
     sqrtProbs <- rep(1/sqrt(N),N)
     i <- 1
@@ -234,7 +236,7 @@ set.seed(1)
 N <- 2^c(10:14)
 df <- data.frame()
 for(n in N) {
-  for(M in 5:1) {
+  for(M in c(20,15,10,5,1)) {
     for (k in 1:500) {
       df <- rbind(df,c(n,M,expoSearch(N=n,M=M)[[1]]))
       if(k %% 100==0)   cat(k,"\n")
