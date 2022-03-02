@@ -623,6 +623,18 @@ which combines the numerators of Equation \eqref{eq:probs}, the Gumbel-max trick
 
 In general MCMC, one often calibrates the scaling of a proposal kernel to balance between exploring the target's domain and remaining within high-density regions.  Optimal scaling strategies may lead to a large number of rejected proposals \citep{roberts2001optimal}.  Indeed, \citet{holbrook2021generating} shows that parallel MCMC algorithms are no exception. When using the Gumbel-max trick to sample from proposals, this means that the current state is often quite near optimality, representing a warm-start.  Figure \ref{fig:mcmcIterations} shows how this warm-starting effects the number of oracle calls (and hence target evaluations) within the quantum minimization sub-routine over the course of an MCMC trajectory.  We target multi-dimensional standard normal distributions of differing dimensions using the vector $(100,\dots,100)$ as starting position. We fix the number of Gaussian proposals to be 2,000 and use standard adaptation procedures to target a 50\% acceptance rate while guaranteeing convergence \citep{rosenthal2011optimal}. Across iterations, QPMCMC requires relatively few oracle calls compared to the 2,000 target evaluations of parallel MCMC. We also witness the expected drop in the number of oracle evaluations as the chain approaches the target's high-density region. Remarkably, the algorithm succeeds in sampling from the true discrete distribution in 99.5\% of the MCMC iterations. An independent simulation obtains similar results, requiring roughly 7\% of the usual number of target evaluations. Figure \ref{fig:qq} shows a quantile-quantile plot for all 100 dimensions of a multi-dimensional standard normal distribution. We see no appreciable impact from the rare failure of the quantum minimization sub-routine.
 
+%\begin{table}[ht]\centering
+%	\begin{tabular}{llll}  \toprule 
+%	Proposals	& Effective samples (ES) & Evaluations per ES & Speedup \\   \midrule
+%	1 (MH)	 & 21.35  (11.74, 50.65) & 429.81  (180.15, 766.89) & 1.00  (1.00, 1.00) \\  
+%		 50 & 736.25 (418.73, 1072.35) & 259.54  (177.72, 475.16) & 1.66  (1.01, 1.61) \\  
+%		 100 & 1842.71 (1604.07, 2097.74) & 146.49  (128.76, 168.39) & 2.93 (1.40, 4.55) \\  
+%		 150 & 2287.03  (1734.34, 2444.05) & 146.39 (137.36, 193.16) & 2.94 (1.31, 3.97) \\ 
+%		  200 & 2662.89  (2547.71, 2844.14) & 145.92 (136.37, 152.74) & 2.95  (1.32, 5.02) \\ 
+%		   250 & 2971.59  (2439.45, 3208.46) & 147.77  (136.53, 180.95) & 2.91  (1.32, 4.24) \\  
+%		  \bottomrule\end{tabular}
+%\end{table}
+
 \subsection{Note on simulations}
 
 We use the \textsc{R} programming language \citep{rlang} for all simulations and the \textsc{ggplot2} package to generate all figures \citep{ggplot}.  All simulations rely on the fact that the Grover iterations of Equation \eqref{eq:grov} manipulate the probability amplitudes in a deterministic manner. For example, the following \textsc{R} code specifies $N$ uniform probability amplitudes (\verb|sqrtProbs|), performs $I$ Grover iterations and measures a single state according to the resulting probabilities.
@@ -636,6 +648,7 @@ while (i <= I) {
 measurement <- sample(size=1, x=1:N, prob=sqrtProbs^2)
 \end{minted}
 Of course, simulating these iterations on a classical computer, requires precomputing the values of \verb|marks| beforehand.
+
 
 \section{Discussion}
 

@@ -134,10 +134,11 @@ pMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
   return(list(states,numberLess))
 }
 
-qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
+qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5,
+                    initial=100,earlyStop=FALSE) {
   
   states <- matrix(0,nIts,dims)
-  states[1,] <- 100
+  states[1,] <- initial
   numberLess <- rep(0,nIts)
   batches    <- 1
   oracleCalls <- 0
@@ -152,6 +153,7 @@ qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
     targetVals      <- apply(currentAndProps,MARGIN = 1,FUN=target)
     selectionProbs  <- targetVals
     lambdas         <- -selectionProbs + log(rexp(n=nProps+1))
+    browser()
     currentAndProps <- currentAndProps[order(lambdas),]
     rank1           <- rank(lambdas)[1]
     qmin            <- quantumMin(field=1:(nProps+1),y=rank1)
@@ -163,7 +165,7 @@ qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
     if(any(states[i,] != states[i-1,])) {
       Acceptances <- Acceptances + 1
     }    
-    if(i %% 100 == 0) cat("Iteration ", i, " complete.\n")
+    if(i %% 1000 == 0) cat("Iteration ", i, " complete.\n")
     if (SampCount == SampBound) { 
       AcceptRatio <- Acceptances / SampBound
       if ( AcceptRatio > targetAccept ) {
@@ -172,14 +174,59 @@ qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
         sigma <- sigma * (1 - delta(batches))
       }
       batches <- batches + 1
-      cat("Acceptance ratio: ", AcceptRatio, ". sigma: ", sigma, "\n")
+    #  cat("Acceptance ratio: ", AcceptRatio, ". sigma: ", sigma, "\n")
       
       SampCount <- 0
       Acceptances <- 0
     }
+    
+    if (earlyStop & i>101 & i %% 1000 == 0) {
+      ess0 <- min(coda::effectiveSize(states[101:i,]))
+      cat(ess0,"\n")
+      if(ess0 >100) {
+        return(list(i,oracleCalls))
+      }
+    }
   }
   return(list(states,oracleCalls))
 }
+
+randomWalk <- function(N, x0, maxIt=10000,earlyStop=FALSE) {
+  if(N!=length(x0)) stop("Dimension mismatch.")
+  
+  chain <- matrix(0,maxIt,N)
+  
+  sigma <- 2.4/sqrt(N)
+  Ct <- sigma^2*diag(N) 
+  xbar <- x0
+  
+  accept <- rep(0,maxIt)
+  chain[1,] <- x0
+  for (i in 2:maxIt){
+      xStar <- rnorm(N,sd=sigma) + chain[i-1,]
+      if(log(runif(1)) < target(xStar) -
+         target(chain[i-1,])) {
+        accept[i] <- 1
+        chain[i,] <- xStar
+      } else {
+        chain[i,] <- chain[i-1,]
+      }
+
+    
+    if(i %% 1000 == 0) cat(i,"\n")
+      if (earlyStop & i>101 & i %% 1000 == 0) {
+        ess0 <- min(coda::effectiveSize(chain[101:i,]))
+        cat(ess0,"\n")
+        if(ess0 > 100) {
+          return(list(i,i))
+        }
+      }
+  }
+  ratio <- sum(accept)/(maxIt-1)
+  cat("Acceptance ratio: ", ratio,"\n")
+    return(list(chain,ratio,sigma,diag(N)))
+}
+
 
 
 ################################################################################
@@ -352,3 +399,196 @@ ggsave(gg,filename = "qqPlot.png",device = "png",path = "~/qpMCMC/figures/",dpi 
        width=5,height=12)
 
 
+################################################################################
+# ess per evaluation 
+
+
+
+target <- function(X,B=0.1) { 
+  # B is bananicity constant
+  N <- length(X)
+  output <-  - X[2]^2/200 - 0.5*(X[1]+B*X[2]^2-100*B)^2 - 0.5*sum(X[3:N]^2)
+  return(output)
+}
+
+
+set.seed(1)
+nProps <- seq(from=100,to=1000,by=100)#,12800,25600)
+df  <- data.frame()
+nIts <- 10000
+#for (k in 1:10) {
+for(d in nProps) {
+  out <- qpMCMC(nIts=nIts,nProps = d, dims = 20,initial = 0, sigma=0.5)
+  df <- rbind(df,c(d,min(coda::effectiveSize(out[[1]][1001:nIts,])),out[[2]]))
+}
+
+rwm <- randomWalk(N=20,x0=rep(0,20),maxIt = nIts)
+df <- rbind(df,c(1,min(coda::effectiveSize(rwm[[1]][1001:nIts,])),nIts))
+#}
+df[,3] <- df[,3]*((nIts-1000)/nIts)
+df[,4] <- df[,3]/df[,2]
+colnames(df) <- c("Proposals", "ESS","Evaluations","EvalsPerESS")
+
+saveRDS(df,"~/qpMCMC/essPerEvalBanana.rds")
+df <- readRDS("~/qpMCMC/essPerEvalBanana.rds")
+
+df$Proposals <- factor(df$Proposals)
+
+df2 <- by(data=df$ESS,INDICES=list(df$Proposals),
+                        FUN=quantile,probs=c(0.5,0.05,0.95))
+df3 <- data.frame()
+for(i in 1:length(df2)) df3 <- rbind(df3,df2[[i]])
+
+df2 <- by(data=df$EvalsPerESS,INDICES=list(df$Proposals),
+          FUN=quantile,probs=c(0.5,0.05,0.95))
+df4 <- data.frame()
+for(i in 1:length(df2)) df4 <- rbind(df4,df2[[i]])
+
+df5 <- cbind(df3,df4)
+
+df6 <- data.frame()
+for(i in 1:11) df6 <- rbind(df6, df5[1,4:6]/df5[i,4:6])
+df <- cbind(df5,df6)
+
+print(xtable::xtable(df),booktabs=TRUE)
+
+##############################
+
+
+# target <- function(X,B=0.1) { 
+#   # B is bananicity constant
+#   N <- length(X)
+#   output <-  - X[2]^2/200 - 0.5*(X[1]+B*X[2]^2-100*B)^2 #- 0.5*sum(X[3:N]^2)
+#   return(output)
+# }
+# 
+# set.seed(1)
+# nProps <- seq(from=10,to=100,by=10)#,12800,25600)
+# df  <- data.frame()
+# nIts <- 1000000
+# for (k in 1:20) {
+# for(d in nProps) {
+#   out <- qpMCMC(nIts=nIts,nProps = d, dims = 2,initial = 0, sigma=0.5,earlyStop=TRUE)
+#   df <- rbind(df,c(d,out[[1]],out[[2]]))
+# }
+# 
+# rwm <- randomWalk(N=2,x0=rep(0,2),maxIt = 1000000,earlyStop = TRUE)
+# df <- rbind(df,c(1,rwm[[1]],rwm[[2]]))
+# }
+# 
+# 
+# colnames(df) <- c("Proposals", "Iterations","Evaluations")
+# 
+# saveRDS(df,"~/qpMCMC/essPerEvalBananaTimeTo.rds")
+# df <- readRDS("~/qpMCMC/essPerEvalBananaTimeTo.rds")
+# 
+# df$Proposals <- as.factor(df$Proposals)
+# by(data=df$Evaluations,INDICES=list(df$Proposals),FUN=quantile,probs=c(0.5,0.05,0.95))
+
+# target <- function(X,B=0.1) {
+#   # B is bananicity constant
+#     output <- log( exp( - X[2]^2/200 - 0.5*(X[1]+B*X[2]^2-100*B)^2) +
+#                      exp( - (X[1]-1000)^2/200 - 0.5*(X[2]+500+B*(X[1]-1000)^2-100*B)^2) +
+#                      exp( - (X[2])^2/200 - 0.5*(X[1]-2000-B*(X[2])^2-100*B)^2 ) +
+#                      exp( - (X[1]-500)^2/200 - 0.5*(X[2]-500 -B*(X[1]-500)^2-100*B)^2 ) +
+#                      exp( - (X[1]-1500)^2/200 - 0.5*(X[2]-500 -B*(X[1]-1500)^2-100*B)^2 ) )
+# 
+#   return(output)
+# }
+# 
+# set.seed(1)
+# nProps <- seq(from=2000,to=10000,by=2000)#,12800,25600)
+# df  <- data.frame()
+# nIts <- 100000
+#   for(d in nProps) {
+#     out <- qpMCMC(nIts=nIts,nProps = d, dims = 2,initial = 0, sigma=0.5)
+#     df <- rbind(df,c(d,mean(coda::effectiveSize(out[[1]][1001:nIts,])),out[[2]]))
+# }
+# df[,3] <- df[,3]*((nIts-1000)/nIts)
+# df[,4] <- df[,3]/df[,2]
+# colnames(df) <- c("Proposals", "ESS","Evaluations","EvalsPerESS")
+# 
+# saveRDS(df,"~/qpMCMC/essPerEvalMob.rds")
+# df <- readRDS("~/qpMCMC/essPerEvalMob.rds")
+# 
+# df$Proposals <- factor(df$Proposals)
+# 
+# df2 <- by(data=df$ESS,INDICES=list(df$Proposals),
+#           FUN=quantile,probs=c(0.5,0.05,0.95))
+# df3 <- data.frame()
+# for(i in 1:length(df2)) df3 <- rbind(df3,df2[[i]])
+# 
+# df2 <- by(data=df$EvalsPerESS,INDICES=list(df$Proposals),
+#           FUN=quantile,probs=c(0.5,0.05,0.95))
+# df4 <- data.frame()
+# for(i in 1:length(df2)) df4 <- rbind(df4,df2[[i]])
+# 
+# df5 <- cbind(df3,df4)
+# 
+# df6 <- data.frame()
+# for(i in 1:11) df6 <- rbind(df6, df5[1,4:6]/df5[i,4:6])
+# df <- cbind(df5,df6)
+# 
+
+# get number of evals
+set.seed(1)
+
+nProps <- 10000
+#ranks  <- rpois(n=10000,lambda = 5) + 1
+ranks <- read_csv("qpMCMC/qpMCMC10KRanks.txt", 
+                     col_names = FALSE)
+ranks <- unlist(ranks)
+ranks <- ranks + 1
+ranks <- as.numeric(ranks)
+
+oracleCalls <- 0
+L <- length(ranks) # 5998
+for(i in 1:L) {
+  qmin <- quantumMin(1:(nProps+1),ranks[i])
+  oracleCalls <- oracleCalls + qmin[[2]]
+  if(i%%100==0) cat(i,"\n")
+}
+oracleCalls # 1993847
+oracleCalls/(L*10000) # 0.03324186
+
+# get number of evals
+set.seed(1)
+
+nProps <- 1000
+#ranks  <- rpois(n=10000,lambda = 5) + 1
+ranks <- read_csv("qpMCMC/qpMCMC1KRanks.txt", 
+                  col_names = FALSE)
+ranks <- unlist(ranks)
+ranks <- ranks + 1
+ranks <- as.numeric(ranks)
+
+oracleCalls2 <- 0
+L2 <- length(ranks) # 
+for(i in 1:L2) {
+  qmin <- quantumMin(1:(nProps+1),ranks[i])
+  oracleCalls2 <- oracleCalls2 + qmin[[2]]
+  if(i%%100==0) cat(i,"\n")
+}
+oracleCalls2 # 
+oracleCalls2/(L2*1000) # 
+
+
+set.seed(1)
+
+nProps <- 100
+#ranks  <- rpois(n=10000,lambda = 5) + 1
+ranks <- read_csv("qpMCMC/qpMCMC100Ranks.txt", 
+                  col_names = FALSE)
+ranks <- unlist(ranks)
+ranks <- ranks + 1
+ranks <- as.numeric(ranks)
+
+oracleCalls3 <- 0
+L3 <- length(ranks) # 
+for(i in 1:L3) {
+  qmin <- quantumMin(1:(nProps+1),ranks[i])
+  oracleCalls3 <- oracleCalls3 + qmin[[2]]
+  if(i%%100==0) cat(i,"\n")
+}
+oracleCalls3 # 
+oracleCalls3/(L3*1000) # 
