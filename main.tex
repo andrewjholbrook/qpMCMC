@@ -574,11 +574,24 @@ Recalling that $\lambda_{p'}=\log \pi_{p'}$, we exponentiate the logarithms, and
 where the final equality follows easily from a change of variables.  QPMCMC combines this trick with the quantum minimization algorithm presented in Section \ref{sec:qmin}.
 
 \subsection{Symmetric proposals}\label{sec:sym}
+\newcommand{\SSigma}{\boldsymbol{\Sigma}}
 
-
+Evaluation of the $P+1$ proposal density terms $q(\ttheta_{p},\Ttheta_{-p})$ can be computationally burdensome as $P$ grows large.  \citet{holbrook2021generating} proves that two specific proposal mechanisms enforce equality across all $P+1$ terms and thus enable the simplified acceptance probabilities
+\begin{align}\label{eq:probsSimp}
+	\pi_p = \frac{\pi(\ttheta_p) }{\sum_{p'=0}^P \pi(\ttheta_{p'})} \, , \quad p=0,\dots,P \, .
+\end{align}
+In the following, we opt for one of these proposal mechanisms, the centered Gaussian proposal of \citet{tjelmeland2004using}.  This strategy first generates a Gaussian random variable $\bar{\ttheta}$ centered at the current state $\ttheta_{0}$ and then generates $P$ proposals centered at $\bar{\ttheta}$:
+\begin{align}\label{eq:p1}
+	\ttheta_1,\dots,\ttheta_P \stackrel{\perp}{\sim} Normal_D(\bar{\ttheta},\SSigma) \, , \quad \bar{\ttheta} \sim Normal_D(\ttheta_{0},\SSigma) \, .
+\end{align}
+\citet{holbrook2021generating} shows that this strategy leads to the higher-order proposal symmetry
+\begin{align*}
+	q(\ttheta_0,\Ttheta_{-0}) = q(\ttheta_{1},\Ttheta_{-1}) =\dots =q(\ttheta_{P},\Ttheta_{-P})  
+\end{align*}
+and that the simplified acceptance probabilities \eqref{eq:probsSimp} maintain detailed balance.  In fact, other location scale families also suffice in the manner, but here we focus on Gaussian proposals without loss of generality.  Finally, the simplicial sampler \citep{holbrook2021generating} accomplishes the same simplified acceptance probabilities but incurs an $\mathcal{O}(D^3)$ computational cost.
 
 \subsection{QPMCMC}
-\newcommand{\SSigma}{\boldsymbol{\Sigma}}
+
 
 \begin{algorithm}[t!]
 	\caption{Quantum parallel MCMC}\label{alg:qpMCMC}
@@ -586,7 +599,7 @@ where the final equality follows easily from a change of variables.  QPMCMC comb
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
 		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
-		$\bar{\ttheta} \gets Normal_D(\ttheta_0,\SSigma)$; \hspace{15em} \Comment{ \hspace{0.3em}     Proposal \eqref{alg:min}}      
+		$\bar{\ttheta} \gets Normal_D(\ttheta_0,\SSigma)$; \hspace{14em} \Comment{ \hspace{0.3em}     Proposal \eqref{eq:p1}}      
 		\For{$p \in \{0,\dots,P\}$}{
 			$\ttheta_p \gets Normal_D(\bar{\ttheta},\SSigma)$\;
 			$z_{p} \gets Gumbel(0,1)$\;

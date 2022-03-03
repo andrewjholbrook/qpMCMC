@@ -550,7 +550,7 @@ for(k in 0:4){
     oracleCalls <- oracleCalls + qmin[[2]]
     if(i%%100==0) cat(i,"\n")
   }
-  df <- rbind(df,c(nProps, L,oracleCalls, oracleCalls/(L*nProps)))
+  df <- rbind(df,c(nProps, L,oracleCalls, (L*nProps)/oracleCalls))
 }
 
 
@@ -572,7 +572,7 @@ for(k in 0:4){
     oracleCalls <- oracleCalls + qmin[[2]]
     if(i%%100==0) cat(i,"\n")
   }
-  df <- rbind(df,c(nProps, L,oracleCalls, oracleCalls/(L*nProps)))
+  df <- rbind(df,c(nProps, L,oracleCalls, (L*nProps)/oracleCalls))
 }
 
 
@@ -593,5 +593,5 @@ for(k in 0:4){
     oracleCalls <- oracleCalls + qmin[[2]]
     if(i%%100==0) cat(i,"\n")
   }
-  df <- rbind(df,c(nProps, L,oracleCalls, oracleCalls/(L*nProps)))
+  df <- rbind(df,c(nProps, L,oracleCalls, (L*nProps)/oracleCalls))
 }
