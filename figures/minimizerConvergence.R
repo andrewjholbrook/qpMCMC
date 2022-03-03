@@ -534,63 +534,64 @@ print(xtable::xtable(df),booktabs=TRUE)
 
 # get number of evals
 set.seed(1)
-
+df <- data.frame("Proposals","Iterations","Evaluations","Speedup")
 nProps <- 10000
-#ranks  <- rpois(n=10000,lambda = 5) + 1
-ranks <- read_csv("qpMCMC/qpMCMC10KRanks.txt", 
-                     col_names = FALSE)
-ranks <- unlist(ranks)
-ranks <- ranks + 1
-ranks <- as.numeric(ranks)
-
-oracleCalls <- 0
-L <- length(ranks) # 5998
-for(i in 1:L) {
-  qmin <- quantumMin(1:(nProps+1),ranks[i])
-  oracleCalls <- oracleCalls + qmin[[2]]
-  if(i%%100==0) cat(i,"\n")
+for(k in 0:4){
+  ranks <- read_csv(paste0("qpMCMC/qpMCMC10KRanks",k,".txt"), 
+                    col_names = FALSE)
+  ranks <- unlist(ranks)
+  ranks <- ranks + 1
+  ranks <- as.numeric(ranks)
+  
+  oracleCalls <- 0
+  L <- length(ranks) # 5998
+  for(i in 1:L) {
+    qmin <- quantumMin(1:(nProps+1),ranks[i])
+    oracleCalls <- oracleCalls + qmin[[2]]
+    if(i%%100==0) cat(i,"\n")
+  }
+  df <- rbind(df,c(nProps, L,oracleCalls, oracleCalls/(L*nProps)))
 }
-oracleCalls # 1993847
-oracleCalls/(L*10000) # 0.03324186
+
 
 # get number of evals
 set.seed(1)
 
-nProps <- 1000
-#ranks  <- rpois(n=10000,lambda = 5) + 1
-ranks <- read_csv("qpMCMC/qpMCMC1KRanks.txt", 
-                  col_names = FALSE)
-ranks <- unlist(ranks)
-ranks <- ranks + 1
-ranks <- as.numeric(ranks)
-
-oracleCalls2 <- 0
-L2 <- length(ranks) # 
-for(i in 1:L2) {
-  qmin <- quantumMin(1:(nProps+1),ranks[i])
-  oracleCalls2 <- oracleCalls2 + qmin[[2]]
-  if(i%%100==0) cat(i,"\n")
+nProps <- 5000
+for(k in 0:4){
+  ranks <- read_csv(paste0("qpMCMC/qpMCMC5KRanks",k,".txt"), 
+                    col_names = FALSE)
+  ranks <- unlist(ranks)
+  ranks <- ranks + 1
+  ranks <- as.numeric(ranks)
+  
+  oracleCalls <- 0
+  L <- length(ranks) # 5998
+  for(i in 1:L) {
+    qmin <- quantumMin(1:(nProps+1),ranks[i])
+    oracleCalls <- oracleCalls + qmin[[2]]
+    if(i%%100==0) cat(i,"\n")
+  }
+  df <- rbind(df,c(nProps, L,oracleCalls, oracleCalls/(L*nProps)))
 }
-oracleCalls2 # 
-oracleCalls2/(L2*1000) # 
 
 
 set.seed(1)
 
-nProps <- 100
-#ranks  <- rpois(n=10000,lambda = 5) + 1
-ranks <- read_csv("qpMCMC/qpMCMC100Ranks.txt", 
-                  col_names = FALSE)
-ranks <- unlist(ranks)
-ranks <- ranks + 1
-ranks <- as.numeric(ranks)
-
-oracleCalls3 <- 0
-L3 <- length(ranks) # 
-for(i in 1:L3) {
-  qmin <- quantumMin(1:(nProps+1),ranks[i])
-  oracleCalls3 <- oracleCalls3 + qmin[[2]]
-  if(i%%100==0) cat(i,"\n")
+nProps <- 1000
+for(k in 0:4){
+  ranks <- read_csv(paste0("qpMCMC/qpMCMC1KRanks",k,".txt"), 
+                    col_names = FALSE)
+  ranks <- unlist(ranks)
+  ranks <- ranks + 1
+  ranks <- as.numeric(ranks)
+  
+  oracleCalls <- 0
+  L <- length(ranks) # 5998
+  for(i in 1:L) {
+    qmin <- quantumMin(1:(nProps+1),ranks[i])
+    oracleCalls <- oracleCalls + qmin[[2]]
+    if(i%%100==0) cat(i,"\n")
+  }
+  df <- rbind(df,c(nProps, L,oracleCalls, oracleCalls/(L*nProps)))
 }
-oracleCalls3 # 
-oracleCalls3/(L3*1000) # 

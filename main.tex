@@ -571,28 +571,26 @@ Recalling that $\lambda_{p'}=\log \pi_{p'}$, we exponentiate the logarithms, and
 \end{align*}
 where the final equality follows easily from a change of variables.  QPMCMC combines this trick with the quantum minimization algorithm presented in Section \ref{sec:qmin}.
 
-
+\subsection{Symmetric proposals}
 
 
 
 \subsection{QPMCMC}
+\newcommand{\SSigma}{\boldsymbol{\Sigma}}
 
 \begin{algorithm}[t!]
 	\caption{Quantum parallel MCMC}\label{alg:qpMCMC}
-	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and the standard Gumbel distribution $Gumbel(0,1)$.}
+	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from a $D$-dimensional multivariate Gaussian $Normal_D(\boldsymbol{\mu},\SSigma)$ and the standard Gumbel distribution $Gumbel(0,1)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
-		%$\sigma_\pi \gets 0$\;
 		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
-		\For{$p' \in \{1,\dots,P\}$}{
-			$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;
+		$\bar{\ttheta} \gets Normal_D(\ttheta_0,\SSigma)$; \hspace{15em} \Comment{ \hspace{0.3em}     Proposal \eqref{alg:min}}      
+		\For{$p \in \{0,\dots,P\}$}{
+			$\ttheta_p \gets Normal_D(\bar{\ttheta},\SSigma)$\;
+			$z_{p} \gets Gumbel(0,1)$\;
 		}
-		\For{$p' \in \{0,\dots,P\}$}{
-			$q_{p'} \gets  \prod_{p''\neq p'}q(\ttheta_{p'},\ttheta_{p''})$\; 
-			$z_{p'} \gets Gumbel(0,1)$\;
-		}
-		$p \gets \argmin_{p'=0,\dots,P}f(p')= -\left(\log \big(\pi(\ttheta_{p'}) q_{p'}\big) + z_{p'}\right)$; \hspace{2em} \Comment{$\order{\sqrt{P}}$ Alg \ref{alg:min}}
-		$\ttheta^{(s)} \gets \ttheta_p$\;
+		$\hat{p} \gets \argmin_{p=0,\dots,P}\Big(f(p):= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big)\Big)$; \hspace{3.5em} \Comment{$\order{\sqrt{P}}$ Alg \ref{alg:min}}
+		$\ttheta^{(s)} \gets \ttheta_{\hat{p}}$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
 	
@@ -615,9 +613,12 @@ where the final equality follows easily from a change of variables.  QPMCMC comb
 	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
 \end{figure}
 
-Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. This sub-routine seeks to find the minimizer of the function
+Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}.  To keep the conventional computing burden low, we recommend 
+
+
+This sub-routine seeks to find the minimizer of the function
 \begin{align*}
-f(p')= -\left(\log \big(\pi(\ttheta_{p'}) q_{p'}\big) + z_{p'}\right) \quad \mbox{over} \quad p'=0,1,\dots, P,
+f(p)= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big) \quad \mbox{over} \quad p=0,1,\dots, P,
 \end{align*} 
 which combines the numerators of Equation \eqref{eq:probs}, the Gumbel-max trick and a trivial negation.  As discussed in Section \ref{sec:qmin}, the sub-routine requires only $\mathcal{O}(\sqrt{P})$ oracle evaluations and, therefore, only $\mathcal{O}(\sqrt{P})$ evaluations of the target density $\pi(\cdot)$ using a quantum circuit.  In theory, a quantum computer can perform the same computations as a classical computer, but the efficiency of the target evaluations would depend on a number of factors related to the structure of the density itself, the availability of fast quantum random access memory \citep{giovannetti2008quantum} and the ability of large numbers of quantum gates to act in concert with negligible noise \citep{kielpinski2002architecture,erhard2019characterizing}.
 
