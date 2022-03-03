@@ -206,6 +206,7 @@ We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithm
 \section{Introduction}
 
 \newcommand{\ttheta}{\boldsymbol{\theta}}
+\newcommand{\Ttheta}{\boldsymbol{\Theta}}
 \newcommand{\dd}{\mbox{d}}
 \newcommand{\ppsi}{\boldsymbol{\psi}}
 \newcommand{\U}{\mathbf{U}}
@@ -221,10 +222,11 @@ Parallel MCMC techniques use multiple proposals to obtain efficiency gains over 
 \begin{align}\label{eq:fixes}
 \pi(A) = \int \pi(\dd \ttheta_0) P(\ttheta_0,A) \, \quad a.s.
 \end{align} 
-for  $A \subset \mathbb{R}^D$ for which $\pi(A) > 0$.  Letting $\ttheta_0$ denote the current state of the Markov chain, \citet{tjelmeland2004using} proposes sampling from such a kernel $P(\ttheta_0,\cdot)$ by drawing $P$ proposals $\ttheta_1,\dots,\ttheta_P$ from a distribution $Q(\ttheta_0,\dd \ttheta) =: q(\ttheta_0,\ttheta)\dd \ttheta$ and selecting the next Markov chain state from among the current and proposed states with probabilities
+for  $A \subset \mathbb{R}^D$ for which $\pi(A) > 0$.  Letting $\ttheta_0$ denote the current state of the Markov chain, \citet{tjelmeland2004using} proposes sampling from such a kernel $P(\ttheta_0,\cdot)$ by drawing $P$ proposals $\Ttheta_{-0}=(\ttheta_1,\dots,\ttheta_P)$ from a joint distribution $Q(\ttheta_0,\dd \Ttheta_{-0}) =: q(\ttheta_0, \Ttheta_{-0})\dd  \Ttheta_{-0}$ and selecting the next Markov chain state from among the current and proposed states with probabilities
 \begin{align}\label{eq:probs}
-\pi_p = \frac{\pi(\ttheta_p) \prod_{p' \neq p} q(\ttheta_p,\ttheta_{p'})}{\sum_{p''=0}^P \pi(\ttheta_{p''}) \prod_{p' \neq p''} q(\ttheta_{p''},\ttheta_{p'})} \, , \quad p=0,\dots,P \, .
+\pi_p = \frac{\pi(\ttheta_p) q(\ttheta_p, \Ttheta_{-p})}{\sum_{p'=0}^P \pi(\ttheta_{p'})q(\ttheta_{p'}, \Ttheta_{-p'})} \, , \quad p=0,\dots,P \, .
 \end{align}
+Here, if $\Ttheta=(\ttheta_0,\dots,\ttheta_{P})$ is the $D\times (P+1)$ matrix having the current state and all $P$ proposals as columns, then $\Ttheta_{-p}$ is the $D\times P$ matrix obtained by removing the $p$th column.
 \citet{tjelmeland2004using} shows that the kernel $P(\ttheta_0,\cdot)$ constructed in such a manner maintains detailed balance and hence satisfies Equation \eqref{eq:fixes}.  Others have since built on this work, developing parallel MCMC methods that generate or recycle multiple proposals \citep{frenkel2004speed,delmas2009does,calderhead2014general,yang2018parallelizable,luo2019multiple,schwedes2021rao,holbrook2021generating}.  
 These developments demonstrate the ability of parallel MCMC methods to alleviate inferential challenges such as multimodality and to deliver performance gains over single-proposal competitors as measured by reduced autocorrelation between samples.  In the following, we focus on the specification presented in Algorithm \ref{alg:pMCMC} but note that the techniques we present may also be effective for generalizations of this basic algorithm.
 
@@ -235,21 +237,19 @@ These developments demonstrate the ability of parallel MCMC methods to alleviate
 	\For{$s \in\{1,\dots,S\}$}{
 		%$\sigma_\pi \gets 0$\;
 		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
-		\For{$p' \in \{1,\dots,P\}$}{
-			$\ttheta_{p'} \gets Q(\ttheta^{(s-1)},\cdot)$\;
+		$\Ttheta_{-0} \gets Q(\ttheta_0,\cdot)$\;
+		\For{$p \in \{0,\dots,P\}$}{
+			$\pi_{p} \gets \pi(\ttheta_{p})\, q(\ttheta_{p},\Ttheta_{-p})$\; 
 		}
-		\For{$p' \in \{0,\dots,P\}$}{
-			$\pi_{p'} \gets \pi(\ttheta_{p'}) \prod_{p''\neq p'}q(\ttheta_{p'},\ttheta_{p''})$\; 
-		}
-		$p \gets Discrete(\ppi/\ppi^T\mathbb{1})$\;
-		$\ttheta^{(s)} \gets \ttheta_p$\;
+		$\hat{p} \gets Discrete(\ppi/\ppi^T\mathbb{1})$\;
+		$\ttheta^{(s)} \gets \ttheta_{\hat{p}}$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
 	\vspace{0.5em}
 	
 \end{algorithm}
 
-But the real promise and power of parallel MCMC comes from its natural parallelizability \citep{calderhead2014general}.  Contemporary hardware design emphasizes architectures that enable execution of multiple mathematical operations simultaneously. Parallel MCMC techniques stand to leverage technological developments that keep modern computation on track with Moore's Law, which predicts that processing power doubles every two years.  For example, the algorithm of \citet{tjelmeland2004using} generates $P$ conditionally independent proposals and then evaluates the probabilities of Equation \eqref{eq:probs}.  One may parallelize the proposal generation step using parallel pseudorandom number generators (PRNG) such as those advanced in \citet{salmon2011parallel}. The computational complexity of the target evaluations $\pi(\ttheta_p)$ is linear in the number of proposals. This presents a significant burden when $\pi(\cdot)$ is computationally expensive, e.g., in big data settings or for Bayesian inversion, but evaluation of the target density over the $P$ proposals is again a naturally parallelizable task.  Moreover, widely available machine learning software such as \textsc{TensorFlow} allows users to easily parallelize both random number generation and target evaluations on general purpose graphics processing units (GPU) \citep{lao2020tfp}. Finally, the pairwise evaluations of the proposal density $q(\cdot,\cdot)$ in Equation \eqref{eq:probs} are $\order{P^2}$, but \citet{massive} demonstrate the natural parallelizability of such pairwise operations, obtaining orders-of-magnitude speedups with contemporary GPUs.
+But the real promise and power of parallel MCMC comes from its natural parallelizability \citep{calderhead2014general}.  Contemporary hardware design emphasizes architectures that enable execution of multiple mathematical operations simultaneously. Parallel MCMC techniques stand to leverage technological developments that keep modern computation on track with Moore's Law, which predicts that processing power doubles every two years.  For example, the algorithm of \citet{tjelmeland2004using} generates $P$ conditionally independent proposals and then evaluates the probabilities of Equation \eqref{eq:probs}.  One may parallelize the proposal generation step using parallel pseudorandom number generators (PRNG) such as those advanced in \citet{salmon2011parallel}. The computational complexity of the target evaluations $\pi(\ttheta_p)$ is linear in the number of proposals. This presents a significant burden when $\pi(\cdot)$ is computationally expensive, e.g., in big data settings or for Bayesian inversion, but evaluation of the target density over the $P$ proposals is again a naturally parallelizable task.  Moreover, widely available machine learning software such as \textsc{TensorFlow} allows users to easily parallelize both random number generation and target evaluations on general purpose graphics processing units (GPU) \citep{lao2020tfp}. Finally, when generating independent proposals using a proposal distribution of the form $q(\ttheta_0,\Ttheta_{-0})=\prod_{p=1}^Pq(\ttheta_0,\ttheta_{p})$, the acceptance probabilities \eqref{eq:probs} require the $\order{P^2}$ evaluation of the $P+1\choose 2$ terms $q(\ttheta_{p},\ttheta_{p'})$, but \citet{massive,holbrook2021scalable} demonstrate the natural parallelizability of such pairwise operations, obtaining orders-of-magnitude speedups with contemporary GPUs.
 
 
 
@@ -523,7 +523,9 @@ With the rudiments of quantum minimization in hand, we present a quantum paralle
  
  \emph{Having successfully generated proposals $\ttheta_p,$ $p=1,\dots,P$ and evaluated the corresponding proposal densities $q(\cdot,\cdot)$, we would like to use quantum parallelism and an appropriate oracle gate to efficiently compute the $\pi(\ttheta_p)$s but immediately encounter a Catch-22 when we seek to draw a sample $\ttheta^{(s+1)} \sim$ \emph{Discrete}$(\ppi)$ for $\ppi$ the vector of probabilities $\pi_0,\pi_1,\dots,\pi_P$ defined in Equation \eqref{eq:probs}.  We can use neither a quantum nor a classical circuit to draw the sample! On the one hand, drawing the sample within a quantum circuit would somehow require that all superposed states have access to all the $\pi(\ttheta_p)$s at once to perform the required normalization.  On the other hand, drawing the sample within the classical circuit would require access to all the $\pi(\ttheta_p)$s, but measurement in the computational basis can only return one.}  
  
- In light of this dilemma, we propose to use the Gumbel-max trick \citep{papandreou2011perturb} to transform the generalized accept-reject step into a discrete optimization procedure.  From there, we use quantum minimization to efficiently sample from $Discrete(\ppi)$. Crucially, we get away with quantum parallel evaluation of the target $\pi(\cdot)$ over all superposed states because the Gumbel-max trick does not rely on a normalization step: each superposed state requires no knowledge of any target evaluation other than its own.  
+ In light of this dilemma, we propose to use the Gumbel-max trick \citep{papandreou2011perturb} to transform the generalized accept-reject step into a discrete optimization procedure (Section \ref{sec:gm}).  From there, we use quantum minimization to efficiently sample from $Discrete(\ppi)$. Crucially, we get away with quantum parallel evaluation of the target $\pi(\cdot)$ over all superposed states because the Gumbel-max trick does not rely on a normalization step: each superposed state requires no knowledge of any target evaluation other than its own.  
+
+Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$, the new computational bottleneck is the calculations required to obtain the $P+1$ proposal density terms $q(\ttheta_{p},\Ttheta_{-p})$, for $p=0,\dots,P$.  Under an independent proposal mechanism with a proposal distribution of the form $q(\ttheta_0,\Ttheta_{-0})=\prod_{p=1}^Pq(\ttheta_0,\ttheta_{p})$, the acceptance probabilities \eqref{eq:probs} require the $\order{P^2}$ evaluation of the $P+1\choose 2$ terms $q(\ttheta_{p},\ttheta_{p'})$.  To avoid such calculations, we follow \citet{holbrook2021generating} and use symmetric proposal distributions for which $q(\ttheta_{p},\Ttheta_{-p}) = q(\ttheta_{p'},\Ttheta_{-p'})$ for $p,p'=0,\dots,P$ (Section \ref{sec:sym}).
 
 \subsection{Gumbel-max}\label{sec:gm}
 \newcommand{\p}{\mbox{p}}
@@ -531,12 +533,12 @@ With the rudiments of quantum minimization in hand, we present a quantum paralle
 \begin{algorithm}[!t]
 	\caption{The Gumbel-max trick}\label{alg:gm}
 	\KwData{A vector of unnormalized log-probabilities $\llambda^*=\log \ppi +\log c$, for $\ppi$ a discrete probability vector with $P+1$ elements.}
-	\KwResult{A single sample $p \sim$ \emph{Discrete}$(\ppi)$ satisfying $p\in\{0,1,\dots,P\}$.}
-	\For{$p' \in\{0,1,\dots,P\}$}{
-		$z_{p'} \gets Gumbel(0,1)$\;
-		$\alpha^*_{p'} \gets \lambda_{p'}^* + z_{p'}$\;
+	\KwResult{A single sample $\hat{p} \sim$ \emph{Discrete}$(\ppi)$ satisfying $\hat{p}\in\{0,1,\dots,P\}$.}
+	\For{$p \in\{0,1,\dots,P\}$}{
+		$z_{p} \gets Gumbel(0,1)$\;
+		$\alpha^*_{p} \gets \lambda_{p}^* + z_{p}$\;
 	}
-	$p \gets \argmax_{p'=0,\dots,P}\alpha^*_{p'}$\;
+	$\hat{p} \gets \argmax_{p=0,\dots,P}\alpha^*_{p}$\;
 	\Return{p}\ .
 	
 	\vspace{0.5em}
@@ -571,7 +573,7 @@ Recalling that $\lambda_{p'}=\log \pi_{p'}$, we exponentiate the logarithms, and
 \end{align*}
 where the final equality follows easily from a change of variables.  QPMCMC combines this trick with the quantum minimization algorithm presented in Section \ref{sec:qmin}.
 
-\subsection{Symmetric proposals}
+\subsection{Symmetric proposals}\label{sec:sym}
 
 
 
@@ -613,9 +615,7 @@ where the final equality follows easily from a change of variables.  QPMCMC comb
 	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
 \end{figure}
 
-Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}.  To keep the conventional computing burden low, we recommend 
-
-
+Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. 
 This sub-routine seeks to find the minimizer of the function
 \begin{align*}
 f(p)= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big) \quad \mbox{over} \quad p=0,1,\dots, P,
