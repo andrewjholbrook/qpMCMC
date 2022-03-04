@@ -595,3 +595,28 @@ for(k in 0:4){
   }
   df <- rbind(df,c(nProps, L,oracleCalls, (L*nProps)/oracleCalls))
 }
+
+
+saveRDS(df,"evalsTillResults.rds")
+
+colnames(df) <- c("Proposals","Iterations","Evaluations","Speedup")
+df <- df[-1,]
+df[,1] <- as.numeric(df[,1])
+df[,2] <- as.numeric(df[,2])
+df[,3] <- as.numeric(df[,3])
+df[,4] <- as.numeric(df[,4])
+
+df$Gain <- df$Evaluations[11:15] / df$Evaluations
+#df$MeanSpeedup <- df$Speedup
+
+df2 <- rbind(colMeans(df[df$Proposals==10000,]),colMeans(df[df$Proposals==5000,]),colMeans(df[df$Proposals==1000,]))
+df3 <- rbind(apply(df[df$Proposals==10000,],2,min),apply(df[df$Proposals==5000,],2,min),apply(df[df$Proposals==1000,],2,min))
+
+df4 <- rbind(apply(df[df$Proposals==10000,],2,max),apply(df[df$Proposals==5000,],2,max),apply(df[df$Proposals==1000,],2,max))
+
+colnames(df3) <- c("Proposals","MinIts","MinEvals","MinSpeedup","MinGain")
+colnames(df4) <- c("Proposals","MaxIts","MaxEvals","MaxSpeedup","MaxGain")
+df5 <- merge(df2,df3)
+df6 <- merge(df5,df4)
+df6 <- df6[,c(1,2,6,10,3,7,11,4,8,12,5,9,13)]
+print(xtable::xtable(df6),booktabs=TRUE)
