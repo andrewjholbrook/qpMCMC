@@ -59,7 +59,7 @@ textfont=it]{caption}
 
 \definecolorset{rgb}{}{}{darkred,0.8,0,0;darkgreen,0,0.5,0;darkblue,0,0,0.5}
 
-\doublespacing
+%\doublespacing
 
 \SetKwComment{Comment}{/* }{ */}
 %\RestyleAlgo{ruled}
@@ -173,12 +173,12 @@ d_{F}
 
 
 
-%\author{Andrew J.~Holbrook}
+\author{Andrew J.~Holbrook}
 
 
-%\affil{UCLA Biostatistics}
+\affil{UCLA Biostatistics}
 
-\author{}
+%\author{}
 
 
 
@@ -602,12 +602,13 @@ and that the simplified acceptance probabilities \eqref{eq:probsSimp} maintain d
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
 		$\ttheta_0 \gets \ttheta^{(s-1)}$\;
+		$z_{0} \gets Gumbel(0,1)$\;
 		$\bar{\ttheta} \gets Normal_D(\ttheta_0,\SSigma)$; \hspace{14em} \Comment{ \hspace{0.3em}     Proposal \eqref{eq:p1}}      
-		\For{$p \in \{0,\dots,P\}$}{
+		\For{$p \in \{1,\dots,P\}$}{
 			$\ttheta_p \gets Normal_D(\bar{\ttheta},\SSigma)$\;
 			$z_{p} \gets Gumbel(0,1)$\;
 		}
-		$\hat{p} \gets \argmin_{p=0,\dots,P}\Big(f(p):= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big)\Big)$; \hspace{3.5em} \Comment{$\order{\sqrt{P}}$ Alg \ref{alg:min}}
+		$\hat{p} \gets \argmin_{p=0,\dots,P}\Big(f(p):= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big)\Big)$\;  \hspace{10em}\Comment{\hspace{0.5em} $\order{\sqrt{P}}$ Alg \ref{alg:min} with warm-start at $p=0$.}
 		$\ttheta^{(s)} \gets \ttheta_{\hat{p}}$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
