@@ -22,6 +22,55 @@ groverProbs <- function(N=2^10,M=1) {
   return(probSucceed)
 }
 
+chebPoly <- function(x,L){
+  if(abs(x)<=1){
+    return( cos(L*acos(x)) )
+  } else if (x>1) {
+    return( cosh(L*acosh(x)) )
+  } else {
+    stop("Error")
+  }
+}
+
+RPhiTheta <- function(theta,phi) {
+  Z <- matrix(c(1,0,0,-1),2,2)
+  X <- matrix(c(0,1,1,0),2,2)
+  output <- complexplus::matexp( -0.5*1i*theta*(cos(phi)*Z+sin(phi)*X) )
+  return(output)
+}
+
+genGroverProbs <- function(N=2^10,M=1,delta=sqrt(0.01),L=NULL) {
+  w <- 1/N # width
+  if(is.null(L))  L <- ceiling( log(2/delta)/sqrt(w) )
+  if(L %% 2 == 0) L <- L + 1
+  l <- (L-1)/2 # iterations
+  alphas <- rep(0,l)
+  betas  <- rep(0,l)
+  gamma  <- 1/chebPoly(1/delta,1/L)
+  
+
+  sqrtProbs <- matrix(0,l+1,2)
+  probSucceed <- rep(0,l+1) 
+  sqrtProbs[1,] <- c(sqrt(1-M/N),sqrt(M/N))
+  probSucceed[1] <- M/N
+  phi    <- 2*asin(sqrt(M/N))
+  
+  for(j in 1:l) {
+    alphas[j]    <- 2*atan( 1/(tan(2*pi*j/L)*sqrt(1-gamma^2)) )
+    betas[l-j+1] <- -alphas[j]
+  }
+  
+  for(i in 2:(l+1)) {
+    sqrtProbs[i,]  <- matrix(c(1,0,0,exp(1i*betas[i-1])),2,2) %*% sqrtProbs[i-1,]
+    sqrtProbs[i,]  <- -matrix(c(1-(1-exp(-1i*alphas[i-1]))*(1-M/N),
+                                -(1-exp(-1i*alphas[i-1]))*sqrt((1-M/N)*M/N),
+                                -(1-exp(-1i*alphas[i-1]))*sqrt((1-M/N)*M/N),
+                                1-(1-exp(-1i*alphas[i-1]))*(M/N)),2,2) %*% sqrtProbs[i,]
+    probSucceed[i] <- Mod(sqrtProbs[i,2])^2
+  }
+  return(probSucceed)
+}
+
 expoSearch <- function(N=2^10,M=1,marks=NULL) {
   success <- FALSE
   m <- 1
@@ -53,6 +102,22 @@ expoSearch <- function(N=2^10,M=1,marks=NULL) {
     }
   }
   return(list(grovIter,draw,success))
+}
+
+fixedPointSearch <- function(N=2^10,M=1,marks=NULL,delta=sqrt(0.995)) {
+  # 2D representation
+  grovIter <- 0
+  if(is.null(marks)) {
+    marks <- c(rep(1,M),rep(0,N-M))
+  } else {
+    M <- sum(marks==1)
+    N <- length(marks)
+  }
+  w <- 1/N # width
+  L <- ceiling( log(2/delta)/sqrt(w) )
+  if (L %% 2 == 0) L <- L + 1
+  
+  
 }
 
 quantumMin <- function(field, y=NULL) {
