@@ -39,15 +39,14 @@ RPhiTheta <- function(theta,phi) {
   return(output)
 }
 
-genGroverProbs <- function(N=2^10,M=1,delta=sqrt(0.01),L=NULL) {
-  w <- 1/N # width
+genGroverProbs <- function(N=2^12,M=1,delta=sqrt(0.1),L=NULL,w=NULL) {
+  if(is.null(w)) w <- 1/N
   if(is.null(L))  L <- ceiling( log(2/delta)/sqrt(w) )
   if(L %% 2 == 0) L <- L + 1
   l <- (L-1)/2 # iterations
   alphas <- rep(0,l)
   betas  <- rep(0,l)
   gamma  <- 1/chebPoly(1/delta,1/L)
-  
 
   sqrtProbs <- matrix(0,l+1,2)
   probSucceed <- rep(0,l+1) 
