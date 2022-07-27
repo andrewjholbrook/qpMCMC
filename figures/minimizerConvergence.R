@@ -21,6 +21,22 @@ groverProbs <- function(N=2^10,M=1) {
   return(probSucceed)
 }
 
+# groverProbsExp <- function(N=2^10,M=1) {
+#   Iter  <- ceiling(pi*sqrt(N/M)/4)
+#   marks <- c(rep(1,M),rep(0,N-M))
+#   sqrtProbs <- matrix(0,Iter,N)
+#   probSucceed <- rep(0,Iter) 
+#   sqrtProbs[1,] <- 1/sqrt(N)
+#   probSucceed[1] <- M/N
+#   
+#   for(i in 2:Iter) {
+#     sqrtProbs[i,]  <- sqrtProbs[i-1,] - 2*marks*mean(sqrtProbs[i-1,marks])  
+#     sqrtProbs[i,]  <- -sqrtProbs[i,] + 2*mean(sqrtProbs[i,])
+#     probSucceed[i] <- sum(marks*sqrtProbs[i,]^2)
+#   }
+#   return(probSucceed)
+# }
+
 chebPoly <- function(x,L){
   if(abs(x)<=1){
     return( cos(L*acos(x)) )
@@ -132,9 +148,13 @@ fixedPointSearch <- function(N=2^10,M=1,marks=NULL,delta=sqrt(0.1)) {
   }
   
   for(j in 1:l) {
-    sqrtProbs  <- (diag(N) - (1-exp(1i*betas[j]))*tMat/M) %*% sqrtProbs 
-    sqrtProbs  <- ((1-exp(-1i*alphas[j]))*S - diag(N)) %*% sqrtProbs
-    probSucceed[j+1] <- sum(Mod(sqrtProbs[marks])^2)
+    mult1 <- exp(1i*betas[j]) #/ Mod(1-exp(1i*betas[j])) 
+    mult2 <- exp(-1i*alphas[j]) #/ Mod(1-exp(-1i*alphas[j]))
+    sqrtProbs <-  (1-(1-mult1)*marks)*sqrtProbs
+    sqrtProbs  <- -sqrtProbs + (1-mult2)*mean(sqrtProbs)
+   # sqrtProbs  <- #(diag(N) - (1-exp(1i*betas[j]))*tMat/M) %*% sqrtProbs 
+  #  sqrtProbs  <- #((1-exp(-1i*alphas[j]))*S - diag(N)) %*% sqrtProbs
+    probSucceed[j+1] <- sum(marks*Mod(sqrtProbs)^2)
   }
   draw <- sample(size=1,x=1:N,prob=Mod(sqrtProbs)^2)
   success <- draw <= M
