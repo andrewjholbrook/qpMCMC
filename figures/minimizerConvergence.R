@@ -102,9 +102,8 @@ expoSearch <- function(N=2^10,M=1,marks=NULL) {
   return(list(grovIter,draw,success))
 }
 
-fixedPointSearch <- function(N=2^10,M=1,marks=NULL,delta=sqrt(0.995)) {
+fixedPointSearch <- function(N=2^10,M=1,marks=NULL,delta=sqrt(0.1)) {
   # 2D representation
-  grovIter <- 0
   if(is.null(marks)) {
     marks <- c(rep(1,M),rep(0,N-M))
   } else {
@@ -114,8 +113,32 @@ fixedPointSearch <- function(N=2^10,M=1,marks=NULL,delta=sqrt(0.995)) {
   w <- 1/N # width
   L <- ceiling( log(2/delta)/sqrt(w) )
   if (L %% 2 == 0) L <- L + 1
+  l <- (L-1)/2 # iterations
+  alphas <- rep(0,l)
+  betas  <- rep(0,l)
+  gamma  <- 1/chebPoly(1/delta,1/L)
   
+  s         <- rep(sqrt(1/N),N)
+  S         <- outer(s,s)
+  tMat      <- outer(marks,marks)
+  sqrtProbs <- s
+  probSucceed <- rep(0,l+1) 
+  probSucceed[1] <- M/N
+  phi    <- 2*asin(sqrt(M/N))
   
+  for(j in 1:l) {
+    alphas[j]    <- 2*atan( 1/(tan(2*pi*j/L)*sqrt(1-gamma^2)) )
+    betas[l-j+1] <- -alphas[j]
+  }
+  
+  for(j in 1:l) {
+    sqrtProbs  <- (diag(N) - (1-exp(1i*betas[j]))*tMat) %*% sqrtProbs 
+    sqrtProbs  <- ((1-exp(-1i*alphas[j]))*S - diag(N)) %*% sqrtProbs
+    probSucceed[j+1] <- sum(Mod(sqrtProbs[marks])^2)
+  }
+  draw <- sample(size=1,x=1:N,prob=Mod(sqrtProbs)^2)
+  success <- draw <= M
+  return(list(L-1,draw,success,probSucceed))
 }
 
 quantumMin <- function(field, y=NULL) {
