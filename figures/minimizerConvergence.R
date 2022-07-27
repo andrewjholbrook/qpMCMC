@@ -132,7 +132,7 @@ fixedPointSearch <- function(N=2^10,M=1,marks=NULL,delta=sqrt(0.1)) {
   }
   
   for(j in 1:l) {
-    sqrtProbs  <- (diag(N) - (1-exp(1i*betas[j]))*tMat) %*% sqrtProbs 
+    sqrtProbs  <- (diag(N) - (1-exp(1i*betas[j]))*tMat/M) %*% sqrtProbs 
     sqrtProbs  <- ((1-exp(-1i*alphas[j]))*S - diag(N)) %*% sqrtProbs
     probSucceed[j+1] <- sum(Mod(sqrtProbs[marks])^2)
   }
