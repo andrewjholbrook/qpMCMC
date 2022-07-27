@@ -1,5 +1,4 @@
 library(ggplot2)
-library(ggplot2)
 library(wesanderson)
 library(forcats)
 pal <- wes_palette("Zissou1", 5, type = "discrete")
@@ -67,7 +66,7 @@ genGroverProbs <- function(N=2^12,M=1,delta=sqrt(0.1),L=NULL,w=NULL) {
                                 1-(1-exp(-1i*alphas[i-1]))*(M/N)),2,2) %*% sqrtProbs[i,]
     probSucceed[i] <- Mod(sqrtProbs[i,2])^2
   }
-  return(probSucceed)
+  return( list(probSucceed,L-1) )
 }
 
 expoSearch <- function(N=2^10,M=1,marks=NULL) {
@@ -293,7 +292,45 @@ randomWalk <- function(N, x0, maxIt=10000,earlyStop=FALSE) {
     return(list(chain,ratio,sigma,diag(N)))
 }
 
+################################################################################
+# recreate figure 1 in Yoder et al 2014 (it works!)
+N <- 2^10
+df <- matrix(0,5*N,3)
+df[,3] <- rep(c(0.5,0.25,0.125,0.0625,0.03125),each=N)
 
+for (i in 1:(5*N)) {
+  probs           <- genGroverProbs(N=N,M=i%%N,w=df[i,3])
+  df[i,1]         <- probs[[1]][length(probs[[1]])]
+  df[i,2]         <- probs[[2]]
+}
+df <- as.data.frame(df)
+colnames(df) <- c("Success probability","Oracle\nevaluations","Lower\nbound")
+df$`Success probability`[df$`Success probability`==0] <- 1
+df$Marks <- c(1:N,1:N,1:N,1:N,1:N)/N
+df$`Lower\nbound (M/N)` <- factor(df$`Lower\nbound`)
+df$`Oracle\nevaluations` <- factor(df$`Oracle\nevaluations`)
+
+gg <- ggplot(df,aes(x=Marks,
+                    y=`Success probability`,
+                    color=`Lower\nbound (M/N)`,
+                    fill=`Oracle\nevaluations`)) +
+  geom_hline(aes(yintercept = 0.9)) +
+  geom_line() +
+  geom_point(shape=21,stroke=0,size=0.1) +
+  scale_color_manual(values = pal,guide=guide_legend(override.aes = list(size=c(1,2,3,4,5)))) +
+  scale_fill_manual(values = pal[5:1],guide=guide_legend(reverse=TRUE,override.aes = list(size=c(5,4,3,2,1)))) +
+  xlab("Proportion of solutions (M/N)") +
+  ylab("Probability of success") +
+  ggtitle("Fixed point quantum search") +
+  annotate("text", x = 0.9, y = 0.85, label = expression(paste("1-",delta^2,"=0.9"))) +
+  theme_bw()
+gg
+
+ggsave("~/qpMCMC/figures/FixedPoint.pdf", gg, device = "pdf",width = 8,height=5)
+system2(command = "pdfcrop",
+        args    = c("~/qpMCMC/figures/FixedPoint.pdf",
+                    "~/qpMCMC/figures/FixedPoint.pdf")
+)
 
 ################################################################################
 set.seed(1)
