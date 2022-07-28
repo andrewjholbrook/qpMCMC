@@ -267,84 +267,7 @@ In the following section, we provide a \emph{very} short introduction to the mos
 
 
 
-\section{Limited introduction to quantum computing}\label{sec:shortIntro}
 
-Quantum computers perform operations on unit-length vectors of complex data called quantum bits or \emph{qubits}.  One may write any qubit $\ppsi$ as a linear combination of the \emph{computational basis states} $\ket{0}$ and $\ket{1}$.  In symbols,
-\begin{align*}
-\ket{\psi} = \alpha \ket{0} + \beta \ket{1} \quad \mbox{for} \quad \alpha, \, \beta \in \mathbb{C} \quad \mbox{and} \quad  |\alpha|^2 + |\beta|^2 = 1\, .
-\end{align*}
-This formula uses \emph{Dirac} or \emph{bra-ket} notation and obscures ideas that are commonplace in the realm of applied statistics. We make the unit-vector specification of $\ket{\psi}$ clear by writing
-\begin{align*}
-\ket{0}=\begin{bmatrix}
-1 \\ 0
-\end{bmatrix} \, ,  \quad \ket{1}=\begin{bmatrix}
-0 \\ 1
-\end{bmatrix} \quad \mbox{or} \quad \ket{\psi} = \alpha \begin{bmatrix}
-1 \\ 0
-\end{bmatrix} + \beta  \begin{bmatrix}
-0 \\ 1
-\end{bmatrix}\, .
-\end{align*} 
-The full machinery of linear algebra is also available within this notation. The conjugate transpose of $\ket{\psi}$ is $\bra{\psi}$. The inner product of $\ket{\psi}$ and $\ket{\phi}$ is $\braket{\phi|\psi}$. The outer product is $\ket{\psi}\bra{\phi}$. Naturally, we can write $\ppsi$ as a linear combination of any other such basis elements. Consider instead the vectors
-\begin{align*}
-\ket{+} = \frac{1}{\sqrt{2}} \ket{0} + \frac{1}{\sqrt{2}} \ket{1} \quad \mbox{and} \quad \ket{-} = \frac{1}{\sqrt{2}} \ket{0} - \frac{1}{\sqrt{2}} \ket{1} \, .
-\end{align*}
-A little algebra shows that $\ket{+}$ and $\ket{-}$ are indeed unit-length and orthogonal to each other. A little more algebra reveals that, with respect to this basis, $\ppsi$ has coefficients $\alpha'$ and $\beta'$ given by $(\alpha + \beta)/\sqrt{2}$ and $(\alpha - \beta)/\sqrt{2}$, respectively. A last bit of algebra shows that this representation is consistent with $\ppsi$'s unit length.
-
-But linear algebra is not the only aspect of quantum computing that should come easily to applied statisticians. In addition to thinking of $\ppsi$ as a vector, it is also useful to think of $\ppsi$ as a (discrete) probability distribution over the computational basis states $\ket{0}$ and $\ket{1}$. The constraints on coefficients $\alpha$ and $\beta$ mean that we can think of $|\alpha|^2$ and $|\beta|^2$ as probabilities that $\ppsi$ is in state $\ket{0}$ or $\ket{1}$, respectively.  Accordingly, $\ket{+}$ and $\ket{-}$ encode uniform distributions over the computational basis states.  In the parlance of quantum mechanics, $\alpha$, $\beta$ and $\pm1/\sqrt{2}$ are all \emph{probability amplitudes}, and $\ppsi$, $\ket{+}$ and $\ket{-}$ are all \emph{superpositions} of the computational basis states. Quantum \emph{measurement} of $\ppsi$ results in $\ket{0}$ with probability $|\alpha|^2$, but---in the following---we can safely think of this physical procedure as drawing a single discrete sample from $\ppsi$'s implied probability distribution.
-
-Quantum logic gates perform linear operations on qubits like $\ppsi$ and take the form of unitary matrices $\U$ satisfying $\U^\dagger \U=\I$ for $\U^\dagger$ the conjugate transpose of $\U$. One terrifically important single-qubit quantum gate is the \emph{Hadamard gate}
-\begin{align*}
-\H = \frac{1}{\sqrt{2}} \left[\begin{array}{rr}
-1 & 1 \\
-1 & -1 \end{array}\right] \, .
-\end{align*}
-One may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  In fact, the reverse is also true on account of the symmetry of $\H$.  The Hadamard gate thus takes the computational basis states in and out of superposition, facilitating a phenomenon called \emph{quantum parallelism}. Given a function $f: \{0,1\} \rightarrow \{0,1\}$, consider the two-qubit quantum \emph{oracle} gate $\U_f$ which takes $\ket{x}\ket{y}$ as input and returns $\ket{x}\ket{y\oplus f(x)}$ as output, where $\oplus$ denotes addition modulo 2.  Importantly, the output simplifies to $\ket{x}\ket{f(x)}$ for $y=0$. We now consider a quantum circuit that acts on two qubits by first applying the Hadamard transform $\H$ to the first qubit and then applying the oracle gate $\U_f$ to both. Using the state $\ket{0}\ket{0}$ as input, we have
-\begin{align}\label{eq:quantparallel}
-\ket{0}\ket{0} \longrightarrow \frac{1}{\sqrt{2}} \ket{0}\ket{0} + \frac{1}{\sqrt{2}} \ket{1}\ket{0}  \longrightarrow \frac{1}{\sqrt{2}} \ket{0}\ket{f(0)} + \frac{1}{\sqrt{2}} \ket{1}\ket{f(1)} \, .
-\end{align}
-The quantum circuit evaluates $f(\cdot)$ simultaneously over both inputs!  Unfortunately, the scientist who implements this circuit cannot directly access $\U_f$'s output, and measurement will provide only $\ket{0}\ket{f(0)}$ or $\ket{1}\ket{f(1)}$ with probability $1/2$ each.  Unlocking the potential of quantum parallelism requires more ingenuity.
-
-Uncountably many single- and two-qubit quantum gates exist, but the real power of quantum computing stems from the development of complex quantum gates that act on multiple qubits simultaneously.   To access this power, we need one more tool that also appears in the statistics literature.  The \emph{Kronecker} or \emph{tensor} product between an $L$-by-$M$ matrix $\A$ and an $N$-by-$O$ matrix $\B$ is the $LN$-by-$MO$ matrix
-\begin{align}\label{eq:kron}
-\A \otimes \B = \begin{bmatrix}
-A_{11} \B & \dots & A_{1M} \B \\
-\vdots & \ddots & \vdots \\
-A_{L1}\B & \cdots & A_{LM}  \B
-\end{bmatrix} \, .
-\end{align} 
-In statistics, the Kronecker product features in the definition of a matrix normal distribution and is sometimes helpful when specifying the kernel function of a multivariate Gaussian process \citep{werner2008estimation}. Here, the product is equivalent to the parallel action of individual quantum gates on individual qubits.  Simple application of Formula \eqref{eq:kron} shows that
-\begin{align}\label{eq:twoqubits}
-\H^{\otimes 2} =\H \otimes \H = \frac{1}{2} \left[\begin{array}{rrrr}
-1 & 1 & 1 & 1 \\
-1 &  -1& 1 & -1 \\
-1 & 1 & -1 & -1 \\
-1 & -1 & -1 & 1
-\end{array}\right] \quad \mbox{and} \quad \ket{0}\otimes\ket{0}=\begin{bmatrix}
-1 \\ 0
-\end{bmatrix} \otimes \begin{bmatrix}
-1 \\ 0
-\end{bmatrix} = \begin{bmatrix}
-1 \\ 0 \\ 0 \\ 0
-\end{bmatrix} \, .
-\end{align} 
-We may also denote the left product $\H^{\otimes2}$ and the right product $\ket{0}^{\otimes2}$, $\ket{00}$ or $\ket{0}\ket{0}$. One may therefore express Equation \eqref{eq:quantparallel} as a series of transformations applied to the 4-vector on the very right. Letting $\ket{10}$, $\ket{01}$ and $\ket{11}$ take on analogous meanings to $\ket{00}$, an immediate result of Equation \eqref{eq:twoqubits} is that
-\begin{align}\label{eq:twodmult}
-\H^{\otimes2} \ket{00} = \frac{1}{2}\Big(\ket{00} + \ket{01} + \ket{10} + \ket{11}\Big) \, .
-\end{align}
-The action of $\H^{\otimes2}$ transforms $\ket{00}$ into a superposition of the states $\ket{00}$, $\ket{10}$, $\ket{01}$ and $\ket{11}$, where the probability of selecting each is a uniform $(1/2)^2=1/4$. Writing so many $0$s and $1$s is tedious, so an alternative notation becomes preferable. Exchanging $\ket{0}$ for $\ket{00}$, $\ket{1}$ for $\ket{01}$, $\ket{2}$ for $\ket{10}$, and $\ket{3}$ for $\ket{11}$, Equation \eqref{eq:twodmult} becomes the more succinct
-\begin{align*}
-\H^{\otimes2} \ket{00} = \frac{1}{2}\Big(\ket{0} + \ket{1} + \ket{2} + \ket{3}\Big) \, .
-\end{align*}
-This formula extends generally to operations over $n$ qubits.  Now letting $N=2^n$, we have
-\begin{align*}%\label{eq:superpos}
-\H^{\otimes n} \ket{0}^{\otimes n} = \frac{1}{\sqrt{N}}\Big(\ket{0} + \ket{1} + \dots + \ket{N-1}\Big) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x}=:\ket{h} \, ,
-\end{align*}
-and we call $\ket{h}$ a \emph{uniform superposition} over the states $\ket{0},\dots,\ket{N-1}$. The many-qubit analogue for the quantum parallelism of Equation \eqref{eq:quantparallel} is then
-\begin{align*}%\label{eq:quantparallel2}
-\ket{0}^{\otimes n}\ket{0} \longrightarrow \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right) \ket{0}  \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{f(x)} \, .
-\end{align*}
-In the next section, we review established quantum algorithms that leverage such many-qubit quantum parallelism for search and minimization.  Following this, we embed parallel MCMC subroutines within quantum minimization.
 
 \section{Quantum search and quantum minimization}\label{sec:qmin}
 
@@ -432,17 +355,29 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
 \end{algorithm}
  
  While Grover's algorithm delivers impressive speedups over classical search algorithms, it has a major weakness.
- Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monotinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}).  When a solution exists, the algorithm returns a solution with expected total number of Grover iterations bounded above by $\frac{9}{2}\sqrt{N/M}$.  Still better, this upper bound reduces to $\frac{9}{4}\sqrt{N/M}$ for the special case $M\ll N$, and simulations presented in Figure \ref{fig:expo} show that even this bound is large.  Such results come in handy when deciding whether to halt the algorithm's progress if one believes it possible that no solutions exist.  Indeed, this turns out to be useful in the context of quantum minimization.
+ Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monotinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}).  When a solution exists, the algorithm returns a solution with expected total number of Grover iterations bounded above by $\frac{9}{2}\sqrt{N/M}$.  Still better, this upper bound reduces to $\frac{9}{4}\sqrt{N/M}$ for the special case $M\ll N$, and simulations presented in Figure \ref{fig:expo} show that even this bound is large.  Such results come in handy when deciding whether to halt the algorithm's progress if one believes it possible that no solutions exist.  Indeed, this turns out to be useful in the context of quantum minimization (Section \ref{sec:qmin}).
  
 
  
  \begin{figure}[!t]
  	\centering
- 	\includegraphics[width=0.9\linewidth]{expoSearch.pdf}
- 	\caption{Total number of oracle evaluations required by quantum exponential searching algorithm \citep{boyer1998tight} for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.  Horizontal lines at $\frac{9}{4}\sqrt{N}$ represent upper bounds on expected total number of evaluations to obtain a solution for the $M=1$ problem.}\label{fig:expo}
+ 	\includegraphics[width=1\linewidth]{searchingFigs.pdf}
+ 	\caption{[Left] Total number of oracle evaluations required by quantum exponential searching algorithm (QESA) \citep{boyer1998tight} for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.  Horizontal lines at $\frac{9}{4}\sqrt{N}$ represent upper bounds on expected total number of evaluations to obtain a solution for the $M=1$ problem. [Right] Under the same experimental settings, additional number of oracle evaluations required by fixed-point quantum search (FPQS) algorithm of \citet{yoder2014fixed} compared to QESA.}\label{fig:expo}
  \end{figure}
  
-
+Algorithm \ref{alg:expoSearch} is not the only quantum search algorithm that is useful when the number of solutions $M$ is unknown.  \citet{yoder2014fixed} use \emph{generalized Grover iterations} that extend Equation \eqref{eq:grov} to include general phases $(\alpha_j,\beta_j)$:
+\begin{align}\label{eq:grovGen}
+	\G(\alpha_j,\beta_j) := - \U_h(\alpha_j) \U_{x_0}(\beta_j) := \Big((1-e^{-i\alpha_j})\ket{h}\bra{h}-\I \Big) \Big( \I - (1-e^{i\beta_j}) \ket{x_0}\bra{x_0} \Big) \, .
+\end{align}
+The method first fixes an error tolerance $\delta^2>0$ and a lower bound $w\leq \lambda=M/N$ and then selects an odd upper bound $L$ on the total number of oracle queries ($L-1$) such that 
+\begin{align*}
+	L \geq \frac{\log(2/\delta)}{\sqrt{w}} \, .
+\end{align*}
+Finally,  letting $l=(L-1)/2$, one obtains phases $(\alpha_j,\beta_j)$ for $j=1,\dots,l$ that satisfy
+\begin{align*}
+	\alpha_j = - \beta_{l-j+1} =2 \cot^{-1} \left( \tan(2\pi j /L) \sqrt{1-\gamma^2} \right) \, ,
+\end{align*}
+ where $\gamma^{-1} =  \cos(\frac{1}{L}\cos^{-1}(\frac{1}{\delta}))$ is the reciprocal of the inverse  $L$th Chebyshev polynomial of the first kind.  
  
  \subsection{Quantum minimization}
 
@@ -697,13 +632,90 @@ Of course, simulating these iterations on a classical computer, requires precomp
 
 We have shown how parallel MCMC may enjoy quadratic speedups by combining quantum minimization with the Gumbel-max trick.  Within a QPMCMC iteration, the current state represents a warm-start for the sampling-turned-optimization problem, leading to increased efficiencies for the quantum minimization algorithm.  This work leads to two immediate questions.  First, more recent quantum minimization algorithms exist \citep{baritompa2005grover,farhi2014quantum}.  Would these confer additional speedups for quantum parallel MCMC and benefit from warm-starting in a similar manner? Second, there are other models and algorithms in statistics, machine learning and statistical mechanics that require sampling from potentially costly discrete distributions.  Can one adapt  the proposed strategies to these?  Large-scale, practical quantum computing is still a long way off, but quantum algorithms are ripe for mainstream computational statistics.
 
-\bibliographystyle{chicago}
-\bibliography{refs}
+
 
 \appendix
 
+\section{Limited introduction to quantum computing}\label{sec:shortIntro}
 
+Quantum computers perform operations on unit-length vectors of complex data called quantum bits or \emph{qubits}.  One may write any qubit $\ppsi$ as a linear combination of the \emph{computational basis states} $\ket{0}$ and $\ket{1}$.  In symbols,
+\begin{align*}
+	\ket{\psi} = \alpha \ket{0} + \beta \ket{1} \quad \mbox{for} \quad \alpha, \, \beta \in \mathbb{C} \quad \mbox{and} \quad  |\alpha|^2 + |\beta|^2 = 1\, .
+\end{align*}
+This formula uses \emph{Dirac} or \emph{bra-ket} notation and obscures ideas that are commonplace in the realm of applied statistics. We make the unit-vector specification of $\ket{\psi}$ clear by writing
+\begin{align*}
+	\ket{0}=\begin{bmatrix}
+		1 \\ 0
+	\end{bmatrix} \, ,  \quad \ket{1}=\begin{bmatrix}
+		0 \\ 1
+	\end{bmatrix} \quad \mbox{or} \quad \ket{\psi} = \alpha \begin{bmatrix}
+		1 \\ 0
+	\end{bmatrix} + \beta  \begin{bmatrix}
+		0 \\ 1
+	\end{bmatrix}\, .
+\end{align*} 
+The full machinery of linear algebra is also available within this notation. The conjugate transpose of $\ket{\psi}$ is $\bra{\psi}$. The inner product of $\ket{\psi}$ and $\ket{\phi}$ is $\braket{\phi|\psi}$. The outer product is $\ket{\psi}\bra{\phi}$. Naturally, we can write $\ppsi$ as a linear combination of any other such basis elements. Consider instead the vectors
+\begin{align*}
+	\ket{+} = \frac{1}{\sqrt{2}} \ket{0} + \frac{1}{\sqrt{2}} \ket{1} \quad \mbox{and} \quad \ket{-} = \frac{1}{\sqrt{2}} \ket{0} - \frac{1}{\sqrt{2}} \ket{1} \, .
+\end{align*}
+A little algebra shows that $\ket{+}$ and $\ket{-}$ are indeed unit-length and orthogonal to each other. A little more algebra reveals that, with respect to this basis, $\ppsi$ has coefficients $\alpha'$ and $\beta'$ given by $(\alpha + \beta)/\sqrt{2}$ and $(\alpha - \beta)/\sqrt{2}$, respectively. A last bit of algebra shows that this representation is consistent with $\ppsi$'s unit length.
 
+But linear algebra is not the only aspect of quantum computing that should come easily to applied statisticians. In addition to thinking of $\ppsi$ as a vector, it is also useful to think of $\ppsi$ as a (discrete) probability distribution over the computational basis states $\ket{0}$ and $\ket{1}$. The constraints on coefficients $\alpha$ and $\beta$ mean that we can think of $|\alpha|^2$ and $|\beta|^2$ as probabilities that $\ppsi$ is in state $\ket{0}$ or $\ket{1}$, respectively.  Accordingly, $\ket{+}$ and $\ket{-}$ encode uniform distributions over the computational basis states.  In the parlance of quantum mechanics, $\alpha$, $\beta$ and $\pm1/\sqrt{2}$ are all \emph{probability amplitudes}, and $\ppsi$, $\ket{+}$ and $\ket{-}$ are all \emph{superpositions} of the computational basis states. Quantum \emph{measurement} of $\ppsi$ results in $\ket{0}$ with probability $|\alpha|^2$, but---in the following---we can safely think of this physical procedure as drawing a single discrete sample from $\ppsi$'s implied probability distribution.
+
+Quantum logic gates perform linear operations on qubits like $\ppsi$ and take the form of unitary matrices $\U$ satisfying $\U^\dagger \U=\I$ for $\U^\dagger$ the conjugate transpose of $\U$. One terrifically important single-qubit quantum gate is the \emph{Hadamard gate}
+\begin{align*}
+	\H = \frac{1}{\sqrt{2}} \left[\begin{array}{rr}
+		1 & 1 \\
+		1 & -1 \end{array}\right] \, .
+\end{align*}
+One may verify that $\H$ is indeed unitary and that its action maps $\ket{0}$ to $\ket{+}$ and $\ket{1}$ to $\ket{-}$.  In fact, the reverse is also true on account of the symmetry of $\H$.  The Hadamard gate thus takes the computational basis states in and out of superposition, facilitating a phenomenon called \emph{quantum parallelism}. Given a function $f: \{0,1\} \rightarrow \{0,1\}$, consider the two-qubit quantum \emph{oracle} gate $\U_f$ which takes $\ket{x}\ket{y}$ as input and returns $\ket{x}\ket{y\oplus f(x)}$ as output, where $\oplus$ denotes addition modulo 2.  Importantly, the output simplifies to $\ket{x}\ket{f(x)}$ for $y=0$. We now consider a quantum circuit that acts on two qubits by first applying the Hadamard transform $\H$ to the first qubit and then applying the oracle gate $\U_f$ to both. Using the state $\ket{0}\ket{0}$ as input, we have
+\begin{align}\label{eq:quantparallel}
+	\ket{0}\ket{0} \longrightarrow \frac{1}{\sqrt{2}} \ket{0}\ket{0} + \frac{1}{\sqrt{2}} \ket{1}\ket{0}  \longrightarrow \frac{1}{\sqrt{2}} \ket{0}\ket{f(0)} + \frac{1}{\sqrt{2}} \ket{1}\ket{f(1)} \, .
+\end{align}
+The quantum circuit evaluates $f(\cdot)$ simultaneously over both inputs!  Unfortunately, the scientist who implements this circuit cannot directly access $\U_f$'s output, and measurement will provide only $\ket{0}\ket{f(0)}$ or $\ket{1}\ket{f(1)}$ with probability $1/2$ each.  Unlocking the potential of quantum parallelism requires more ingenuity.
+
+Uncountably many single- and two-qubit quantum gates exist, but the real power of quantum computing stems from the development of complex quantum gates that act on multiple qubits simultaneously.   To access this power, we need one more tool that also appears in the statistics literature.  The \emph{Kronecker} or \emph{tensor} product between an $L$-by-$M$ matrix $\A$ and an $N$-by-$O$ matrix $\B$ is the $LN$-by-$MO$ matrix
+\begin{align}\label{eq:kron}
+	\A \otimes \B = \begin{bmatrix}
+		A_{11} \B & \dots & A_{1M} \B \\
+		\vdots & \ddots & \vdots \\
+		A_{L1}\B & \cdots & A_{LM}  \B
+	\end{bmatrix} \, .
+\end{align} 
+In statistics, the Kronecker product features in the definition of a matrix normal distribution and is sometimes helpful when specifying the kernel function of a multivariate Gaussian process \citep{werner2008estimation}. Here, the product is equivalent to the parallel action of individual quantum gates on individual qubits.  Simple application of Formula \eqref{eq:kron} shows that
+\begin{align}\label{eq:twoqubits}
+	\H^{\otimes 2} =\H \otimes \H = \frac{1}{2} \left[\begin{array}{rrrr}
+		1 & 1 & 1 & 1 \\
+		1 &  -1& 1 & -1 \\
+		1 & 1 & -1 & -1 \\
+		1 & -1 & -1 & 1
+	\end{array}\right] \quad \mbox{and} \quad \ket{0}\otimes\ket{0}=\begin{bmatrix}
+		1 \\ 0
+	\end{bmatrix} \otimes \begin{bmatrix}
+		1 \\ 0
+	\end{bmatrix} = \begin{bmatrix}
+		1 \\ 0 \\ 0 \\ 0
+	\end{bmatrix} \, .
+\end{align} 
+We may also denote the left product $\H^{\otimes2}$ and the right product $\ket{0}^{\otimes2}$, $\ket{00}$ or $\ket{0}\ket{0}$. One may therefore express Equation \eqref{eq:quantparallel} as a series of transformations applied to the 4-vector on the very right. Letting $\ket{10}$, $\ket{01}$ and $\ket{11}$ take on analogous meanings to $\ket{00}$, an immediate result of Equation \eqref{eq:twoqubits} is that
+\begin{align}\label{eq:twodmult}
+	\H^{\otimes2} \ket{00} = \frac{1}{2}\Big(\ket{00} + \ket{01} + \ket{10} + \ket{11}\Big) \, .
+\end{align}
+The action of $\H^{\otimes2}$ transforms $\ket{00}$ into a superposition of the states $\ket{00}$, $\ket{10}$, $\ket{01}$ and $\ket{11}$, where the probability of selecting each is a uniform $(1/2)^2=1/4$. Writing so many $0$s and $1$s is tedious, so an alternative notation becomes preferable. Exchanging $\ket{0}$ for $\ket{00}$, $\ket{1}$ for $\ket{01}$, $\ket{2}$ for $\ket{10}$, and $\ket{3}$ for $\ket{11}$, Equation \eqref{eq:twodmult} becomes the more succinct
+\begin{align*}
+	\H^{\otimes2} \ket{00} = \frac{1}{2}\Big(\ket{0} + \ket{1} + \ket{2} + \ket{3}\Big) \, .
+\end{align*}
+This formula extends generally to operations over $n$ qubits.  Now letting $N=2^n$, we have
+\begin{align*}%\label{eq:superpos}
+	\H^{\otimes n} \ket{0}^{\otimes n} = \frac{1}{\sqrt{N}}\Big(\ket{0} + \ket{1} + \dots + \ket{N-1}\Big) =  \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x}=:\ket{h} \, ,
+\end{align*}
+and we call $\ket{h}$ a \emph{uniform superposition} over the states $\ket{0},\dots,\ket{N-1}$. The many-qubit analogue for the quantum parallelism of Equation \eqref{eq:quantparallel} is then
+\begin{align*}%\label{eq:quantparallel2}
+	\ket{0}^{\otimes n}\ket{0} \longrightarrow \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right) \ket{0}  \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{f(x)} \, .
+\end{align*}
+
+\bibliographystyle{chicago}
+\bibliography{refs}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

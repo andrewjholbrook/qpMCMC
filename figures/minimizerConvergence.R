@@ -394,7 +394,7 @@ gg <- ggplot(df3,aes(x=Solutions,y=Additional,fill=N)) +
   geom_boxplot() +
   #scale_color_manual(values = pal) +
   scale_fill_manual(values = pal) +
-  ylab("Oracle evaluations (QFPS minus QESA)")+
+  ylab("Oracle evaluations (FPQS minus QESA)")+
   xlab("Solutions (M)") +
   ggtitle("Comparing quantum search algorithms") +
   theme_bw()
@@ -438,7 +438,10 @@ library(ggpubr)
 
 ggsave("~/qpMCMC/figures/searchingFigs.pdf",ggarrange(gg2,gg , ncol = 2, nrow = 1, common.legend = TRUE, 
           legend = "bottom"),device = "pdf",width = 12,height=4)
-
+system2(command = "pdfcrop",
+        args    = c("~/qpMCMC/figures/searchingFigs.pdf",
+                    "~/qpMCMC/figures/searchingFigs.pdf")
+)
 
 ################################################################################
 # recreate figure 1 in Yoder et al 2014 (it works!)
