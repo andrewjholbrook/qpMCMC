@@ -362,8 +362,15 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  \begin{figure}[!t]
  	\centering
  	\includegraphics[width=1\linewidth]{searchingFigs.pdf}
- 	\caption{[Left] Total number of oracle evaluations required by quantum exponential searching algorithm (QESA) \citep{boyer1998tight} for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.  Horizontal lines at $\frac{9}{4}\sqrt{N}$ represent upper bounds on expected total number of evaluations to obtain a solution for the $M=1$ problem. [Right] Under the same experimental settings, additional number of oracle evaluations required by fixed-point quantum search (FPQS) algorithm of \citet{yoder2014fixed} compared to QESA.}\label{fig:expo}
+ 	\caption{[Left] Total number of oracle evaluations required by quantum exponential searching algorithm (Algorithm \ref{alg:expoSearch}) for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.  Horizontal lines at $\frac{9}{4}\sqrt{N}$ represent upper bounds on expected total number of evaluations to obtain a solution for the $M=1$ problem. [Right] Probabilities of success for the fixed-point quantum search algorithm \citep{yoder2014fixed} for different proportions of solutions $\lambda=M/N$ and selecting different lower bounds $w$ on $M/N$ with error tolerance $\delta^2$. }\label{fig:expo}
  \end{figure}
+
+ \begin{figure}[!t]
+	\centering
+	\includegraphics[width=0.7\linewidth]{searchComparison.pdf}
+	\caption{Total number of oracle evaluations required by fixed-point quantum search (FPQS) \citep{yoder2014fixed} minus total required for quantum exponential searching algorithm (QESA) (Algorithm \ref{alg:expoSearch}) for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.}\label{fig:comp}
+\end{figure}
+
  
 Algorithm \ref{alg:expoSearch} is not the only quantum search algorithm that is useful when the number of solutions $M$ is unknown.  \citet{yoder2014fixed} use \emph{generalized Grover iterations} that extend Equation \eqref{eq:grov} to include general phases $(\alpha_j,\beta_j)$:
 \begin{align}\label{eq:grovGen}
