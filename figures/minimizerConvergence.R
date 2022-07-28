@@ -336,6 +336,111 @@ randomWalk <- function(N, x0, maxIt=10000,earlyStop=FALSE) {
 }
 
 ################################################################################
+# fixed point vs exponential search
+set.seed(1)
+
+# first get empirical probabilities of failure from 1000 independent runs
+# for exponential search
+N <- 2^c(10:14)
+df <- data.frame()
+for(n in N) {
+  for(M in c(20,15,10,5,1)) {
+    for (k in 1:500) {
+      df <- rbind(df,c(n,
+                       M,
+                       expoSearch(N=n,M=M)[[3]]))
+      if(k %% 100==0)   cat(k,"\n")
+    }
+    cat(M,"\n")
+  }  
+}
+colnames(df) <- c("N","M","Success")
+
+
+N <- 2^c(10:14)
+df2 <- data.frame()
+for(n in N) {
+  for(M in c(20,15,10,5,1)) {
+    for (k in 1:500) {
+      if (mean(df$Success[df$N==n & df$M==M])==1 ) {
+        delta <- sqrt(0.005)
+      } else {
+        delta <- sqrt(1-mean(df$Success[df$N==n & df$M==M]))
+      }
+      df2 <- rbind(df2,c(n,
+                       M,
+                       expoSearch(N=n,M=M)[[1]],
+                       fixedPointSearch(N=n,M=M,delta = delta)[[1]]))
+      if(k %% 100==0)   cat(k,"\n")
+    }
+    cat(M,"\n")
+  }  
+}
+saveRDS(df2,"~/qpMCMC/expoVsFixed.rds")
+df3 <- readRDS("~/qpMCMC/expoVsFixed.rds")
+
+colnames(df3) <- c("N","Solutions","Expo","Fixed")
+df3$Solutions <- factor(df3$Solutions)
+df3$N <- factor(df3$N)
+df3$N <- fct_rev(df3$N)
+df3$Additional <- df3$Fixed - df3$Expo
+
+# df4 <- reshape2::melt(df3,measure.vars=3:4,
+#                       value.name ="Evaluations",
+#                       variable.name="Algorithm")
+
+gg <- ggplot(df3,aes(x=Solutions,y=Additional,fill=N)) +
+  #geom_hline(aes(yintercept = 9/4*sqrt(2^(9+6-as.numeric(N))), colour=N),size=1.5,alpha=0.7) +
+  geom_boxplot() +
+  #scale_color_manual(values = pal) +
+  scale_fill_manual(values = pal) +
+  ylab("Oracle evaluations (QFPS minus QESA)")+
+  xlab("Solutions (M)") +
+  ggtitle("Comparing quantum search algorithms") +
+  theme_bw()
+gg
+
+ggsave("~/qpMCMC/figures/searchComparison.pdf",device="pdf",width = 7, height = 4)
+
+#expo plot
+set.seed(1)
+N <- 2^c(10:14)
+df <- data.frame()
+for(n in N) {
+  for(M in c(20,15,10,5,1)) {
+    for (k in 1:500) {
+      df <- rbind(df,c(n,M,expoSearch(N=n,M=M)[[1]]))
+      if(k %% 100==0)   cat(k,"\n")
+    }
+    cat(M,"\n")
+  }  
+}
+
+
+colnames(df) <- c("N","Solutions","GroverIts")
+df$Solutions <- factor(df$Solutions)
+df$N <- factor(df$N)
+
+df$N <- fct_rev(df$N)
+
+gg2 <- ggplot(df,aes(x=Solutions,y=GroverIts,fill=N)) +
+  geom_hline(aes(yintercept = 9/4*sqrt(2^(9+6-as.numeric(N))), colour=N),size=1.5,alpha=0.7) +
+  geom_boxplot() +
+  scale_color_manual(values = pal) +
+  scale_fill_manual(values = pal) +
+  ylab("Oracle evaluations")+
+  xlab("Solutions (M)") +
+  ggtitle("Quantum exponential searching algorithm") +
+  theme_bw()
+gg2
+
+library(ggpubr)
+
+ggsave("~/qpMCMC/figures/searchingFigs.pdf",ggarrange(gg2,gg , ncol = 2, nrow = 1, common.legend = TRUE, 
+          legend = "bottom"),device = "pdf",width = 12,height=4)
+
+
+################################################################################
 # recreate figure 1 in Yoder et al 2014 (it works!)
 N <- 2^10
 df <- matrix(0,5*N,3)
