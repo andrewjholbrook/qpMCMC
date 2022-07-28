@@ -26,7 +26,7 @@
 \usepackage{etoolbox}
 \usepackage{appendix}
 \usepackage[format=plain,
-labelfont={it},
+labelfont={it,bf},
 textfont=it]{caption}
 \usepackage{subcaption}
 \usepackage{wrapfig}
@@ -184,6 +184,9 @@ d_{F}
 
 \renewcommand\Authands{ and }
 
+\renewcommand\AlCapFnt{\itshape}
+\renewcommand\AlCapNameFnt{\AlCapFnt}
+
 
 \graphicspath{{figures/}}
 
@@ -230,7 +233,11 @@ Here, if $\Ttheta=(\ttheta_0,\dots,\ttheta_{P})$ is the $D\times (P+1)$ matrix h
 \citet{tjelmeland2004using} shows that the kernel $P(\ttheta_0,\cdot)$ constructed in such a manner maintains detailed balance and hence satisfies Equation \eqref{eq:fixes}.  Others have since built on this work, developing parallel MCMC methods that generate or recycle multiple proposals \citep{frenkel2004speed,delmas2009does,calderhead2014general,yang2018parallelizable,luo2019multiple,schwedes2021rao,holbrook2021generating}.  
 These developments demonstrate the ability of parallel MCMC methods to alleviate inferential challenges such as multimodality and to deliver performance gains over single-proposal competitors as measured by reduced autocorrelation between samples.  In the following, we focus on the specification presented in Algorithm \ref{alg:pMCMC} but note that the techniques we present may also be effective for generalizations of this basic algorithm.
 
-\begin{algorithm}[t!]
+\begin{figure}[!t]
+	\centering
+	\scalebox{0.9}{
+\begin{minipage}{1\textwidth}
+\begin{algorithm}[H]
 	\caption{Parallel MCMC \citep{tjelmeland2004using}}\label{alg:pMCMC}
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and from a $P+1$ discrete distribution $Discrete(\ppi)$ given some probability vector $\ppi=(\pi_0,\dots,\pi_P)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
@@ -248,6 +255,9 @@ These developments demonstrate the ability of parallel MCMC methods to alleviate
 	\vspace{0.5em}
 	
 \end{algorithm}
+\end{minipage}
+}
+\end{figure}
 
 But the real promise and power of parallel MCMC comes from its natural parallelizability \citep{calderhead2014general}.  Contemporary hardware design emphasizes architectures that enable execution of multiple mathematical operations simultaneously. Parallel MCMC techniques stand to leverage technological developments that keep modern computation on track with Moore's Law, which predicts that processing power doubles every two years.  For example, the algorithm of \citet{tjelmeland2004using} generates $P$ conditionally independent proposals and then evaluates the probabilities of Equation \eqref{eq:probs}.  One may parallelize the proposal generation step using parallel pseudorandom number generators (PRNG) such as those advanced in \citet{salmon2011parallel}. The computational complexity of the target evaluations $\pi(\ttheta_p)$ is linear in the number of proposals. This presents a significant burden when $\pi(\cdot)$ is computationally expensive, e.g., in big data settings or for Bayesian inversion, but evaluation of the target density over the $P$ proposals is again a naturally parallelizable task.  Moreover, widely available machine learning software such as \textsc{TensorFlow} allows users to easily parallelize both random number generation and target evaluations on general purpose graphics processing units (GPU) \citep{lao2020tfp}. Finally, when generating independent proposals using a proposal distribution of the form $q(\ttheta_0,\Ttheta_{-0})=\prod_{p=1}^Pq(\ttheta_0,\ttheta_{p})$, the acceptance probabilities \eqref{eq:probs} require the $\order{P^2}$ evaluation of the $P+1\choose 2$ terms $q(\ttheta_{p},\ttheta_{p'})$, but \citet{massive,holbrook2021scalable} demonstrate the natural parallelizability of such pairwise operations, obtaining orders-of-magnitude speedups with contemporary GPUs.
 
@@ -275,7 +285,11 @@ In the following section, we provide a \emph{very} short introduction to the mos
 
 \subsection{Quantum search}
 
-\begin{algorithm}[t!]
+\begin{figure}[!t]
+	\centering
+	\scalebox{0.9}{
+\begin{minipage}{1\textwidth}
+\begin{algorithm}[H]
 	\caption{Quantum search algorithm \citep{grover1996fast}}\label{alg:grover}
 	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ that satisfies $f(x_0)=1$ for a single $x_0$; $n+1=\log_2(N)+1$ quantum states initialized to $\ket{0}^{\otimes n} \ket{1}$; an integer $R=\ceil{\pi\sqrt{N}/4}$ denoting the number of Grover iterations.}
 	\KwResult{An $n$-bit binary string $x_0$ satisfying $f(x_0)=1$ with error less than $1/N$.}
@@ -286,6 +300,9 @@ In the following section, we provide a \emph{very} short introduction to the mos
 		\vspace{0.5em}
 		
 \end{algorithm}
+\end{minipage}
+}
+\end{figure}
 
 \begin{figure}[!t]
 	\centering
@@ -333,7 +350,11 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
 \end{align}
  and the probability of success after those $R$ iterations \emph{do} change \citep{boyer1998tight}.  When $M$ is much smaller than $N$, the success rate is greater than $1-M/N$, and even for large $M$ the success rate is more than $1/2$. Lower-bounds are useful for establishing mathematical guarantees, but it is also helpful to understand the quality of algorithmic performance as a function of $M$ and $R$. Figure \ref{fig:grov} shows success curves as a function of the number of Grover iterations (or oracle calls) applied.  The search field contains $2^{14} \approx 16$k elements, and the number of solutions $M$ varies. Each curve represents an individual search task.  The algorithm requires more iterations for smaller numbers and fewer iterations for larger numbers of solutions.  The upper bound on error $M/N$ is only an upper bound: the final probability of success for, e.g., $M=256$ is 0.997 compared to the bound of 0.984.
  
-  \begin{algorithm}[th!]
+\begin{figure}[!t]
+	\centering
+	\scalebox{0.9}{
+		\begin{minipage}{1\textwidth}
+			\begin{algorithm}[H]
 	\caption{Quantum exponential searching algorithm \citep{boyer1998tight}}\label{alg:expoSearch}
 	\KwData{An oracle gate $\U_f$ taking $\ket{x}\ket{y}$ to $\ket{x}\ket{y\oplus f(x)}$ for a function $f(x):\{0,\dots,N-1\}\rightarrow \{0,1\}$ with unknown number of solutions; $n=\log_2(N)$.}
 	\KwResult{If a solution exists, an $n$-bit binary string $x_0$ satisfying $f(x_0)=1$; if no solution exists, the algorithm runs forever.}
@@ -353,6 +374,9 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
 	
 	\vspace{0.5em}
 \end{algorithm}
+\end{minipage}
+}
+\end{figure}
  
  While Grover's algorithm delivers impressive speedups over classical search algorithms, it has a major weakness.
  Figure \ref{fig:grov} hides the fact that the probability of success for Grover's algorithm is \emph{not} monatonic in the number of iterations.  Running the algorithm for more than $R$ iterations can backfire.  For example, running the algorithm for $\sqrt{2N}$ iterations when $M=1$ results in a probability of success less than $0.095$ \citep{boyer1998tight}.  The non-monotinicity of Grover's algorithm becomes particularly problematic when we do not know the number of solutions $M$. Taking for example $N=2^{20}$, \citet{boyer1998tight} point out that 804 iterations provide an extremely high probability of success when $M=1$ but a one-in-a-million chance of success when $M=4$.  To solve this problem and develop an effective search algorithm when $M$ is unknown, those authors adopt the strategy of focusing on the expected number of iterations before success. In particular, they propose the quantum exponential search algorithm (Algorithm \ref{alg:expoSearch}).  When a solution exists, the algorithm returns a solution with expected total number of Grover iterations bounded above by $\frac{9}{2}\sqrt{N/M}$.  Still better, this upper bound reduces to $\frac{9}{4}\sqrt{N/M}$ for the special case $M\ll N$, and simulations presented in Figure \ref{fig:expo} show that even this bound is large.  Such results come in handy when deciding whether to halt the algorithm's progress if one believes it possible that no solutions exist.  Indeed, this turns out to be useful in the context of quantum minimization (Section \ref{sec:qmin}).
@@ -384,13 +408,17 @@ Finally,  letting $l=(L-1)/2$, one obtains phases $(\alpha_j,\beta_j)$ for $j=1,
 \begin{align*}
 	\alpha_j = - \beta_{l-j+1} =2 \cot^{-1} \left( \tan(2\pi j /L) \sqrt{1-\gamma^2} \right) \, ,
 \end{align*}
- where $\gamma^{-1} =  \cos(\frac{1}{L}\cos^{-1}(\frac{1}{\delta}))$ is the reciprocal of the inverse  $L$th Chebyshev polynomial of the first kind.  
+ where $\gamma^{-1} =  \cos(\frac{1}{L}\cos^{-1}(\frac{1}{\delta}))$ is the reciprocal of the inverse  $L$th Chebyshev polynomial of the first kind.  \todo{finish section}
  
  \subsection{Quantum minimization}
 
 
 
- \begin{algorithm}[t!]
+\begin{figure}[!t]
+	\centering
+	\scalebox{0.9}{
+		\begin{minipage}{1\textwidth}
+			\begin{algorithm}[H]
  	\vspace{3em}
  	
 	\caption{Quantum minimum searching algorithm \citep{durr1996quantum}}\label{alg:min}
@@ -411,6 +439,9 @@ Finally,  letting $l=(L-1)/2$, one obtains phases $(\alpha_j,\beta_j)$ for $j=1,
 	\vspace{0.5em}
 	
 \end{algorithm}
+\end{minipage}
+}
+\end{figure}
 		
 
 
@@ -475,7 +506,11 @@ Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$,
 \subsection{Gumbel-max}\label{sec:gm}
 \newcommand{\p}{\mbox{p}}
 
-\begin{algorithm}[!t]
+\begin{figure}[!t]
+	\centering
+	\scalebox{0.9}{
+		\begin{minipage}{1\textwidth}
+			\begin{algorithm}[H]
 	\caption{The Gumbel-max trick}\label{alg:gm}
 	\KwData{A vector of unnormalized log-probabilities $\llambda^*=\log \ppi +\log c$, for $\ppi$ a discrete probability vector with $P+1$ elements.}
 	\KwResult{A single sample $\hat{p} \sim$ \emph{Discrete}$(\ppi)$ satisfying $\hat{p}\in\{0,1,\dots,P\}$.}
@@ -488,6 +523,9 @@ Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$,
 	
 	\vspace{0.5em}
 \end{algorithm}
+\end{minipage}
+}
+\end{figure}
 
 We wish to randomly select a single element from the set $\{0,1,\dots,P\}$ with probability proportional to the unnormalized probabilities $\ppi^*=(\pi_0^*,\pi_1^*,\dots,\pi_P^*)$.  That is, there exists a $c>0$ such that $\ppi^* = c \ppi$, for $\ppi$ a valid probability vector, but we only have access to $\ppi^*$.  Define $\llambda:= \log \ppi$ and $\llambda^*:= \log \ppi^*=\log\ppi + \log c$,  and assume that $z_0,\dots,z_P\stackrel{iid}{\sim}Gumbel(0,1)$. Then, the probability density function $g(\cdot)$ and cumulative distribution function $G(\cdot)$ for each individual $z_p$ are
 \begin{align*}
@@ -538,7 +576,11 @@ and that the simplified acceptance probabilities \eqref{eq:probsSimp} maintain d
 \subsection{QPMCMC}
 
 
-\begin{algorithm}[t!]
+\begin{figure}[!t]
+	\centering
+	\scalebox{0.9}{
+		\begin{minipage}{1\textwidth}
+			\begin{algorithm}[H]
 	\caption{Quantum parallel MCMC}\label{alg:qpMCMC}
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from a $D$-dimensional multivariate Gaussian $Normal_D(\boldsymbol{\mu},\SSigma)$ and the standard Gumbel distribution $Gumbel(0,1)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
@@ -557,6 +599,9 @@ and that the simplified acceptance probabilities \eqref{eq:probsSimp} maintain d
 	
 	\vspace{0.5em}
 \end{algorithm}
+\end{minipage}
+}
+\end{figure}
 
  \begin{figure}[!t]
  	\vspace{3em}
