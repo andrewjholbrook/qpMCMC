@@ -5,7 +5,8 @@
 \usepackage[colorlinks, citecolor={blue}]{hyperref}
 \usepackage{url}
 \usepackage{amsfonts,amscd,amssymb}
-\usepackage{amsthm,amsmath,natbib}
+\usepackage{amsthm,amsmath}
+\usepackage{natbib}
 \usepackage{mathtools}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \usepackage{algorithm2e}
@@ -15,7 +16,6 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{setspace}
-\usepackage{natbib}
 \usepackage[margin=1in]{geometry}
 \usepackage{enumitem}
 %\usepackage[nolists]{endfloat}
@@ -200,7 +200,7 @@ d_{F}
 
 \begin{abstract}
 
-We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by using the Gumbel-max trick to turn the generalized accept-reject step into a discrete optimization problem.  This allows us to embed target density evaluations within a well-known extension of Grover's quantum search algorithm.  Letting $P$ denote the number of proposals in a single MCMC iteration, the combined strategy reduces the number of target evaluations required from $\order{P}$ to $\order{P^{1/2}}$.  In the following, we review both the rudiments of quantum computing and the Gumbel-max trick in order to elucidate their combination for as wide a readership as possible. 
+We propose a novel quantum computing strategy for \emph{parallel MCMC} algorithms that generate multiple proposals at each step. This strategy makes parallel MCMC amenable to quantum parallelization by using the Gumbel-max trick to turn the generalized accept-reject step into a discrete optimization problem.  When combined with new insights from the parallel MCMC literature, such an approach allows us to embed target density evaluations within a well-known extension of Grover's quantum search algorithm.  Letting $P$ denote the number of proposals in a single MCMC iteration, the combined strategy reduces the number of target evaluations required from $\order{P}$ to $\order{P^{1/2}}$.  In the following, we review the rudiments of quantum computing, quantum search and the Gumbel-max trick in order to elucidate their combination for as wide a readership as possible. 
 
 
 \end{abstract}
@@ -264,7 +264,7 @@ But the real promise and power of parallel MCMC comes from its natural paralleli
 
 
 
-While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described in the previous paragraph.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{holbrook2021viral,massive,holbrook2021scalable} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
+While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described in the previous paragraph.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{massive,holbrook2021scalable,holbrook2022bayesian,holbrook2022viral} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
 
 \emph{In the presence of these trade-offs, it is worthwhile to develop additional parallel computing tools for parallel MCMC so that future scientists may be better able to flexibly assign sub-routines to different computing resources in a way that is tailored to their specific inference task.  In particular, we show that quantum parallelization can be a useful tool for parallel MCMC when evaluation of the target density represents the computational bottleneck.}
 
@@ -306,7 +306,7 @@ In the following section, we provide a \emph{very} short introduction to the mos
 
 \begin{figure}[!t]
 	\centering
-	\includegraphics[width=0.9\linewidth]{groverCurves.pdf}
+	\includegraphics[width=0.8\linewidth]{groverCurves.pdf}
 	\caption{Curves depict the probability that Grover's quantum search algorithm returns a solution as a function of the number of oracle evaluations. For the ranges depicted, the number of iterations required and the number of solutions inversely relate, but increasing the number of iterations past \emph{R} (Equation \ref{eq:R}) can backfire and lead to extremely small probabilities of success.  }\label{fig:grov}
 \end{figure}
 
@@ -489,7 +489,7 @@ In practice, the number of time steps before finding the minimum is surprisingly
 
  \begin{figure}[!t]
 	\centering
-	\includegraphics[width=0.9\linewidth]{qMinAlg.pdf}
+	\includegraphics[width=0.7\linewidth]{qMinAlg.pdf}
 	\caption{Total number of oracle evaluations required by quantum minimization algorithm \citep{durr1996quantum} for different starting ranks and search set sizes $N$ from 500 independent simulations each.  Here, less than 1\% of the 12,500 instances fail to recover the true minimum on account of early stopping.}\label{fig:qMinAlg}
 \end{figure}
 
@@ -672,20 +672,22 @@ We use \textsc{R} \citep{rlang}, \textsc{Python} \citep{vanrossum1995python} and
 \begin{minted}{R}
 sqrtProbs <- rep(1/sqrt(N),N); i <- 1
 while (i <= I) {
-	sqrtProbs  <- -marks*sqrtProbs + (1-marks)*sqrtProbs
+	sqrtProbs  <- (1-2*marks)*sqrtProbs
 	sqrtProbs  <- -sqrtProbs + 2*mean(sqrtProbs)
 	i <- i + 1
 }
 measurement <- sample(size=1, x=1:N, prob=sqrtProbs^2)
 \end{minted}
-Of course, simulating these iterations on a classical computer, requires precomputing the values of \verb|marks| beforehand.
+Of course, simulating these iterations on a classical computer requires precomputing the values of \verb|marks| beforehand.
 
 
 \section{Discussion}
 
 We have shown how parallel MCMC may enjoy quadratic speedups by combining quantum minimization with the Gumbel-max trick.  Within a QPMCMC iteration, the current state represents a warm-start for the sampling-turned-optimization problem, leading to increased efficiencies for the quantum minimization algorithm.  This work leads to two immediate questions.  First, more recent quantum minimization algorithms exist \citep{baritompa2005grover,farhi2014quantum}.  Would these confer additional speedups for quantum parallel MCMC and benefit from warm-starting in a similar manner? Second, there are other models and algorithms in statistics, machine learning and statistical mechanics that require sampling from potentially costly discrete distributions.  Can one adapt  the proposed strategies to these?  Large-scale, practical quantum computing is still a long way off, but quantum algorithms are ripe for mainstream computational statistics.
 
+\section*{Acknowledgments}
 
+This work was supported by NIH grant K25 AI153816 and NSF grant DMS 2152774.
 
 \appendix
 
@@ -767,7 +769,7 @@ and we call $\ket{h}$ a \emph{uniform superposition} over the states $\ket{0},\d
 	\ket{0}^{\otimes n}\ket{0} \longrightarrow \left(\frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \right) \ket{0}  \longrightarrow \frac{1}{\sqrt{N}} \sum_{x=0}^{N-1} \ket{x} \ket{f(x)} \, .
 \end{align*}
 
-\bibliographystyle{chicago}
+\bibliographystyle{sysbio}
 \bibliography{refs}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
