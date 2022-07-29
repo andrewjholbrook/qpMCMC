@@ -279,11 +279,11 @@ In the following section, we provide a \emph{very} short introduction to the mos
 
 
 
-\section{Quantum search and quantum minimization}\label{sec:qmin}
+\section{Quantum search and quantum minimization}\label{sec:searchAndMin}
 
 \citet{grover1996fast} demonstrates how use a quantum computer to find a single marked element within a finite set of $N$ items with only $\mathcal{O}(\sqrt{N})$ queries, and a result from \citet{bennett1997strengths} shows that Grover's algorithm is optimal up to a multiplicative constant. \citet{boyer1998tight} extend Grover's algorithm to multiple marked items or solutions, further extend it to the case when the number of solutions is unknown and provide a rigorous bounds on the algorithms' error rates.  Finally, \citet{durr1996quantum} use the results of \citet{boyer1998tight} to obtain the minimum value within a discrete ordered set.  Here, we briefly review these advances and provide illustrative simulations.  In Section \ref{sec:gm}, the Gumbel-max trick allows us to extend these results to the problem of sampling from a discrete distribution.
 
-\subsection{Quantum search}
+\subsection{Quantum search}\label{sec:qSearch}
 
 \begin{figure}[!t]
 	\centering
@@ -392,7 +392,7 @@ R = \ceil[\Bigg]{\frac{\pi}{4} \sqrt{\frac{N}{M}}}
  \begin{figure}[!t]
 	\centering
 	\includegraphics[width=0.7\linewidth]{searchComparison.pdf}
-	\caption{Total number of oracle evaluations required by fixed-point quantum search (FPQS) \citep{yoder2014fixed} minus total required for quantum exponential searching algorithm (QESA) (Algorithm \ref{alg:expoSearch}) for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.}\label{fig:comp}
+	\caption{Total number of oracle evaluations required by fixed-point quantum search (FPQS) \citep{yoder2014fixed} minus total required for quantum exponential searching algorithm (QESA) (Algorithm \ref{alg:expoSearch}) for different numbers of solutions $M$ and search set sizes $N$ from 500 independent simulations each.  FPQS underperforms partially due to a miniscule lower bound $w=1/N$ on $\lambda=M/N$, a tuning decision motivated by the potential application within quantum minimization with warm-starting (Section \ref{sec:qmin}).}\label{fig:comp}
 \end{figure}
 
  
@@ -400,7 +400,8 @@ Algorithm \ref{alg:expoSearch} is not the only quantum search algorithm that is 
 \begin{align}\label{eq:grovGen}
 	\G(\alpha_j,\beta_j) := - \U_h(\alpha_j) \U_{x_0}(\beta_j) := \Big((1-e^{-i\alpha_j})\ket{h}\bra{h}-\I \Big) \Big( \I - (1-e^{i\beta_j}) \ket{x_0}\bra{x_0} \Big) \, .
 \end{align}
-The method first fixes an error tolerance $\delta^2>0$ and a lower bound $w\leq \lambda=M/N$ and then selects an odd upper bound $L$ on the total number of oracle queries ($L-1$) such that 
+This form reduces to the original Grover iteration \eqref{eq:grov} when $\alpha=\pm \pi$ and $\beta=\pm \pi$.
+To select general phases, the method first fixes an error tolerance $\delta^2>0$ and a lower bound $w\leq \lambda=M/N$ and then selects an odd upper bound $L$ on the total number of oracle queries ($L-1$) such that 
 \begin{align*}
 	L \geq \frac{\log(2/\delta)}{\sqrt{w}} \, .
 \end{align*}
@@ -410,7 +411,7 @@ Finally,  letting $l=(L-1)/2$, one obtains phases $(\alpha_j,\beta_j)$ for $j=1,
 \end{align*}
  where $\gamma^{-1} =  \cos(\frac{1}{L}\cos^{-1}(\frac{1}{\delta}))$ is the reciprocal of the inverse  $L$th Chebyshev polynomial of the first kind.  \todo{finish section}
  
- \subsection{Quantum minimization}
+ \subsection{Quantum minimization}\label{sec:qmin}
 
 
 
