@@ -409,7 +409,7 @@ Finally,  letting $l=(L-1)/2$, one obtains phases $(\alpha_j,\beta_j)$ for $j=1,
 \begin{align*}
 	\alpha_j = - \beta_{l-j+1} =2 \cot^{-1} \left( \tan(2\pi j /L) \sqrt{1-\gamma^2} \right) \, ,
 \end{align*}
- where $\gamma^{-1} =  \cos(\frac{1}{L}\cos^{-1}(\frac{1}{\delta}))$ is the reciprocal of the inverse  $L$th Chebyshev polynomial of the first kind.  \todo{finish section}
+ for $\gamma^{-1} =  \cos(\frac{1}{L}\cos^{-1}(\frac{1}{\delta}))$ is the reciprocal of the inverse  $L$th Chebyshev polynomial of the first kind.  Such phases mark the only algorithmic difference between the fixed-point quantum search and the original Grover search (Algorithm \ref{alg:grover}).  The upshot is a search procedure that obtains a guaranteed probability of success $1-\delta^2$ for any $M$ such that there exists an $M_0<M$ that also obtains the same success threshold (Figure \ref{fig:expo}).  On the one hand, this algorithm avoids the exponential quantum search algorithm's need to perform multiple measurements of the quantum state.  On the other hand, the exponential quantum search algorithm requires significantly fewer oracle evaluations when $M$ is small (Figure \ref{fig:comp}), and it turns out that this is precisely the scenario that interests us.
  
  \subsection{Quantum minimization}\label{sec:qmin}
 
