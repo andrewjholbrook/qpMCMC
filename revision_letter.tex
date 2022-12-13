@@ -1,0 +1,1123 @@
+%\documentclass[standard,
+%               backaddress=off,
+%               foldmarks=false,
+%               enlargefirstpage,
+%               pagenumber=off,
+%               parskip=half
+%               ]{scrlttr2}
+%
+%\setkomavar{fromname}{Gabriel Hassler}
+%\setkomavar{fromaddress}{Department of Computational Medicine / UCLA \\ 5303 Life Sciences \\ Box 951766 \\ Los Angeles, CA 90095}
+%\setkomavar{fromphone}{(202) 557-5140}
+%\setkomavar{fromemail}{ghassler@g.ucla.edu}
+%%\setkomavar{department}{Department of Computational Medicine}
+
+
+\documentclass[12pt]{article}
+
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{url}
+\geometry{letterpaper} % or letterpaper (US) or a5paper or....
+\geometry{margin=1in} % for example, change the margins to 2 inches all round
+\usepackage[table]{xcolor}
+
+\newenvironment{reply}{$\triangleright$\bfseries}{$\triangleleft$}
+\renewenvironment{quote}
+               {\list{}{\rightmargin\leftmargin}%
+                \item\relax\normalfont}
+               {\endlist}
+
+%
+%\newcommand{\bibsection}[1]{}
+%\newcommand{\section}[1]{}
+%\newcommand{\newblock}{}
+%
+%   \newenvironment{thebibliography}[1]%
+%      {References\begin{description}}{\end{description}}
+%   \newcommand{\htmlbibitem}[2]{\label{#2}\item[{[#1]}]}
+\usepackage{natbib}
+\usepackage[colorlinks, citecolor={blue}]{hyperref}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{xr}
+\usepackage[textsize=tiny]{todonotes}
+\usepackage{algorithm,algorithmicx,algpseudocode}
+%\usepackage{subfigure}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{12pt}
+
+
+\usepackage{amsthm}
+
+\definecolor{trevorblue}{rgb}{0.330, 0.484, 0.828}
+\definecolor{trevoryellow}{rgb}{0.829, 0.680, 0.306}
+
+
+\def\suppDoc{main}
+\externaldocument{\suppDoc}
+%\input{missing_traits_supplement_revision.xtr}
+%\input{revision_values.sty}
+%\input{new_floats.tex}
+
+\usepackage{makecell}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bm}
+
+\usepackage{todonotes}
+
+\newcommand{\mb}{\mathbf}
+\newcommand{\mc}{\mathcal}
+\newcommand{\dx}{\mbox{d}}
+
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand*{\fplus}{\genfrac{}{}{0pt}{}{}{+}}
+\newcommand*{\fdots}{\genfrac{}{}{0pt}{}{}{\cdots}}
+
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\numTaxa}{N}
+\newcommand{\numTraits}{D}
+\newcommand{\numDatasets}{M}
+%\newcommand{\numLatent}{D}
+\newcommand{\taxonIndex}{i}
+\newcommand{\traitIndex}{j}
+\newcommand{\traitData}{\vec{Y}}
+\newcommand{\traitDatum}{y}
+\newcommand{\datasetIndex}{m}
+\newcommand{\exemplar}{\text{e}}
+
+\newcommand{\sequences}{\vec{S}}
+\newcommand{\latentData}{\vec{X}}
+\newcommand{\latentdata}{\vec{z}}
+\newcommand{\latentDatum}{x}
+\newcommand{\phylogeneticParameters}{\boldsymbol{\phi}}
+\newcommand{\phylogeny}{{\cal G}}
+\newcommand{\tree}{\phylogeny}
+%\newcommand{\otherParameters}{\boldsymbol{\
+\newcommand{\transpose}{^{t}}
+
+\newcommand{\distanceMatrix}{\mathbf{Y}}
+\newcommand{\distance}{y}
+\newcommand{\summant}{r}
+
+
+
+\newcommand{\cdensity}[2]{\ensuremath{p(#1 \,|\,#2)}}
+\newcommand{\density}[1]{\ensuremath{p(#1 )}}
+
+\newcommand{\treeNode}{\nu}
+
+\newcommand{\traitVariance}{\mathbf{\Sigma}}
+\newcommand{\nodeIndex}{c}
+%\newcommand{\parent}[1]{\mbox{\tiny pa}(#1)}
+\newcommand{\parentBig}[1]{\mbox{pa}(#1)}
+
+\newcommand{\sibling}[1]{\mbox{\tiny sib}(#1)}
+\newcommand{\siblingBig}[1]{\mbox{sib}(#1)}
+
+\newcommand{\rootMean}{\boldsymbol{\mu}_0}
+\newcommand{\rootVarianceScalar}{\tau_0}
+\newcommand{\unsequencedVarianceScalar}{\tau_{\exemplar}}
+\newcommand{\treeVariance}{\vec{V}_{\tree}}
+\newcommand{\hatTreeVariance}{\hat{\vec{V}}_{\tree}}
+\newcommand{\mdsSD}{\sigma}
+\newcommand{\mdsVariance}{\mdsSD^2}
+\newcommand{\residual}{\hat{\traitDatum}}
+\newcommand{\modelDistance}{\delta}
+\newcommand{\cdf}{\phi}
+\newcommand{\normalCDF}[1]{\Phi \left( #1 \right)}
+
+\newcommand{\order}[1]{{\cal O}\hspace{-0.2em}\left( #1 \right)}
+
+\newcommand{\rootNode}{\nu^{\datasetIndex}_{2 \numTaxa_{\datasetIndex} -1 }}
+\newcommand{\pathLength}[1]{d(F, #1 )}
+\newcommand{\pathLengthNew}[2]{
+	d_{F}
+	(
+	{#1}, {#2}
+	)
+}
+\newcommand{\J}{\vec{J}}
+\newcommand{\pprime}{^{\prime}}
+\newcommand{\otherIndex}{i \pprime}
+\def\kronecker{\raisebox{1pt}{\ensuremath{\:\otimes\:}}}
+
+\newcommand{\x}{\mathbf{x}}
+
+%\graphicspath{{../../Graphs/}}
+
+\def\journalName{Journal of Multivariate Analysis}
+\def\journalAbbr{JMVA}
+\def\editor{Hongyu Zhao}
+\def\editorTitle{Theory and Methods Co-Editor}
+\def\editorLast{Zhao}
+\def\pubOrg{American Statistical Association}
+\def\pubAddressOne{732 North Washington Street}
+\def\pubAddressTwo{Alexandria, VA 22314-1943}
+
+\def\paperTitle{Generating MCMC proposals by randomly rotating the regular simplex}
+\def\paperID{JMVA-D-21-00468}
+
+%\newcommand{\bigo}[1]{\cal{O}\hspace{-.5mm}\left(#1\right)}
+\onehalfspacing
+
+\renewcommand{\x}{\mathbf{x}}
+\renewcommand{\v}{\mathbf{v}}
+\newcommand{\TTheta}{\boldsymbol{\theta}}
+\newcommand{\TTTheta}{\boldsymbol{\Theta}}
+\newcommand{\tr}{\mbox{tr}}
+\newcommand{\X}{\mathbf{X}}
+
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows,shapes}
+\usetikzlibrary{decorations}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{fit}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{shapes.geometric}
+
+\newtheorem{thm}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{cor}{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+\newtheorem{mydef}{Definition}
+\newtheorem*{assumption}{Assumption}
+\newtheorem{clm}{Claim}
+
+
+\begin{document}
+
+%\input{main.xtr}
+
+\centerline{\large \bf Reponse to Editor and Reviewer Comments}
+
+To the Editors and Reviewers:
+
+We appreciate the thoughtful comments and recommendations made by the Reviewers and the opportunity to revise our manuscript ``\paperTitle" (\paperID).
+We have carefully considered these extremely helpful suggestions and have addressed them to the best of our abilities.  We believe that the manuscript is now \emph{significantly} improved and are thankful for the time and energy put forth by the Reviewers.
+
+In particular, we have:
+\begin{itemize}
+	\item expanded the Introduction to better discuss related work, motivate our work and provide background on items such as the simplex and Haar measure;
+	\item  further elucidated the relationship between the simplicial sampler and the two proposal mechanisms of \citet{tjelmeland2004using}, adding an additional result proving that strategy `P1' also enables simplified acceptance probabilities and demonstrating significant theoretical and practical speedups;
+	\item added a new section, `Computational considerations' outlining aspects that will influence algorithmic effectiveness, e.g., theoretical complexity, memory constraints, parallelization, programming language and specific form of target distribution.
+	\item specified why the conclusions of the now Lemma 2 do not extend to the extra-dimensional sampler when it is interpreted as using a degenerate preconditioner; and
+	\item included a new numerical comparison between the simplicial sampler and the (fast and slow) P1 sampler and revisited a multiple-try Metropolis simulation using new target values.
+\end{itemize}
+
+
+The document below contains our replies (in \textbf{bold}) alongside the AE and Reviewers' comments (normal text).  We list changes to the text with indented normal text set off by quotation marks.
+
+With sincere gratitude,
+
+Andrew Holbrook
+\clearpage
+
+
+{\Large \bf Editor and Reviewer Comments:}
+
+
+
+
+%\section{Reviewer 1}
+%
+%
+%The author introduces \emph{simplicial samplers}, which are Markov chain Monte Carlo (MCMC) methods that sample multiple proposals at each iteration by randomly rotating a simplex and randomly
+%selecting a proposal among those produced. After reading the paper a couple of times, I understood
+%that it contributes to the literature. It was not clear at the beginning because the way the paper is
+%written is often opaque and not detailed enough. Also, even if the paper contributes to the literature, to me, the contribution is not significant enough at the moment. In the light of the above, the
+%paper cannot be accepted as is, but could be after a major revision.
+%
+%I will now state what is the main contribution of the paper (at least from what I understood).
+%The main contribution is: within the framework of \citet{tjelmeland2004using}, to introduce a proposal
+%scheme which is effective and satisfies the condition mentioned in Proposition 1, thus leading to
+%MCMC methods which sample and use multiple proposals at each iteration while not requiring the
+%typical accept/reject step. With this sampler, there is a positive probability of staying at the same
+%state because the current state is among the proposals, but the design of the proposal scheme is
+%such that, by itself, it allows to satisfy detailed balance. From the algorithm presented in Section
+%3, it seems that in general the probability of leaving the current state increases with the number of
+%proposals. The author may want to highlight all that and how the proposed samplers contrast with
+%other relevant samplers.
+%
+%To me, the proposed samplers are strongly connected to multiple-try Metropolis (MTM) \citep{liu2000multiple} and that connection is not sufficiently exploited (in fact, it is not even mentioned). The
+%connection becomes clear to me in Section 3.1.1 when the author describes the Gaussian variant of
+%the proposed samplers. Let $\TTheta$ be the current state of the Markov chain. The author writes in that
+%section: each of the proposals has a Gaussian marginal distribution with mean $\TTheta$ and covariance
+%matrix $\lambda^2\mathbf{I}$ and one proposal, say $\TTheta^*$, will be randomly selected for the next state of the chain with
+%probability proportional to $\pi(\TTheta^*)$ where $\pi$ is the target density. MTM works very similarly. MTM is
+%one of the most popular samplers that can make effective use of parallel computing. The author could
+%therefore contrast the algorithms with MTM so that we understand the similarities and differences.
+%It would help to understand why and when they are expected to be better. The proposed samplers
+%for instance require the sampling of a random rotation which seems to be computationally costly.
+%
+%	\renewcommand{\x}{\mathbf{x}}
+%\renewcommand{\v}{\mathbf{v}}
+%\renewcommand{\TTheta}{\boldsymbol{\theta}}
+%\renewcommand{\TTTheta}{\boldsymbol{\Theta}}
+%\renewcommand{\tr}{\mbox{tr}}
+%\renewcommand{\X}{\mathbf{X}}
+%\renewcommand{\u}{\mathbf{u}}
+%\newcommand{\QQ}{\mathbf{Q}}
+%\newcommand{\haar}{\mathcal{H}}
+%\newcommand{\orthog}{\mathcal{O}}
+%\newcommand{\SSigma}{\boldsymbol{\Sigma}}
+%\newcommand{\dd}{\mbox{d}}
+%
+%\begin{reply}
+%	We thank the Reviewer for taking the time to review our manuscript and now recognize that the previous version was opaque and that MTM did not feature prominently enough.  To address this, we have completely rewritten the introduction using MTM as our starting point and carefully provided reasons we are interested in exploring other multiproposal algorithms. These are the first two paragraphs of the introduction:
+%	\begin{quote}
+%		Generating random samples from probability distributions is a crucial task in many of the quantitative sciences. Markov chain Monte Carlo (MCMC) algorithms sample from target distributions by constructing Markov chains that maintain their targets as equilibrium distributions. The classic Metropolis-Hastings (MH) algorithm \citep{metropolis1953equation,hastings1970monte} builds such a Markov chain by iteratively generating a single proposal state conditioned on the current state and randomly accepting or rejecting that proposal based on a ratio involving the target and proposal densities evaluated at the current and proposed states.  The majority of MCMC techniques share this general structure, randomly proposing and accepting a single proposal at each iteration, but some relatively recent methods make use of multiple proposals (or, \emph{multiproposals}) at each step with the goals of, e.g., reducing autocorrelation between Markov chain states or making better use of parallel computing resources.
+%		
+%		\citet{liu2000multiple} develops the first such multiproposal technique, the multiple-try Metropolis algorithm (MTM). Each iteration of MTM starts by proposing multiple states $\TTheta_p^*$, $p=1,\dots,P$ from a proposal distribution $q(\TTheta^{(s)},\cdot)$ and choosing a candidate $\TTheta^*$ from among them with probability proportional to their respective target density values $\pi(\TTheta^*_p)$.  After this, the MTM algorithm generates an additional $P-1$ states $\TTheta_1',\cdots,\TTheta_{P-1}'$ from the distribution $q(\TTheta^{*},\cdot)$.  In the case that $q(\cdot,\cdot)$ is symmetric, the MTM algorithm then accepts $\TTheta^*$ with probability
+%		\begin{align}\label{eq:mtmMetropolis}
+%			1   \wedge \frac{\pi(\TTheta^*_1) + \cdots + \pi(\TTheta^*_P) }{\pi(\TTheta'_1) + \cdots + \pi(\TTheta'_{P-1}) + \pi(\TTheta^{(s)} ) } \, .
+%		\end{align}
+%		Whereas MTM is the most widely used multiproposal MCMC algorithm, it has certain drawbacks. First, to use $P$ proposals, one must generate $O(2P)$ states and evaluate the target density $\pi(\cdot)$ $O(2P)$ times. Second, after randomly selecting a potentially good candidate state $\TTheta^*$, one might nonetheless reject it based on the target density values of the other proposed states within the Metropolis step that uses Formula (\ref{eq:mtmMetropolis}). Third, \citet{yang2021convergence} rigorously prove superior mixing of MH over MTM albeit in the simplified setting of independence proposals.  Perhaps most importantly, \citet{tjelmeland2004using} shows that MTM's additional Metropolis step and its extra noise are simply not necessary.
+%	\end{quote}  
+%\end{reply}
+%
+%\subsection{Major Concerns}
+%
+%\begin{itemize}
+%	\item As mentioned, the way the paper is written is often opaque and not detailed enough. I
+%	propose the author puts great effort into improving presentation, simplifying the manuscript
+%	and clarifying the narrative. The author should also add details when relevant to facilitate the
+%	understanding and reading. For instance, the proof of Proposition 1 should be more detailed
+%	(and the notation $p$ in it should be defined). Another example: the presentation of the main
+%	sampler in Section 3 should be more detailed. The author should not take for granted that
+%	the reader is familiar with simplex and the uniform Haar distribution. The presentation of
+%	that sampler should be very detailed and rigorous, perhaps with precise examples of what the
+%	different mathematic objects can be to make things concrete. To me, it is not clear that there
+%	is no problem of irreducibility with that sampler. The presentation of the Gaussian simplicial
+%	sampler is much clearer.
+%\end{itemize}
+%
+%\begin{figure}[!t]
+%	\centering
+%	\scalebox{0.9}{
+%		\begin{tikzpicture}
+%			\tikzstyle{point}=[thick,draw=black,fill=black,shape=circle,inner sep=0pt,minimum width=4pt,minimum height=4pt]
+%			\tikzstyle{pointSmall}=[thick,draw=black,fill=black,shape=circle,inner sep=0pt,minimum width=3pt,minimum height=3pt]
+%			
+%			\node (l)[point,label={[label distance=0cm]180:$\v_1$}] at (-9,0) {};
+%			\node (aa)[label={0-simplex}] at (-9,-1.2) {};
+%			
+%			\node (q)[point,label={[label distance=0cm]180:$\v_1$}] at (-5,0) {};
+%			\node (r)[point,label={[label distance=0cm]0:$\v_2$}] at (-3,0) {};
+%			\node (aa)[label={1-simplex}] at (-4,-1.2) {};
+%			\draw (q.center) -- (r.center);
+%			
+%			
+%			\node (x)[point,label={[label distance=0cm]180:$\v_1$}] at (0,0) {};
+%			\node (y)[point,label={[label distance=0cm]0:$\v_2$}] at (2,0) {};
+%			\node (z)[point,label={[label distance=0cm]0:$\v_3$}] at (1,1.73) {};
+%			\node (aa)[label={2-simplex}] at (1,-1.2) {};
+%			\draw (x.center) -- (y.center) -- (z.center) -- cycle;
+%			
+%			\node (a)[point,label={[label distance=0cm]180:$\v_1$}] at (5,0) {};
+%			\node (b)[point,label={[label distance=0cm]0:$\v_2$}] at (7,0) {};
+%			\node (c)[point,label={[label distance=0cm]0:$\v_3$}] at (6,2) {};
+%			\node (d)[pointSmall,label={[label distance=-0.1cm]0:$\v_4$}] at (6,0.7) {};
+%			\draw (a.center) -- (b.center) -- (c.center) -- cycle;
+%			\draw[dashed] (a.center) -- (d.center) -- (b.center);
+%			\draw[dashed] (d.center) -- (c.center);
+%			\node (aa)[label={3-simplex}] at (6,-1.2) {};
+%		\end{tikzpicture}
+%	}
+%	\caption{Regular simplices. The 0-simplex is a point; the 1-simplex is a line connecting two points; the regular 2-simplex is an equilateral triangle; and the regular 3-simplex is a tetrahedron, the faces of which are equilateral triangles.}\label{fig:regSimps}
+%\end{figure}
+%
+%
+%\begin{figure}[!th]
+%	\centering
+%	\scalebox{1}{
+%		\begin{tikzpicture}
+%			\tikzstyle{point}=[thick,draw=black,fill=black,shape=circle,inner sep=0pt,minimum width=4pt,minimum height=4pt]
+%			
+%			
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=3] at (0,0) {};
+%			\foreach \x in {1,2,3}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,2,3}
+%			\foreach \y in {1,2,3}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={2-simplex}] at (0,-1.5) {};
+%			
+%			\node (a)[draw=none,minimum size=2.1cm,regular polygon,regular polygon sides=4] at (3,0.3) {};
+%			\foreach \x in {1,...,4}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,4}
+%			\foreach \y in {1,...,4}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={3-simplex}] at (3,-1.5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=5] at (6,0.3) {};
+%			\foreach \x in {1,...,5}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,5}
+%			\foreach \y in {1,...,5}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={4-simplex}] at (6,-1.5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=6] at (9,0.3) {};
+%			\foreach \x in {1,...,6}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,6}
+%			\foreach \y in {1,...,6}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={5-simplex}] at (9,-1.5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=7] at (12,0.3) {};
+%			\foreach \x in {1,...,7}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,7}
+%			\foreach \y in {1,...,7}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={6-simplex}] at (12,-1.5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=8] at (0,-3) {};
+%			\foreach \x in {1,...,8}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,8}
+%			\foreach \y in {1,...,8}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={7-simplex}] at (0,-5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=9] at (3,-3) {};
+%			\foreach \x in {1,...,9}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,9}
+%			\foreach \y in {1,...,9}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={8-simplex}] at (3,-5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=10] at (6,-3) {};
+%			\foreach \x in {1,...,10}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,10}
+%			\foreach \y in {1,...,10}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={9-simplex}] at (6,-5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=11] at (9,-3) {};
+%			\foreach \x in {1,...,11}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,11}
+%			\foreach \y in {1,...,11}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={10-simplex}] at (9,-5) {};
+%			
+%			\node (a)[draw=none,minimum size=2cm,regular polygon,regular polygon sides=12] at (12,-3) {};
+%			\foreach \x in {1,...,12}
+%			\fill (a.corner \x) circle[radius=2pt];
+%			\foreach \x in {1,...,12}
+%			\foreach \y in {1,...,12}
+%			\draw (a.corner \x) -- (a.corner \y);
+%			\node (a)[label={11-simplex}] at (12,-5) {};
+%			
+%			
+%			
+%		\end{tikzpicture}
+%	}
+%	\caption{Petrie polygon projections \citep{coxeter1973regular} of higher-dimensional, regular simplices preserve symmetry but not distances.}\label{fig:petries}
+%\end{figure}
+%
+%\begin{reply}
+%	We thank the Reviewer for the helpful comment.  Following this advice, we have added detailed explanations of the mathematical objects in the Introduction, added computational details to the new section `Computational considerations' and rewritten Proposition 1 to be clearer (and correct).  In fact, we also clarify that Proposition 1 is a new result not contained in \citet{tjelmeland2004using}.  The introduction now contains the following paragraph and Figures \ref{fig:regSimps} and \ref{fig:petries}:
+%	\begin{quote}
+%		\citet{tjelmeland2004using} does not specify how one might extend his second proposal alternative to accommodate multiproposals when $P>2$. In the following, we accomplish this multivariate generalization by first noting that the equilateral triangle is a \emph{regular 2-simplex}.  Generally, a $D$-dimensional space can hold as a many as $D+1$ points that are pairwise equidistant. If $\tilde{D}\leq D+1$, the points $\v_1, \dots, \v_{\tilde{D}}\in \mathbb{R}^D$ that satisfy
+%		\begin{align*}
+%			||\v_d-\v_{d'}||_2 = \begin{cases} 
+%				\lambda>0 & d \neq d'\\
+%				0 & d = d' 
+%			\end{cases}
+%		\end{align*}
+%		identify a regular polytope called a $\tilde{D}$-simplex. Figure \ref{fig:regSimps} shows the regular simplices that fit in 3-dimensional space.  Figure \ref{fig:petries} shows Petrie polygon projections \citep{coxeter1973regular} that are helpful for visualizing higher dimensional regular simplices.  While we use the regular simplex as our starting point, the multistep nature of (\ref{eq:p2}) makes it unclear how one might actually generate proposals when $P>2$, an endeavor that doubtless involves more random variables with more complicated relationships. To preserve simplicity in this multivariate setting, in Section \ref{sec:simp} we generate proposals using a matrix distribution over the orthogonal group $\orthog_D$, which consists of $D \times D$ matrices $\QQ$ satisfying $\QQ^T\QQ=\mathbf{I}_D$.  Because $\orthog_D$ is a compact topological group, it admits a unique normalized, left-invariant measure $\haar(\cdot)$ called the Haar measure \citep{folland2016course}. In symbols,
+%		\begin{align*}
+%			\haar(\orthog_D)=1 \, , \quad \mbox{and} \quad \haar \left(\QQ \mathcal{B} \right) = \haar \left( \mathcal{B}\right) 
+%		\end{align*}
+%		for $\QQ\in \orthog_D$ and $\mathcal{B}$ a Borel set on $\orthog_D$. The Haar measure on $\orthog_D$ is not only useful for constructing simple multivariate proposals: its uniformity helps maintain a simplified acceptance step as well (Theorem \ref{lem:symm}).
+%	\end{quote}
+%We have included a corrected proof of Proposition 1 that is a new result:
+%\begin{quote}
+%	\begin{prop}\label{prop:db}
+%		The Markov chain with the above transition rule maintains detailed balance with respect to the target distribution $\pi(\TTheta)$ if $q(\cdot,\cdot)$ satisfies
+%		\begin{align}\label{eq:criterion}
+%			q(\TTheta^*_1, \TTTheta^*) = \dots = q(\TTheta^*_p,  \TTTheta^*)= \dots = q(\TTheta^*_{P+1}, \TTTheta^*) \, ,
+%		\end{align}
+%		and so $\pi(\TTheta)$ is a stationary distribution of the chain.
+%	\end{prop}
+%	\begin{proof}
+%		Let $p(\TTheta,\dd \TTheta)$ be the transition kernel associated with the transition from an arbitrary state $\TTheta$ according to the above steps 1-4. Then
+%		\begin{align*}
+%			p(\TTheta,\dd \TTheta) = \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta)\, \delta_{\TTheta_p} (\dd \TTheta) \,  q(\TTheta,\TTTheta)\, \dd \TTheta_1 \dots \dd \TTheta_{P} \, .
+%		\end{align*}
+%		For  any two states $\TTheta$, $\widetilde{\TTheta}$, the following holds:
+%		\begin{align*}
+%			\pi(\TTheta)\dd\TTheta\, p(\TTheta,\dd\widetilde{\TTheta}) 
+%			&= \pi(\TTheta)\dd\TTheta \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta^*)\, \delta_{\TTheta_p^*} (\dd \widetilde{\TTheta}) \,  q(\TTheta,\TTTheta^*)\, \dd \TTheta_1^* \dots \dd \TTheta_{P}^* \\ \nonumber
+%			&= \pi(\TTheta)\dd\TTheta  \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}}\frac{ \pi(\widetilde{\TTheta})}{\sum_{p'=1}^{P+1}\pi(\TTheta^*_{p'})} \, \dd \widetilde{\TTheta} \,  q(\TTheta,\TTTheta^*)\, \prod_{p'\neq p} \dd \TTheta_{p'}^* \\ \nonumber
+%			&= \pi(\widetilde{\TTheta})\dd\widetilde{\TTheta} \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}}\frac{ \pi(\TTheta)}{\sum_{p'=1}^{P+1}\pi(\TTheta^*_{p'})} \, \dd \TTheta \,  q(\widetilde{\TTheta},\TTTheta^*)\, \prod_{p'\neq p} \dd \TTheta_{p'}^*  \\ \nonumber
+%			&= \pi(\widetilde{\TTheta})\dd\widetilde{\TTheta} \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta^*)\, \delta_{\TTheta_p^*} (\dd \TTheta) \,  q(\widetilde{\TTheta},\TTTheta^*)\, \dd \TTheta_1^* \dots \dd \TTheta_{P}^*  \\ \nonumber
+%			&= \pi(\widetilde{\TTheta})\dd \widetilde{\TTheta}\, p(\widetilde{\TTheta},\dd \TTheta) \, ,
+%		\end{align*}	
+%		where we use assumption (\ref{eq:criterion}) in the third line.
+%	\end{proof}
+%\end{quote}
+%
+%The new `Computational considerations' section contains the following details on generating random rotations according to the Haar measure:
+%\begin{quote}
+%	The simplicial sampler requires the $O(D^3)$ generation of a random rotation $\QQ \sim \haar(\orthog_D)$.  The most common way to perform this step is to generate a $D\times D$ matrix of standard normals and then perform the QR factorization. Once one has the orthogonal `Q' matrix, one right multiplies it by a diagonal matrix consisting of the signs of the diagonal of the `R' matrix, guaranteeing that the obtained matrix $\QQ$ is the unique orthogonal matrix corresponding to the $\mathbf{R}$ with positive diagonal elements.  Thus, one obtains $\QQ \sim \haar(\orthog_D)$ using the $O(D^3)$ QR factorization.  There are additional algorithms for sampling from the Haar distribution over $\orthog_D$ that provide speedups while still maintaining cubic complexity \citep{stewart1980efficient,anderson1987generation}. In particular, \citet{stewart1980efficient} achieves a 50\% speedup over the QR factorization based algorithm by iteratively pre-multiplying random Householder matrices of increasing dimensions. We are interested in the fact that, when one only requires the random rotation and not the matrix itself, \citet{stewart1980efficient}'s algorithm only requires $O(D^2)$ floating point operations to randomly rotate a $D$-vector. On the one hand, the simplicial sampler multiproposal still requires $O(D^3)$ floating point operations because it must apply this random rotation to the $D$ $D$-vectors that identify the regular simplex.  On the other hand, one could apply this algorithm in an embarrassingly parallel manner to the $D$ non-zero $D$-vectors that contribute to the regular simplex. Furthermore, the entirety of the algorithm relies on matrix-matrix multiplications and should be extremely fast and scalable on a modern GPU: \citet{li2013gpu} use a (now outdated) Tesla C1060 GPU to score 10,000-fold speedups over a single-core $IJK$-algorithm implementation written in \textsc{C++}.  Such a fast GPU implementation of \citet{stewart1980efficient}'s algorithm requires significant engineering that is a contribution in its own right, so we focus on conventional implementations in the following.
+%	
+%	Finally, even for serial implementations, the language of implementation can eclipse theoretical computational complexity. We find that an \textsc{R} based implementation of \citet{stewart1980efficient}'s algorithm is much slower than the QR factorization based method implemented in the \textsc{PRACMA} \citep{pracma} \textsc{R} package.  The QR decomposition in \textsc{R} calls the \textsc{Fortran} library \textsc{LAPACK} to perform the numerical linear algebra for the QR decomposition, and its precompiled and memory efficient implementation outperform interpreted \textsc{R}.
+%\end{quote}
+%
+%\end{reply}
+%
+%
+%
+%\begin{itemize}
+%	\item The samplers in the paper are introduced in the case where the number of proposals (different from the current state) is $D$, the state-space dimension. This seems like an important
+%	limitation. One may want to generate more or less than $D$ proposals. In parallel computing
+%	environment for instance, if the computations that are performed in parallel are those associated with the density evaluations at the proposal values, one may not want to use less than
+%	$D$ cores, perhaps because the number of cores available is smaller than $D$ or, in contrary, one
+%	may want to use more than $D$ cores to sample more than $D$ proposals. It is thus important
+%	to prove that the proposed algorithms are valid when $P\neq D$.
+%\end{itemize}
+%
+%\begin{figure}[t!]
+%	\centering
+%	\includegraphics[width=\linewidth]{figures/p1p2Fig.pdf}
+%	\caption{Performance of the simplicial sampler (Simpl) and the `P1' proposal mechanism \eqref{eq:p1}, with both $D$ and $2D$ proposals and both fast and slow implementations (Section \ref{sec:simp}).  All samplers target a standard multivariate Gaussian distribution, run for 10,000 iterations and adapt to a 50\% target acceptance rate.}\label{fig:p1p2}
+%\end{figure}
+%
+%\begin{reply}
+%	We agree that the limitation to $P=D$ is a significant limitation.  First, we note that the theory is the exact same when $P<D$, although performance improves with $D$ (Figure 5, right).  We have also outlined the difficulty in proving correctness of the extra-dimensional sampler.  More importantly, we have demonstrated a new result in the new Lemma 1 that shows that the centered Gaussian sampler
+%\begin{align*}
+%	\TTheta^*_1,\dots,\TTheta^*_P \stackrel{\perp}{\sim} N_D(\TTheta_{0},\SSigma) \, , \quad \TTheta_{0} \sim N_D(\TTheta_{P+1}^*,\SSigma) \, .
+%\end{align*}
+%also enables the simplified acceptance probabilities:
+%\begin{quote}
+%	\begin{lemma}\label{lem:gaussCenter}
+%		The Gaussian centered multiproposal $q(\TTheta^{(s)},\TTTheta^*)$ defined by
+%		\begin{align*}
+%			\TTheta^*_1,\dots,\TTheta^*_P \stackrel{\perp}{\sim} N_D(\TTheta_{0},\SSigma) \, , \quad \TTheta_{0} \sim N_D(\TTheta_{P+1}^*,\SSigma) \, .
+%		\end{align*}
+%		satisfies the symmetry relation of Equation \eqref{eq:criterion}, namely
+%		\begin{align*}
+%			q(\TTheta^*_1, \TTTheta^*) = \dots = q(\TTheta^*_p,  \TTTheta^*)= \dots = q(\TTheta^*_{P+1}, \TTTheta^*) \, .
+%		\end{align*}
+%	\end{lemma}
+%	\begin{proof}
+%		Let $p(\cdot,\cdot)$ denote the generic probability density function evaluated at the right and conditioned on the left, and let $\phi(\cdot,\cdot)$ an analogous multivariate Gaussian density with dependence on the covariance suppressed. For two arbitrary indices $p, p' \in \{1,\dots,P+1\}$,
+%		\begin{align*}
+%			q(\TTheta^*_p,\TTTheta^*) - q(\TTheta^*_{p'},\TTTheta^*)&= \int_{\mathbb{R}^D} p(\TTheta_p^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p}^*)\, \dd \TTheta_{0} - \int_{\mathbb{R}^D} p(\TTheta_p^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p}^*)\, \dd \TTheta_{0}\\ \nonumber 
+%			&= \int_{\mathbb{R}^D}\left( p(\TTheta_p^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p}^*)  -  p(\TTheta_{p'}^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p'}^*)\right) \dd \TTheta_{0} \\ \nonumber 
+%			&=\int_{\mathbb{R}^D} \left( \phi(\TTheta_p^*,\TTheta_{0}) \prod_{p''\neq p}\phi(\TTheta_{0},\TTheta_{p''}^*) -\phi(\TTheta_{p'}^*,\TTheta_{0}) \prod_{p'''\neq p'}\phi(\TTheta_{0},\TTheta_{p'''}^*)\right) \dd \TTheta_{0} \\ \nonumber
+%			&= \int_{\mathbb{R}^D} \left(  \prod_{p''=1}^{P+1} \phi(\TTheta_{0},\TTheta_{p''}^*) - \prod_{p'''=1}^{P+1}\phi(\TTheta_{0},\TTheta_{p'''}^*)\right) \dd \TTheta_{0} = 0 \, .
+%		\end{align*}
+%		In the third line, we use the Gaussianity and conditional independence structure of the multiproposal. In the fourth line, we use the symmetry of the Gaussian density function.
+%	\end{proof}
+%	\noindent
+%	This simple result fills in a gap in \citet{tjelmeland2004using}: namely, it relates the symmetry in a proposal strategy to a simplified acceptance mechanism \eqref{eq:simpProbs}. 
+%\end{quote}
+%We also show that simplifying the acceptance probabilities leads to extremely speedups for this sampler (Figure \ref{fig:p1p2}).
+%
+%\end{reply}
+%
+%\begin{itemize}
+%	\item To make a significant contribution, the author could provide additional theoretical guarantees
+%	like a comparison with other samplers (or with the proposed samplers but with different values
+%	for $P$) using Peskun ordering or convergence towards the target. An advantage of the proposed
+%	samplers according to the author is that they can enjoy gains in efficiency by exploiting parallel
+%	computing. It would be helpful to include an example of implementation, ideally in a realistic
+%	situation, using parallel computing.
+%\end{itemize}
+%
+%\begin{reply}
+%	We agree with the Reviewer that these would be interesting theoretical studies, but given the two new additional results (Prop 1 and Lemma 1), we leave such theoretical studies for future work. We do however include this note on Peskun ordering:
+%	\begin{quote}
+%		A modified simplicial sampler that only generates a single proposal reduces to Barker's acceptance criterion \citep{barker1965monte}
+%		\begin{align*}
+%			\pi(\TTheta^*)/\left(\pi(\TTheta^*)+\pi(\TTheta^{(s)})  \right)
+%		\end{align*}
+%		with a symmetric proposal distribution. Just as Barker's criterion is suboptimal with respect to the Peskun ordering \citep{peskun1973optimum}, our criterion is also suboptimal. With this in mind, \citet{tjelmeland2004using} provides an algorithm that manipulates the acceptance probabilities \eqref{eq:probsTjel}, of which our simplified acceptance probabilities are a special case.  One could apply that algorithm to these probabilities as well, but it is important to note that Peskun improvement only reduces the asymptotic variance of an estimator and does not guarantee improvement in variance of an estimator obtained from a finite chain.  Here, we are interested in the many proposals, single finite-state space jump context (Section \ref{sec:intro}), where the finite-state space of interest changes with every iteration \citep[cf.][]{calderhead2014general}. We therefore do not consider Peskun improvements in the following.
+%	\end{quote} 
+%On the one hand, we are actively exploring parallelization of these multiproposal algorithms.  For example, \citet{holbrook2021quantum} demonstrates polynomial theoretical speedups for these algorithms on a quantum computer.   On the other hand, in this manuscript we show that, despite computational overheads, the algorithms can outperform even in sequential implementations for a number of reasons, including speed of Fortran implementations of QR decompositions and the fact that, for some models, one only needs to compute a densities' bottleneck once and use this for many evaluations.  This is the case whenever one uses a GP prior.
+%\end{reply}
+%
+%\subsection{Minor Concerns}
+%
+%\begin{itemize}
+%	\item I recommend the author works on the introduction, especially the literature review. In particular, why mentioning \citet{green1995reversible} when talking about deterministic proposals? The proposals
+%	in that sampler are often random. Why not mentioning HMC instead? Also, the author cites
+%	\citet{zanella2020informed} when talking about acceptance criteria different from the Metropolis-Hastings one. But in \citet{zanella2020informed}, the latter is used! Finally, when the author starts talking about multiple proposals in the introduction, \citet{liu2000multiple} is not cited and no reference to MTM is made.
+%\end{itemize}
+%
+%\begin{reply}
+%	We thank the Reviewer for this piece of advice and have thoroughly rewritten the introduction.
+%\end{reply}
+%
+%\begin{itemize}
+%	\item In the introduction again, the author writes: ``As opposed to traditional MCMC methods that
+%	use a binary accept-reject step, these generally allow for greater parallelization, both ...'' I
+%	don’t see why the accept-reject step prevents parallelization. In fact, we can think of the
+%	proposed samplers to have an accept/reject step.
+%\end{itemize}
+%
+%\begin{reply}
+%	We have removed this sentence and placed significant related discussion in the new `Computational considerations' section.
+%\end{reply}
+%
+%\begin{itemize}
+%	\item The condition in Proposition 1 seems a serious limitation. Could the author discuss that
+%	please?
+%\end{itemize}
+%
+%\begin{reply}
+%	We agree that the symmetry condition is a big limitation but note that the simplified acceptance probabilities lead to serious speedups.  For the centered Gaussian proposal, the alternative is as follows:
+%	\begin{quote}
+%		Furthermore, Proposition \ref{prop:db} results in significant speedups within the acceptance mechanism corresponding to the Gaussian centered multiproposal \eqref{eq:p1}. 
+%		Under this scheme, consider the $DP$-vector $\TTheta^*_{-p}:= \mbox{vec}(\TTTheta^*_{-p})$ obtained by removing the state $\TTheta_p^*$, or the $p$th column, from the proposal set $\TTTheta^*$ and applying the vectorization operator. Integrating over all possible $\TTheta_{0}$ gives the conditional distribution of $\TTheta_{-p}^*$ given $\TTheta^*_{p}$:
+%		\begin{align*}
+%			\TTheta_{-p}^* \sim N_{DP} \left(  \mathbf{1}_P \otimes \TTheta^*_{p} = 
+%			\begin{pmatrix}
+%				\TTheta_{p}^* \\
+%				\TTheta_{p}^* \\
+%				\vdots \\
+%				\TTheta_{p}^* 
+%			\end{pmatrix},\; \left(\mathbf{1}_P\mathbf{1}_P^T + \mathbf{I}_P \right) \otimes  \SSigma = 
+%			\begin{pmatrix}
+%				2 \SSigma & \SSigma & \cdots & \cdots & \SSigma \\
+%				\SSigma  & 2 \SSigma & \SSigma & \cdots & \SSigma \\
+%				\vdots   &  \SSigma & 2\SSigma & & \vdots \\
+%				\vdots   &  \vdots     & &\ddots & \SSigma \\
+%				\SSigma &   \SSigma    & \cdots & \SSigma& 2 \SSigma
+%			\end{pmatrix}
+%			\right) \, .
+%		\end{align*}
+%		If one does not adapt the $D \times D$ proposal covariance $\SSigma$, then one may precompute the $DP \times DP$ covariance matrix inverse in $O(D^3P^3)$ time and store it using $O(D^3P^3)$ memory.  In high-dimensional settings where such storage is not possible, one may store only the $D \times D$ inverse covariance $\SSigma^{-1}$ and fill the $DP \times DP$ inverse covariance at each step with complexity $O(D^2P^2)$ using the formula $(\mathbf{A} \otimes \mathbf{B})^{-1} = \mathbf{A}^{-1} \otimes \mathbf{B}^{-1}$.  Once one has this inverse, the inner product term in each
+%		\begin{align*}
+%			q(\TTheta_{p}^*, \TTTheta^*) \propto \exp \left( - \frac{1}{2}(\TTheta^*_{-p} - \TTheta_{p}^*)^{T}  \left(\left(\mathbf{1}_P\mathbf{1}_P^T + \mathbf{I}_P \right) \otimes  \SSigma\right)^{-1} (\TTheta^*_{-p} - \TTheta_{p}^*) \right)
+%		\end{align*}
+%		requires $O(D^2P^2)$ floating point operations.  The upshot is an $O(D^2P^3)$ cost to compute all $P+1$ proposal densities  $q(\TTheta^*_p,\TTTheta^*)$.
+%		But if one adapts $\SSigma$ following \citet{haario2001adaptive}, then this acceptance mechanism requires: an $O(D^3)$ matrix inversion for the updated $\SSigma$ at each step; an $O(P^2D^2)$ Kronecker product to construct the $DP \times DP$ covariance matrix; and the $O(D^2P^3)$ floating point operations to compute the $P+1$ proposal densities $q(\TTheta^*_p,\TTTheta^*)$.  Thankfully, it turns out, none of these computations are necessary.  
+%	\end{quote}
+%\end{reply}
+%
+%
+%\begin{itemize}
+%	\item Corollary 2, it is not clear to me that this result guarantees that a preconditioned version of
+%	the Gaussian simplicial sampler is valid.
+%\end{itemize}
+%
+%\newcommand{\CC}{\mathbf{C}}
+%\begin{reply}
+%	The preconditioning operation is only a change of basis as long as $\CC$ is positive definite.
+%\end{reply}
+%
+%
+%
+%\begin{itemize}
+%	\item Beginning Section 4, ``Note that faster methods exist ... ''. Why not using them?
+%\end{itemize}
+%
+%\begin{reply}
+%	In the new section `Computational considerations', we completely outline the pros and cons of the different methods for generating samples from the Haar measure.  In particular, the QR decomposition based method is very fast in Lapack. 
+%\end{reply}
+%
+%\begin{itemize}
+%	\item In Section 4.2, it would be interesting to comment the figures. Also, at the beginning of
+%	that section, the author writes: ``RWM and MTM both use optimal scaling of \citet{gelman1997weak}''. But the result in that paper is only valid for RWM (not MTM) and under specific
+%	conditions. The author should therefore be careful and perhaps optimize the scaling of these
+%	algorithms otherwise. For MTM, the number of proposals should be mentioned. Is it the same
+%	as in the proposed samplers? That would make sense. Similar comment for the sentence “We
+%	know that this acceptance target is optimal for ...'' In that sentence, the reference is not the
+%	right one. (And why using the slice samplers for some parameters in the Gaussian process
+%	classification?).
+%\end{itemize}
+%
+%\begin{table}
+%	\caption{Updated table}
+%\resizebox{\textwidth}{!}{\begin{tabular}{@{}llllllll@{}}
+%		\toprule
+%		Algorithm & Mean ESS $\TTheta$  & Min ESS $\TTheta$  & Its to $err=10$  & ESS $\eta^2$  & ESS $\xi^2$  & ESS $\rho^2$  & ESS $\sigma^2$  \\ 
+%		\midrule
+%		Simpl & 1571.50  (15.6) & 256.27 (6.4)     & \cellcolor{trevorblue!15}73.05  (1.8) & 671.39  (10.2) & 2463.76  (76.6) & 3703.05  (50.0) & 452.30  (6.7) \\ 
+%		RWM & 436.34  (2.3) & 68.36  (2.3)       & 276.60  (8.3) & 258.63  (5.7) & 1407.88  (61.8) & 1837.47  (31.3) & 134.91  (2.3) \\ 
+%		MTM & 1195.22    (12.8) &     252.13       (7.3) &  1928.75   (20.5) & 676.75 (12.8)  &2332.81    (84.9) & 3490.12 (58.41) &366.86   (6.3) \\ 
+%		PC-Simpl &\cellcolor{trevorblue!15}1865.18  (14.4) & \cellcolor{trevorblue!15}1200.50  (20.4) & 76.39  (2.2) & \cellcolor{trevorblue!15}1312.98  (18.0) & \cellcolor{trevorblue!15}4583.21  (95.5) & \cellcolor{trevorblue!15}4222.10  (50.7) & \cellcolor{trevorblue!15}532.49  (6.5) \\ 
+%		PC-RWM & 362.99  (4.5) & 205.16  (5.3) & 284.27  (10.5) & 418.99  (10.9) & 1381.00  (37.6) & 1654.35  (29.8) & 125.12  (3.0) \\ 
+%		PC-MTM & 1256.07    (15.9)&      755.42    (16.4) &  1873.89   (21.1) & 951.97 (15.3) & 3840.86  (88.3) & 3736.27 (48.0) & 272.08   (6.3) \\
+%		\bottomrule
+%		\toprule
+%		& Mean ESSs $\TTheta$  & Min ESSs $\TTheta$  & Time to $err=10$  & ESSs $\eta^2$  & ESSs $\xi^2$  & ESSs $\rho^2$  & ESSs $\sigma^2$  \\ 
+%		\midrule
+%		Simpl & \cellcolor{trevorblue!15}5.62  (0.06) & 0.92  (0.02) & \cellcolor{trevorblue!15}15.87 (0.98) & 2.40  (0.04) & 8.81  (0.28) & \cellcolor{trevorblue!15}13.24  (0.18) & \cellcolor{trevorblue!15}1.62  (0.02) \\ 
+%		RWM & 2.50  (0.02) & 0.39  (0.01) & 145.41  (9.69) & 1.48  (0.03) & 8.09  (0.36) & 10.55  (0.19) & 0.77  (0.01) \\ 
+%		MTM & 3.85       (0.04) &    0.81      (0.02)& 11674.88  (252.45)& 2.18 (0.04) & 7.52   (0.27) & 11.25 (0.19) & 1.18 (0.02) \\ 
+%		PC-Simpl & 5.09  (0.13) & \cellcolor{trevorblue!15}3.30  (0.10) & 23.99  (1.46) & \cellcolor{trevorblue!15}3.58  (0.10) & \cellcolor{trevorblue!15}12.59  (0.43) & 11.53  (0.32) & 1.45  (0.04) \\ 
+%		PC-RWM & 1.44  (0.04) & 0.81  (0.03) & 268.77  (39.96) & 1.65  (0.06) & 5.48  (0.22) & 6.54  (0.21) & 0.49  (0.02) \\ 
+%		PC-MTM & 3.87       (0.05) &    2.33      (0.05)& 11540.43   (269.22)& 2.93 (0.05) & 11.85  (0.28) & 11.53 (0.15) & 0.84 (0.02) \\ 
+%		\bottomrule
+%\end{tabular}}
+%\end{table}
+%
+%\begin{reply}
+%	We have added additional commentary to figures and clarified the number of proposals $P=D$ in all comparisons.  We observe no benefit in increasing becase MTM requires $2P$ proposals at each iteration.
+%We agree that the results from \citet{gelman1997weak} only hold for RWM.  \citet{bedard2012scaling} give analogous results for MTM, but note that asymptotics have high variance when $D$ gets large (Figure 3 of \citet{bedard2012scaling}).  Even though Figure 3 of that paper suggests one would do better with a higher acceptance rate as $P$ gets larger, we do not observe any improvement from raising the acceptance rate above $30\%$.  On the other hand, for the GP classification example, we \emph{do} find marginally better performance when we change the acceptance rates to $30\%$ and $40\%$ for vanilla and preconditioned MTM respectively. We update the table to reflect these new results. That said, this is not enough to appreciably change the results. Finally, we found that using Metropolis-within-Gibbs was the only way to get RWM to work and give a reasonable comparison.
+%
+%\end{reply}
+%
+%\begin{reply}
+%	We thank the Reviewer for the very helpful comments and advice.  In response to this advice, we have made significant edits and additions to the manuscript that we are confident significantly improve this work.
+%\end{reply}
+%
+%\section{Reviewer 2}
+%
+%\subsection{Brief Overview}
+%
+%There is a large literature on ``multiple-proposals'' MCMC methods where one proposes $P > 1$
+%candidate states and then picks one of them according to some rule; as opposed to proposing
+%a single candidate state and then accept-rejecting it as in Metropolis-Hastings. The most
+%famous of such schemes is probably multiple-try Metropolis (MTM), even if potentially better alternatives are available. Arguably, the main motivation for such schemes are contexts
+%where, either due to the use of parallel computation or to the structure of the model and
+%the target/likelihood computation, computing the $P$ likelihoods for the $P$ proposed states is
+%cheaper/faster than computing the $P$ likelihoods involved in $P$ successive steps of Metropolis-
+%Hastings. See e.g. discussion in Section 3.2.1 of the PhD thesis of Ian Murray at \url{https:
+%//homepages.inf.ed.ac.uk/imurray2/pub/07thesis/murray_thesis_2007.pdf} for when
+%this might be the case and a more general discussion on these issues. As hinted to in the first paragraph of this paper, the main example is arguably when multiple-proposal schemes
+%allow for better use of parallel computation (e.g. for expensive to evaluate targets). In
+%such (potentially important) cases, multiple-proposals schemes can be appealing and useful;
+%otherwise there is general skepticism on their usefulness, which I personally share. The author proposes a novel, simple and elegant multiple proposal scheme, which fits
+%into the framework of \citet{tjelmeland2004using}. The scheme relies on the use of simplex rotations to build a multi-point proposal, $q(\TTheta,\TTTheta)$ with $\TTheta \in \mathbb{R}^D$ and $\TTTheta \in \mathbb{R}^{D\times P}$, that is ``symmetric'' in
+%the sense that, given $\TTTheta$, $q(\TTheta,\TTTheta)$ is the same for all $\TTheta \in \TTTheta$, i.e. the simplex $\TTTheta$ is equally likely to having been generated starting from any of its end points (see Lemma 1 and its proof).
+%Having a symmetric proposal has the advantage of simplifying the selection mechanism
+%and potentially leading to higher acceptance rates for a given step-size compared to, e.g.,
+%standard MTM.
+%
+%\begin{reply}
+%	We thank the Reviewer for taking the time to review our work.  In response to the literature shared by the Reviewer, we have expanded our introduction to better account for the established literature and more concretely relate our work to that of \citet{tjelmeland2004using}.  
+%\end{reply}
+%
+%
+%\subsection{General Comments}
+%
+%
+%The use of simplexes to build a symmetric multi-point proposal is a simple, practical and
+%neat idea, and the author should be congratulated for that. The geometric aspect of it is
+%also elegant. Intuitively, one would expect this scheme to perform better than standard
+%MTM, e.g. due to the avoidance of the additional noise in the MTM accept-reject as well as
+%to the need to compute $P$ likelihoods rather than $2P$ ones. The simulations seem to confirm
+%that. The paper is well written, concise and easy to read. I found the simulation study to
+%be well designed, modulo some remarks that I discuss below.
+%
+%The paper features a reasonable degree of methodological novelty, even if that is not
+%dramatic compared to e.g. \citet{tjelmeland2004using}, which the paper strongly builds upon (see
+%also question below). Nonetheless, the proposed scheme is novel and seems to be highly com-
+%petitive within the context of multiple-proposal MCMC ones. The theoretical contribution
+%is limited to proving the validity of the proposed algorithm, while no theoretical analysis
+%of the algorithm efficiency is provided nor results proving some improvement compared to
+%alternative schemes. Thus, the main contributions is arguably the methodological one (i.e.
+%the novel proposal) rather than the theoretical one.
+%
+%\begin{reply}
+%We thank the Reviewer for the generally positive reception of our work.  We do add that we have made 2 additional theoretical contributions within the updated manuscript. First, we have corrected Proposition 1 and the result appears to be new.  
+% \begin{quote}
+% 	\setcounter{prop}{0}
+% 	\begin{prop}\label{prop:db}
+% 		The Markov chain with the above transition rule maintains detailed balance with respect to the target distribution $\pi(\TTheta)$ if $q(\cdot,\cdot)$ satisfies
+% 		\begin{align}\label{eq:criterion}
+% 			q(\TTheta^*_1, \TTTheta^*) = \dots = q(\TTheta^*_p,  \TTTheta^*)= \dots = q(\TTheta^*_{P+1}, \TTTheta^*) \, ,
+% 		\end{align}
+% 		and so $\pi(\TTheta)$ is a stationary distribution of the chain.
+% 	\end{prop}
+% 	\begin{proof}
+% 		Let $p(\TTheta,\dd \TTheta)$ be the transition kernel associated with the transition from an arbitrary state $\TTheta$ according to the above steps 1-4. Then
+% 		\begin{align*}
+% 			p(\TTheta,\dd \TTheta) = \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta)\, \delta_{\TTheta_p} (\dd \TTheta) \,  q(\TTheta,\TTTheta)\, \dd \TTheta_1 \dots \dd \TTheta_{P} \, .
+% 		\end{align*}
+% 		For  any two states $\TTheta$, $\widetilde{\TTheta}$, the following holds:
+% 		\begin{align*}
+% 			\pi(\TTheta)\dd\TTheta\, p(\TTheta,\dd\widetilde{\TTheta}) 
+% 			&= \pi(\TTheta)\dd\TTheta \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta^*)\, \delta_{\TTheta_p^*} (\dd \widetilde{\TTheta}) \,  q(\TTheta,\TTTheta^*)\, \dd \TTheta_1^* \dots \dd \TTheta_{P}^* \\ \nonumber
+% 			&= \pi(\TTheta)\dd\TTheta  \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}}\frac{ \pi(\widetilde{\TTheta})}{\sum_{p'=1}^{P+1}\pi(\TTheta^*_{p'})} \, \dd \widetilde{\TTheta} \,  q(\TTheta,\TTTheta^*)\, \prod_{p'\neq p} \dd \TTheta_{p'}^* \\ \nonumber
+% 			&= \pi(\widetilde{\TTheta})\dd\widetilde{\TTheta} \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}}\frac{ \pi(\TTheta)}{\sum_{p'=1}^{P+1}\pi(\TTheta^*_{p'})} \, \dd \TTheta \,  q(\widetilde{\TTheta},\TTTheta^*)\, \prod_{p'\neq p} \dd \TTheta_{p'}^*  \\ \nonumber
+% 			&= \pi(\widetilde{\TTheta})\dd\widetilde{\TTheta} \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta^*)\, \delta_{\TTheta_p^*} (\dd \TTheta) \,  q(\widetilde{\TTheta},\TTTheta^*)\, \dd \TTheta_1^* \dots \dd \TTheta_{P}^*  \\ \nonumber
+% 			&= \pi(\widetilde{\TTheta})\dd \widetilde{\TTheta}\, p(\widetilde{\TTheta},\dd \TTheta) \, ,
+% 		\end{align*}	
+% 		where we use assumption (\ref{eq:criterion}) in the third line.
+% 	\end{proof}
+% \end{quote}
+%Second, we have proven that a proposal mechanism from \citet{tjelmeland2004using} satisfies the symmetry condition.
+%\begin{quote}
+%	\setcounter{lemma}{0}
+%	\begin{lemma}\label{lem:gaussCenter}
+%		The Gaussian centered multiproposal $q(\TTheta^{(s)},\TTTheta^*)$ defined by
+%		\begin{align*}
+%			\TTheta^*_1,\dots,\TTheta^*_P \stackrel{\perp}{\sim} N_D(\TTheta_{0},\SSigma) \, , \quad \TTheta_{0} \sim N_D(\TTheta_{P+1}^*,\SSigma) \, .
+%		\end{align*}
+%		satisfies the symmetry relation of Equation \eqref{eq:criterion}, namely
+%		\begin{align*}
+%			q(\TTheta^*_1, \TTTheta^*) = \dots = q(\TTheta^*_p,  \TTTheta^*)= \dots = q(\TTheta^*_{P+1}, \TTTheta^*) \, .
+%		\end{align*}
+%	\end{lemma}
+%	\begin{proof}
+%		Let $p(\cdot,\cdot)$ denote the generic probability density function evaluated at the right and conditioned on the left, and let $\phi(\cdot,\cdot)$ an analogous multivariate Gaussian density with dependence on the covariance suppressed. For two arbitrary indices $p, p' \in \{1,\dots,P+1\}$,
+%		\begin{align*}
+%			q(\TTheta^*_p,\TTTheta^*) - q(\TTheta^*_{p'},\TTTheta^*)&= \int_{\mathbb{R}^D} p(\TTheta_p^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p}^*)\, \dd \TTheta_{0} - \int_{\mathbb{R}^D} p(\TTheta_p^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p}^*)\, \dd \TTheta_{0}\\ \nonumber 
+%			&= \int_{\mathbb{R}^D}\left( p(\TTheta_p^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p}^*)  -  p(\TTheta_{p'}^*,\TTheta_{0}) \,  p(\TTheta_{0},\TTheta_{-p'}^*)\right) \dd \TTheta_{0} \\ \nonumber 
+%			&=\int_{\mathbb{R}^D} \left( \phi(\TTheta_p^*,\TTheta_{0}) \prod_{p''\neq p}\phi(\TTheta_{0},\TTheta_{p''}^*) -\phi(\TTheta_{p'}^*,\TTheta_{0}) \prod_{p'''\neq p'}\phi(\TTheta_{0},\TTheta_{p'''}^*)\right) \dd \TTheta_{0} \\ \nonumber
+%			&= \int_{\mathbb{R}^D} \left(  \prod_{p''=1}^{P+1} \phi(\TTheta_{0},\TTheta_{p''}^*) - \prod_{p'''=1}^{P+1}\phi(\TTheta_{0},\TTheta_{p'''}^*)\right) \dd \TTheta_{0} = 0 \, .
+%		\end{align*}
+%		In the third line, we use the Gaussianity and conditional independence structure of the multiproposal. In the fourth line, we use the symmetry of the Gaussian density function.
+%	\end{proof}
+%	\noindent
+%	This simple result fills in a gap in \citet{tjelmeland2004using}: namely, it relates the symmetry in a proposal strategy to a simplified acceptance mechanism \eqref{eq:simpProbs}. 
+%\end{quote}
+%We show some impressive speedups for this algorithm coming from this result.
+%\end{reply}
+%
+%\subsection{Criticism}
+%
+%I now discuss what are the main limitations of the paper in its current version in my opinion,
+%in a rough order of importance. None of this is so severe to limit the value of the paper nor
+%to harm its ultimate publishability in my opinion, although some need effort to be improved
+%or overcome:
+%
+%\begin{itemize}
+%	\item \emph{Novelty:} as mentioned above, the level of methodological novelty is present but not
+%	dramatic compared to e.g. \citet{tjelmeland2004using}. 
+%\end{itemize}
+%
+%\begin{reply}
+%	In our opinion, \citet{tjelmeland2004using} contains extremely novel work that our innovations fall short of.  We really like that paper. On the other hand, this manuscript contains results that we found necessary to prove to ourselves.  In some ways, these results clarify issues that were not addressed in \citet{tjelmeland2004using}.  Namely, this work clarifies the relationship between two symmetric multiproposal mechanisms and the simplified acceptance probability.  But we do appreciate the Reviewer's judgement in this regard.
+%\end{reply}
+%
+%\begin{itemize}
+%	\item \emph{Including comparison to \citet{tjelmeland2004using} and limitation of currently competitors under consideration:} besides recognising the common framework, there is no comparison to the methodology proposed in \citet{tjelmeland2004using}. Given the close connection, I think it would help to have at least an empirical comparison with the proposal (P1) in \citet{tjelmeland2004using}, since the simplex methodology looks somehow similar in spirit to a deterministic version of (P1) therein (side question: does the latter also requires a cubic in $D$ cost?). Also, it would help to discuss connections (if any) and differences compared to (P2) in Tjelmeland (2004). Currently the only competitors in the simulations are RWM and MTM, which are not very
+%	strong ones.
+%\end{itemize}
+%
+%\begin{reply}
+%	We have: added thorough comparison to P1 and P2 of \citet{tjelmeland2004using} in the introduction; proven a new result (new Lemma 1) showing that P1 also enjoys the simplified acceptance probabilities; and performed a simulation comparing the simplicial sampler to the original (slow) P1 and the fast P1 that uses the simplified acceptance probabilities. First, the introduction now contains the following:
+%	\begin{quote}
+%		With this in mind, we consider it worthwhile to further develop structured multiproposal methods that maintain scalability while not requiring many jumps within the proposal set. As mentioned above, \citet{tjelmeland2004using} proposes two strategies.  Proposal alternative 1, or `P1' , first generates a Gaussian random variable $\TTheta_0$ centered at the current state $\TTheta^*_{P+1}$ and next generates $P$ proposals centered at $\TTheta_0$:
+%		\begin{align}\label{eq:p1}
+%			\TTheta^*_1,\dots,\TTheta^*_P \stackrel{\perp}{\sim} N_D(\TTheta_{0},\SSigma) \, , \quad \TTheta_{0} \sim N_D(\TTheta_{P+1}^*,\SSigma) \, .
+%		\end{align}
+%		Here, the two $D$-dimensional covariance matrices take the same form so that all $\TTTheta^*=(\TTheta_1^*,\dots,\TTheta_{P+1}^*)$ share the same expected distance from the center $\TTheta_{0}$.  In some ways, the recent work of \citet{luo2019multiple} builds on this proposal strategy.  They extend this multiproposal's simple star-shaped structure, where $\TTheta_{0}$ is the center and $(\TTheta_1^*,\dots,\TTheta_{P+1}^*)$ are the flairs, to general acyclic graphs and tailor their proposals to models with certain discrete structures.  
+%		Unlike his first proposal alternative, \citet{tjelmeland2004using}'s  Proposal alternative 2, or `P2', only applies to the scenario when $P=2$ and constructs proposal sets $\TTTheta^*=(\TTheta_1^*,\TTheta_2^*,\TTheta_3^*)$ that are equidistant from a center $\TTheta_{0}$ and `maximally spread'.  Setting $\TTheta_3^*$ to equal $\TTheta^{(s)}$, the current state of the Markov chain, this scheme satisfies the following relations:
+%		\begin{gather}\label{eq:p2}
+%			\TTheta^*_1 =  \TTheta_{0} + n\v_1 \, , \quad \TTheta^*_2 =  \TTheta_{0} - \frac{n}{2} \v_1 + \frac{\sqrt{3}n}{2}  \v_2\, , \quad \TTheta_0 =  \TTheta_3^* +  \frac{n}{2} \v_1 + \frac{\sqrt{3}n}{2}  \v_2 \, ,\\ \nonumber
+%			\v_1 = \u_1 \, , \quad \v_2 = \frac{\left(\mathbf{I}_D - \u_1 \u_1^T\right) \u_2}{\lVert \left(\mathbf{I}_D - \u_1 \u_1^T\right) \u_2\rVert_2} \, , \quad
+%			n \sim N\left(0,\sigma^2/3\right) \, , \quad \u_1, \, \u_2 \stackrel{\perp}{\sim} \mbox{Uniform}(\mathcal{S}^{D-1}) \, .
+%		\end{gather}
+%		In words, one first generates two independent random variables that are each uniformly distributed on the sphere and forces them to be orthogonal to each other.  Next, one generates the normally distributed $n$ and obtains $\TTheta_{0}$ followed by $\TTheta_1^*$ and $\TTheta_2^*$.  Straightforward calculations show that the proposals $\TTheta_1^*$, $\TTheta_2^*$ and $\TTheta_3^*$ are indeed the same distance from the center $\TTheta_{0}$. Similar calculations show that the proposals $\TTheta_1^*$, $\TTheta_2^*$ and $\TTheta_3^*$ are all equidistant from each other and together constitute an equilateral triangle with random edge lengths.
+%		
+%		\citet{tjelmeland2004using} does not specify how one might extend his second proposal alternative to accommodate multiproposals when $P>2$. In the following, we accomplish this multivariate generalization by first noting that the equilateral triangle is a \emph{regular 2-simplex}.  Generally, a $D$-dimensional space can hold as a many as $D+1$ points that are pairwise equidistant. If $\tilde{D}\leq D+1$, the points $\v_1, \dots, \v_{\tilde{D}}\in \mathbb{R}^D$ that satisfy
+%		\begin{align*}
+%			||\v_d-\v_{d'}||_2 = \begin{cases} 
+%				\lambda>0 & d \neq d'\\
+%				0 & d = d' 
+%			\end{cases}
+%		\end{align*}
+%		identify a regular polytope called a $\tilde{D}$-simplex. Figure \ref{fig:regSimps} shows the regular simplices that fit in 3-dimensional space.  Figure \ref{fig:petries} shows Petrie polygon projections \citep{coxeter1973regular} that are helpful for visualizing higher dimensional regular simplices.  While we use the regular simplex as our starting point, the multistep nature of (\ref{eq:p2}) makes it unclear how one might actually generate proposals when $P>2$, an endeavor that doubtless involves more random variables with more complicated relationships. To preserve simplicity in this multivariate setting, in Section \ref{sec:simp} we generate proposals using a matrix distribution over the orthogonal group $\orthog_D$, which consists of $D \times D$ matrices $\QQ$ satisfying $\QQ^T\QQ=\mathbf{I}_D$.  Because $\orthog_D$ is a compact topological group, it admits a unique normalized, left-invariant measure $\haar(\cdot)$ called the Haar measure \citep{folland2016course}. In symbols,
+%		\begin{align*}
+%			\haar(\orthog_D)=1 \, , \quad \mbox{and} \quad \haar \left(\QQ \mathcal{B} \right) = \haar \left( \mathcal{B}\right) 
+%		\end{align*}
+%		for $\QQ\in \orthog_D$ and $\mathcal{B}$ a Borel set on $\orthog_D$. The Haar measure on $\orthog_D$ is not only useful for constructing simple multivariate proposals: its uniformity helps maintain a simplified acceptance step as well (Theorem \ref{lem:symm}).
+%		
+%	\end{quote}
+%Second, we have included the new result saying that P1 enjoys the simplified acceptance probabilities (which we have already included above). Third, we have compared the performance of fast/slow P1 and the simplicial sampler in Figure \ref{fig:p1p2}.
+%\end{reply}
+%
+%\begin{itemize}
+%	\item \emph{Issues with simulation section:} the fundamental issue of the increased cost per iteration
+%	incurred by multiple-proposals schemes is not discussed clearly enough in the simulations.
+%	This is major issue and I think that a much more explicit and transparent discussion of that
+%	is required. Currently, most simulations evaluate schemes based on ESS per second and it is not clear how much these values are influenced by specific implementation/coding issues.
+%	For example: unless I am interpreting the results incorrectly, Table 1 suggests that the
+%	Simplicial scheme for $D = 48$ proposals per iteration takes only around 1.6 times more time
+%	per iteration compared to RWM with 1 proposal per iteration (for ``Simpl'' $ESS/ESSs =
+%	1571.50/5.62 = 279$, while for RWM $436.34/2.50 = 174$; and $279/174 = 1.6$). Why the
+%	cost per iteration of ``Simpl'' with $D$ proposals is not roughly $D$ times more than the RWM
+%	one? This may be due to software implementation (e.g. use of high level programming
+%	language - which would be fine if both schemes are implemented appropriately); or to the
+%	model/proposal structure; or to the coist being dominated by the slice sampling (but in such
+%	case one should take D successive RWM steps to have a fair comparison). Regardless of the
+%	specific reason, these aspects should be clarified to allow the reader to have the full picture
+%	and not being confused. Similar considerations apply to the results in Figure 5 where the increase in cost per iteration is much less than order $D$.
+%\end{itemize}
+%
+%\begin{reply}
+%	We thank the Reviewer for asking this important question.  As a result of this question, we have clarified at multiple points in the paper that parallel computing is not always necessary to avoid $O(D)$ computations.   A great example is GP regression/classification, where the computational bottleneck is an $O(D^3)$ matrix inversion.  But once this is computed, it is the same for each proposal, so it can be shared across target evaluations.  We add the following to the new section `Computational considerations':
+%	\begin{quote}
+%		The simplified acceptance mechanism \eqref{eq:simpProbs} requires $D$ target density evaluations.  These density evaluations are embarrassingly parallel, but there are some target distributions for which this kind of parallelization is not necessary.  When one jointly infers a multivariate Gaussian random variable and its covariance matrix using Metropolis-within-Gibbs, one must invert the updated covariance every time one updates the Gaussian variable. Once one has inverted the covariance matrix, evaluating the multivariate Gaussian density over $D$ proposals is almost as fast as evaluating the density over a single proposal.  In general, however, careful parallelization should greatly accelerate the acceptance step. For example, \citet{holbrook2021quantum} uses a quantum computer to achieve quadratic speedups that reduce the number of target evaluations from $\mathcal{O}(P)$ to $\mathcal{O}(\sqrt{P})$.
+%	\end{quote}
+%We have also added the explanatory sentence to the GP classification section:
+%\begin{quote}
+%	While Simple and MTM require multiple target evaluations at each step, they only must compute the GP inverse covariance once for all such evaluations.
+%\end{quote}
+%\end{reply}
+%
+%\begin{itemize}	
+%	\item
+%	On a related point: looking at Figure 1-right, it seems that the improvement in ESS
+%	per iteration given by the simplicial method over RWM is around 5-fold when using 100
+%	proposals. How does this fit with the claim in the introduction that  ``[we] demonstrate
+%	that even sequential implementations achieve significant speedups over competitors''? I find implementation-independent and runtime-independent results such as Figure 1-right
+%	quite useful, even if on toy targets (e.g. multivariate Gaussians), while I am currently less
+%	convinced and more puzzled by the runtime-dependent results. My impression is that the
+%	examples considered are either toy (Gaussian or mixture of Gaussians) or ones where I would
+%	not use RWM or MTM (Gaussian Process classification; where gradient based schemes such
+%	as MALA or HMC would perform better). Thus the proposed methodology may not be that
+%	practical or state-of-the-art in such examples and actual runtimes not that interesting. In
+%	order to make the simulations more useful and scientifically informative I would suggest to:
+%	first discuss more carefully and in a convincing way cost per iteration issues; and secondly
+%	either (a) presenting results that are less implementation-dependent (i.e. where algorithms
+%	under comparisons are run for number of iterations that are appropriate to approximately
+%	match the total computational costs) or (b) presenting examples where multiple-proposal
+%	schemes are practically appealing and software implementations are reasonably optimized
+%	(in which case actual runtimes would be meaningful and informative). In other words, I
+%	personally find that current simulations try to be a mix of ``practical'' and ``theoretical'' ones,
+%	without being fully convincing in neither dimension.
+%\end{itemize}
+%
+%\begin{reply}
+%	We thank the Reviewer for the helpful suggestions.  As a result of these suggestions, we have included an entire new section detailing `Computational considerations', expanded the results section, and explained the value of the GP classification application in demonstrating that parallelization is not necessary for speedups.  We also hope that our previous response helps resolve confusion regarding runtime-results.
+%	
+%	That said, we have striven to demonstrate both `runtime-dependent' and `non-runtime-dependent' results throughout.  Every time we report ESS/second we also report ESS, and the same goes for intermodal jumps for the mixture of Gaussians example.  With regard to timings, we show that a sequential simplicial sampler programmed in \textsc{R} can actually be pretty fast, and \emph{a fortiori} will be even faster when written in low-level languages or parallelized. 
+%\end{reply}
+%
+%
+%\begin{itemize}
+%	\item \emph{Motivation:} It may help to discuss more clearly the motivation for the proposed sampler
+%	and when you expect this to be useful compared to, e.g., gradient-based MCMC. There is a
+%	bit of that in the first paragraph but then I am confused by the claim regarding sequential
+%	implementations and by the simulation study.
+%\end{itemize}
+%
+%\begin{reply}
+%	We thank the Reviewer for the helpful comment, and we have completely rewritten the introduction to better motivate our developments. We find it interesting that so much work in this field has focused on Rao-Blackwellization and making many jumps between proposals.  Indeed, we see structured multiproposals that allow for simplified acceptance probabilities as the only real way to make ``many proposals, single jump' work:
+%	\begin{quote}
+%Despite theoretical results favoring the use of weighted estimators that feature all proposals at each step, there are practical downsides to this approach.  Here, one must: either (1) save a massive $S\times D \times (P+1)$ tensor to memory, where $S$ is the total number of MCMC iterations; or (2) know what the estimand of interest is beforehand and maintain a running average of each MCMC iteration's contribution to the weighted estimator.
+%Importantly, \citet{schwedes2021rao} empirically demonstrate that the non-Rao-Blackwellized estimators of \citet{calderhead2014general} can perform poorly when a small number of jumps occur between the $P+1$ states of the proposal set.  On the one hand, this result is disconcerting because the baseline in their experiment of 1000 jumps for $P=1000$ proposals performs much worse than $16P$ jumps for the same number of proposals. Time spent iterating between proposed states is time not spent exploring the target distribution. On the other hand, these empirical results rely on a specific multiproposal scheme in which
+%\begin{align*}
+%	\TTheta^*_1,\dots,\TTheta^*_P \stackrel{\perp}{\sim} N_D(\TTheta_{P+1}^*,\SSigma) 
+%\end{align*}
+%and do not necessarily extend to other multiproposal strategies.
+%
+%With this in mind, we consider it worthwhile to further develop structured multiproposal methods that maintain scalability while not requiring many jumps within the proposal set. As mentioned above, \citet{tjelmeland2004using} proposes two strategies.
+%	\end{quote}
+%\end{reply}
+%
+%\begin{itemize}
+%	\item \emph{Implementation:} It may be useful to discuss implementation issues (e.g. cubic cost per
+%	iteration, existence of faster methods \citep{stewart1980efficient}, etc) more explicitly and in details in
+%	the methodological section, Section 3; rather than only mentioning them inside the numerical section, Section 4. A side question: does the author envisage the possibility of any way
+%	to avoid the cubic cost per iteration, maybe by choosing a discrete set of rotation of other
+%	tricks/algorithms? When and by how much does the author expect this additional cost to be
+%	a limiting issue in practical applications where the proposed methodology may be appealing?
+%\end{itemize}
+%
+%\begin{reply}
+%	In response to these important questions, we have added an entire new section to the paper titled `Computational considerations'. Here, we show only two relevant paragraphs from that section:
+%	\begin{quote}
+%		The simplicial sampler requires the $O(D^3)$ generation of a random rotation $\QQ \sim \haar(\orthog_D)$.  The most common way to perform this step is to generate a $D\times D$ matrix of standard normals and then perform the QR factorization. Once one has the orthogonal `Q' matrix, one right multiplies it by a diagonal matrix consisting of the signs of the diagonal of the `R' matrix, guaranteeing that the obtained matrix $\QQ$ is the unique orthogonal matrix corresponding to the $\mathbf{R}$ with positive diagonal elements.  Thus, one obtains $\QQ \sim \haar(\orthog_D)$ using the $O(D^3)$ QR factorization.  There are additional algorithms for sampling from the Haar distribution over $\orthog_D$ that provide speedups while still maintaining cubic complexity \citep{stewart1980efficient,anderson1987generation}. In particular, \citet{stewart1980efficient} achieves a 50\% speedup over the QR factorization based algorithm by iteratively pre-multiplying random Householder matrices of increasing dimensions. We are interested in the fact that, when one only requires the random rotation and not the matrix itself, \citet{stewart1980efficient}'s algorithm only requires $O(D^2)$ floating point operations to randomly rotate a $D$-vector. On the one hand, the simplicial sampler multiproposal still requires $O(D^3)$ floating point operations because it must apply this random rotation to the $D$ $D$-vectors that identify the regular simplex.  On the other hand, one could apply this algorithm in an embarrassingly parallel manner to the $D$ non-zero $D$-vectors that contribute to the regular simplex. Furthermore, the entirety of the algorithm relies on matrix-matrix multiplications and should be extremely fast and scalable on a modern GPU: \citet{li2013gpu} use a (now outdated) Tesla C1060 GPU to score 10,000-fold speedups over a single-core $IJK$-algorithm implementation written in \textsc{C++}.  Such a fast GPU implementation of \citet{stewart1980efficient}'s algorithm requires significant engineering that is a contribution in its own right, so we focus on conventional implementations in the following.
+%		
+%		Finally, even for serial implementations, the language of implementation can eclipse theoretical computational complexity. We find that an \textsc{R} based implementation of \citet{stewart1980efficient}'s algorithm is much slower than the QR factorization based method implemented in the \textsc{PRACMA} \citep{pracma} \textsc{R} package.  The QR decomposition in \textsc{R} calls the \textsc{Fortran} library \textsc{LAPACK} to perform the numerical linear algebra for the QR decomposition, and its precompiled and memory efficient implementation outperform interpreted \textsc{R}.
+%	\end{quote}
+%\end{reply}
+%
+%
+%\begin{itemize}
+%	\item I find the proof of Proposition 1 not precise. If I interpret notation correctly, $p(\TTheta^{(s)},\TTheta^*_p)$ denotes the transition probability of going from $\TTheta^{(s)}$ to $\TTheta^*_p$ when following algorithm with
+%	steps 1-4. In such case the second equality in the proof (the one where $\TTTheta^*$ first appears, is
+%	either inaccurate of not well-motivated, since the chain could go from $\TTheta^{(s)}$ to $\TTheta^*_p$ by proposing many different sets of $p+1$ points $\TTTheta^*$ in step 1, while this equality only considers one of
+%	them. The correct transition probability $p(\TTheta^{(s)},\TTheta^*_p)$ should involve some sort of integration over $\TTTheta^*$s containing $\TTheta^{(s)}$ and $\TTheta^*_p$. To be clear: I believe the statement of the proposition, but I think the current proof is inaccurate as written (I think minor modifications should suffice).
+%\end{itemize}
+%\begin{reply}
+%	We thank the Reviewer for this helpful comment which has led us to develop what we believe is a new result:
+%	  \begin{quote}
+%	 	\setcounter{prop}{0}
+%	 	\begin{prop}\label{prop:db}
+%	 		The Markov chain with the above transition rule maintains detailed balance with respect to the target distribution $\pi(\TTheta)$ if $q(\cdot,\cdot)$ satisfies
+%	 		\begin{align}\label{eq:criterion}
+%	 			q(\TTheta^*_1, \TTTheta^*) = \dots = q(\TTheta^*_p,  \TTTheta^*)= \dots = q(\TTheta^*_{P+1}, \TTTheta^*) \, ,
+%	 		\end{align}
+%	 		and so $\pi(\TTheta)$ is a stationary distribution of the chain.
+%	 	\end{prop}
+%	 	\begin{proof}
+%	 		Let $p(\TTheta,\dd \TTheta)$ be the transition kernel associated with the transition from an arbitrary state $\TTheta$ according to the above steps 1-4. Then
+%	 		\begin{align*}
+%	 			p(\TTheta,\dd \TTheta) = \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta)\, \delta_{\TTheta_p} (\dd \TTheta) \,  q(\TTheta,\TTTheta)\, \dd \TTheta_1 \dots \dd \TTheta_{P} \, .
+%	 		\end{align*}
+%	 		For  any two states $\TTheta$, $\widetilde{\TTheta}$, the following holds:
+%	 		\begin{align*}
+%	 			\pi(\TTheta)\dd\TTheta\, p(\TTheta,\dd\widetilde{\TTheta}) 
+%	 			&= \pi(\TTheta)\dd\TTheta \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta^*)\, \delta_{\TTheta_p^*} (\dd \widetilde{\TTheta}) \,  q(\TTheta,\TTTheta^*)\, \dd \TTheta_1^* \dots \dd \TTheta_{P}^* \\ \nonumber
+%	 			&= \pi(\TTheta)\dd\TTheta  \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}}\frac{ \pi(\widetilde{\TTheta})}{\sum_{p'=1}^{P+1}\pi(\TTheta^*_{p'})} \, \dd \widetilde{\TTheta} \,  q(\TTheta,\TTTheta^*)\, \prod_{p'\neq p} \dd \TTheta_{p'}^* \\ \nonumber
+%	 			&= \pi(\widetilde{\TTheta})\dd\widetilde{\TTheta} \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}}\frac{ \pi(\TTheta)}{\sum_{p'=1}^{P+1}\pi(\TTheta^*_{p'})} \, \dd \TTheta \,  q(\widetilde{\TTheta},\TTTheta^*)\, \prod_{p'\neq p} \dd \TTheta_{p'}^*  \\ \nonumber
+%	 			&= \pi(\widetilde{\TTheta})\dd\widetilde{\TTheta} \sum_{p=1}^{P+1} \int_{(\mathbb{R}^{D})^{\otimes P}} \pi_p (\TTTheta^*)\, \delta_{\TTheta_p^*} (\dd \TTheta) \,  q(\widetilde{\TTheta},\TTTheta^*)\, \dd \TTheta_1^* \dots \dd \TTheta_{P}^*  \\ \nonumber
+%	 			&= \pi(\widetilde{\TTheta})\dd \widetilde{\TTheta}\, p(\widetilde{\TTheta},\dd \TTheta) \, ,
+%	 		\end{align*}	
+%	 		where we use assumption (\ref{eq:criterion}) in the third line.
+%	 	\end{proof}
+%	 \end{quote}
+%\end{reply}
+%
+%
+%\begin{itemize}
+%	\item I think the validity or lack thereof of the ``Extra-dimensional simplicial sampling'' should
+%	be clarified if possible (either proved or disproved). The whole point of MCMC schemes is
+%	to be asymptotically exact, so having one with no validity is arguably not appealing. As it
+%	stands, Section 3.1.4 feels incomplete.
+%\end{itemize}
+%
+%\begin{reply}
+%	While we have not been able to fully prove or disprove the validity of the extra-dimensional sampler, we have added a discussion of the theoretical difficulty to Section 3.1.4:
+%	\begin{quote}
+%		One may interpret the application of $\mathbf{W}$ as a form of preconditioning with preconditioner $\CC^{1/2}=\mathbf{W}$. In Section \ref{sec:pc}, we argue that the guarantees of Lemma \ref{lem:symm} apply to the preconditioned simplicial sampler because $\CC^{1/2}\QQ$ is a random rotation in Euclidean space with inner product $\langle \v, \v' \rangle_{\CC^{-1}} := \v^T\CC^{-1} \v'$.  Following this analogy, we have
+%		\begin{align*}
+%			\CC=\mathbf{W}^T\mathbf{W}= 
+%			\begin{pmatrix}
+%				\mathbf{I}_D & \boldsymbol{0}_{D\times(P-D)} \\
+%				\boldsymbol{0}_{(P-D)\times D} & 	\boldsymbol{0}_{(P-D)\times (P-D)}
+%			\end{pmatrix} = \CC^{+} \, ,
+%		\end{align*}
+%		for $\CC^{+}$ the Moore-Penrose inverse \citep{holbrook2018differentiating}.  Due to the degeneracy of $\CC^{+}$, the resulting form  $\langle \v, \v' \rangle_{\CC^{+}} := \v^T\CC^{+} \v'$ is no longer an inner product, and we cannot assert that the extra-dimensional algorithm inherits the promises of  Lemma \ref{lem:symm}.
+%		Nonetheless, limited empirical experiments do show the algorithm providing accurate results, and we find it helpful to visualize the sampler in Section \ref{sec:ed}.
+%		
+%	\end{quote}
+%\end{reply}
+%
+%\begin{reply}
+%	Again, we thank the Reviewer for taking the time to review our manuscript, which we believe is much improved as a result of their comments and suggestions.
+%\end{reply}
+%
+%\section{Assistant Editor}
+%
+%The two referees provide a number of valuable suggestions/comments concerning novelty, clarity, empirical evidence and additional theoretical support, which I also believe are relevant and should be carefully addressed.
+%
+%To these comments I would also like to add a further one related to Section 3.1.4. The proposed extra-dimensional simplicial sampler is interesting, but the final statement "We provide no theoretical guarantees for the extra-dimensional simplicial sampler, but limited empirical experiments do show the algorithm providing accurate results" is far from being satisfactory for a top journal like JMVA. It seems to me that, with some efforts, it should be possible to prove some validity result similar to Theorem 1 also for the extra-dimensional simplicial sampler. If the author manages to do this, then such an additional statement could add further value to the article. If, instead, proving this type of theory is particularly difficult, the author should clarify why, and provide more formal and convincing arguments in favor of the extra-dimensional simplicial sampler in Section 3.1.4 (more convincing than "limited empirical experiments do show the algorithm providing accurate
+%results").
+%
+%\begin{reply}
+%	We thank the AE for taking the time to comment on our manuscript.  We include the example of the extra-dimensional sampler in the manuscript because it is interesting to us and not because we consider it a good option for use.  In response to the AE's suggestion, we have clarified why the theory we establish does not extend to the extra-dimensional sampler. Namely, it may be interpreted as preconditioning by a degenerate matrix.
+%	\begin{quote}
+%	One may interpret the application of $\mathbf{W}$ as a form of preconditioning with preconditioner $\CC^{1/2}=\mathbf{W}$. In Section \ref{sec:pc}, we argue that the guarantees of Lemma \ref{lem:symm} apply to the preconditioned simplicial sampler because $\CC^{1/2}\QQ$ is a random rotation in Euclidean space with inner product $\langle \v, \v' \rangle_{\CC^{-1}} := \v^T\CC^{-1} \v'$.  Following this analogy, we have
+%	\begin{align*}
+%		\CC=\mathbf{W}^T\mathbf{W}= 
+%		\begin{pmatrix}
+%			\mathbf{I}_D & \boldsymbol{0}_{D\times(P-D)} \\
+%			\boldsymbol{0}_{(P-D)\times D} & 	\boldsymbol{0}_{(P-D)\times (P-D)}
+%		\end{pmatrix} = \CC^{+} \, ,
+%	\end{align*}
+%	for $\CC^{+}$ the Moore-Penrose inverse \citep{holbrook2018differentiating}.  Due to the degeneracy of $\CC^{+}$, the resulting form  $\langle \v, \v' \rangle_{\CC^{+}} := \v^T\CC^{+} \v'$ is no longer an inner product, and we cannot assert that the extra-dimensional algorithm inherits the promises of  Lemma \ref{lem:symm}.
+%	Nonetheless, limited empirical experiments do show the algorithm providing accurate results, and we find it helpful to visualize the sampler in Section \ref{sec:ed}.
+%	
+%\end{quote}
+%Recognizing that JMVA is indeed a top-tier journal, we have added a new lemma (Lemma 1) showing that the centered Gaussian proposal also enables a simplified acceptance mechanism.  Also, we have improved on Proposition 1 and clarified that it is indeed a new result.
+%
+%Again, we thank the AE for taking the time to review our manuscript, and we are confident it is much stronger as a result.
+%\end{reply}
+%
+%
+%%
+%%The paper attempts to unify Bayesian phylogenetics and spatio-temporal Hawkes processes for a new approach to model disease spread. The problem in my opinion is of great practical interests. However, there are a few issues that I am not so sure about. I would appreciate if the authors could clarify them.
+%%
+%%\begin{reply}
+%%	We are glad that the AE recognizes the practical importance of the problem our model addresses, and we hope that our clarifications and manuscript edits prove helpful.
+%%\end{reply}
+%%
+%%On page 8, lines 12-17, the authors defined $\theta_n$. I am wondering why the first $M$ events all have random $\theta_n$'s but the last $(N-M)$ events all have $\theta_n=1$?
+%%
+%%\newcommand{\M}{\mathcal{M}}
+%%\newcommand{\ttheta}{\boldsymbol{\theta}}
+%%\newcommand{\dd}{\mbox{d}}
+%%\newcommand{\Id}{\mathbf{I}}
+%%
+%%\begin{reply}
+%%	We thank the AE for catching an unfortunate overloading of indices.  We have addressed this in a way that we hope resolves the issue.  Now, the indices $1:N$ are strictly ordered by time ($1$ being earliest and $N$ being latest). We have introduced a new index set $\M$ for the subset of samples that provide genome data.  The relevant text now reads as follows:
+%%	 \begin{quote}
+%%	 	\myeditNewIndices
+%%	 \end{quote}
+%% 	Reflecting this new index system, we have also changed the random rates parameterization:
+%% 	\begin{quote}
+%% 		\myeditRates
+%% 		\begin{align*}
+%% 		\begin{cases}
+%% 		\theta_n = \theta_n(z_n) = \exp\left(z_n+\beta t_n\right) & z_n \in \mathbb{R}\, , \quad n\in \M \\
+%% 		\theta_n = 1 & \quad n\notin \M  \, ,\\
+%% 		\end{cases}
+%% 		\end{align*}
+%% 	\end{quote}
+%% 	Importantly, the sequenced data do \emph{not} uniformly precede the unsequenced data in time (Figure \ref{fig:data}, \emph{right}). We thank the AE for pointing out the previous inconsistency and hope our edits resolve this issue.
+%%\end{reply}
+%%
+%%In the phylogenetic analysis, there are $(2M-1)$ nodes and $(2M-2)$ edge weights in the forms of the elapsed evolutionary time between the nodes. I am wondering how these $t_i$'s are related to the event times (which are denoted as $t_n$'s)?
+%%
+%%\begin{reply}
+%%	We thank the AE for pointing out this overloading of notation, which is related to the AE's previous question.  We have changed the branch lengths notations from $t$ to $w$, so as not to cause confusion. This change appears in the same block of text:
+%%	\begin{quote}
+%%		\myeditNewIndices
+%%	\end{quote}
+%%		We have also added additional text to explain the meaning of the phrase `evolutionary time':
+%%		\begin{quote}
+%%			\myeditevoTime
+%%		\end{quote}
+%%	We hope these edits and additions help resolve any confusion previously caused.
+%%\end{reply}
+%%
+%%In the real data example, only a small proportion of the cases were genetically sequenced. How are the remaining cases handled in the context of the phylogenetic analysis? I felt that it would be helpful if this, along with its novelty (if any), is clearly explained in the methodological section of the paper.
+%%
+%%\begin{reply}
+%%	We thank the AE for asking this question, as the hierarchical combination of sequenced and unsequenced data stands as a major strength for our model.  Put another way, the previous failure of Bayesian phylogeographic methods to integrate unsequenced case data is a major shortcoming that we address.  We have added the following summary to the beginning of the Methods section:
+%%	\begin{quote}
+%%We develop the phylogenetic Hawkes process and its efficient inference in the following sections.  Importantly, our proposed hierarchical model integrates both sequenced and unsequenced viral case data, representing a significant and clear contribution insofar as:
+%%\begin{enumerate}
+%%	\item the percentage of confirmed viral cases sequenced during an epidemic is often in the single digits \citep{wadman2021united};
+%%	\item and previous phylogeographic models have failed to leverage additional information provided by geolocated, unsequenced case data.
+%%\end{enumerate}
+%%We address this shortcoming by constructing a new hierarchical model that \emph{both} models all spatiotemporal data with a Hawkes process (Section \ref{sec:hawkes}) \emph{and} allows an inferred evolutionary history in the form of a phylogenetic tree to influence dependencies between relative rates of contagion (Section \ref{sec:phyloBrown}) for the small subset of viral cases for which genome data are available.  We believe that this approach is altogether novel.
+%%	\end{quote}
+%%\end{reply}
+%%
+%%The data in the application are spatially aggregated. I am wondering if the authors can discuss how the proposed modeling framework can be generalized to handle such data directly.
+%%
+%%\begin{reply}
+%%	We are very happy to discuss this.  We have a preprint \emph{Bayesian mitigation of spatial coarsening for a fairly flexible spatiotemporal Hawkes model} where we demonstrate that one can actually infer unobserved locations in the presence of `spatial coarsening' or aggregation.  In that manuscript, we apply the method to inferring locations in the low thousands.  Unfortunately, we found that the computations were too difficult for the 23,000$+$ observations in the current manuscript.  That said, we have no doubt that this computing will be possible within the next 5 years.
+%%
+%%	Instead, we have opted to integrate over prior uncertainty over locations in the following manner outlined in this addition to the manuscript:
+%%	\begin{quote}
+%%		\myeditlocations
+%%	\end{quote}
+%%\end{reply}
+%%
+%%The authors cited their own unpublished work at several places. I believe that these should be removed, as this might compromised the intended double blindness.
+%%
+%%\begin{reply}
+%%	We believe that the citation \emph{Bayesian mitigation of spatial coarsening for a fairly flexible spatiotemporal Hawkes model} is the only unpublished work of ours that we cite.  We have followed the AE's advice and removed this citation.
+%%\end{reply}
+
+
+%\clearpage
+\bibliographystyle{sysbio}
+\bibliography{refs}
+
+
+\end{document}
