@@ -51,6 +51,8 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{12pt}
 
+\usepackage{braket}
+
 
 \usepackage{amsthm}
 
@@ -161,8 +163,8 @@
 \def\pubAddressOne{732 North Washington Street}
 \def\pubAddressTwo{Alexandria, VA 22314-1943}
 
-\def\paperTitle{Generating MCMC proposals by randomly rotating the regular simplex}
-\def\paperID{JMVA-D-21-00468}
+\def\paperTitle{A quantum parallel Markov chain Monte Carlo}
+\def\paperID{JCGS-22-275}
 
 %\newcommand{\bigo}[1]{\cal{O}\hspace{-.5mm}\left(#1\right)}
 \onehalfspacing
@@ -205,20 +207,16 @@
 
 To the Editors and Reviewers:
 
-We appreciate the thoughtful comments and recommendations made by the Reviewers and the opportunity to revise our manuscript ``\paperTitle" (\paperID).
-We have carefully considered these extremely helpful suggestions and have addressed them to the best of our abilities.  We believe that the manuscript is now \emph{significantly} improved and are thankful for the time and energy put forth by the Reviewers.
+I appreciate the thoughtful comments and recommendations made by the AE and Reviewers and the opportunity to revise my manuscript ``\paperTitle" (\paperID).
+I have carefully considered these extremely helpful suggestions and have addressed them to the best of my abilities.  I believe that the manuscript is now significantly improved and am thankful for the time and energy put forth by the Editors and Reviewers.
 
-In particular, we have:
+In particular, I have:
 \begin{itemize}
-	\item expanded the Introduction to better discuss related work, motivate our work and provide background on items such as the simplex and Haar measure;
-	\item  further elucidated the relationship between the simplicial sampler and the two proposal mechanisms of \citet{tjelmeland2004using}, adding an additional result proving that strategy `P1' also enables simplified acceptance probabilities and demonstrating significant theoretical and practical speedups;
-	\item added a new section, `Computational considerations' outlining aspects that will influence algorithmic effectiveness, e.g., theoretical complexity, memory constraints, parallelization, programming language and specific form of target distribution.
-	\item specified why the conclusions of the now Lemma 2 do not extend to the extra-dimensional sampler when it is interpreted as using a degenerate preconditioner; and
-	\item included a new numerical comparison between the simplicial sampler and the (fast and slow) P1 sampler and revisited a multiple-try Metropolis simulation using new target values.
+	\item done things
 \end{itemize}
 
 
-The document below contains our replies (in \textbf{bold}) alongside the AE and Reviewers' comments (normal text).  We list changes to the text with indented normal text set off by quotation marks.
+The document below contains my replies (in \textbf{bold}) alongside the AE and Reviewers' comments (normal text).  I list changes to the text with indented normal text set off by quotation marks.
 
 With sincere gratitude,
 
@@ -229,6 +227,96 @@ Andrew Holbrook
 {\Large \bf Editor and Reviewer Comments:}
 
 
+\section*{Reviewer 1}
+
+
+This paper presented an interesting framework for large-scale MCMC. It leverages the quantum speedup of Grover's searching algorithm to accelerate the treatment of multi-proposals in MCMC. However, an implementation of a quantum algorithm involves nontrivial steps, which need to be explained before this paper can be accepted.
+
+The author did not clarify whether this is a fully quantum algorithm, or a hybrid one. It is important to explain what is the input of the quantum computer and what to extract. For the input, one has to encode it coherently into a quantum state $\bra{\psi}$, and estimate the complexity associated with such preparation.
+
+To extract quantities from a quantum computer, one has to express it as an expectation (observable), and estimate the probability of obtaining the correct output. 
+
+There have already been numerous quantum algorithms for MCMC, e.g.,
+\begin{enumerate}
+	\item Montanaro, A. Quantum Speedup of Monte Carlo Methods. Proc. R. Soc. A. 2015, 471 (2181), 20150301. \citep{montanaro}
+	
+	\item Wocjan, P.; Abeyesinghe, A. Speedup via Quantum Sampling. Phys. Rev. A 2008, 78 (4), 042336. \citep{wocjan2008speedup}
+\end{enumerate}
+The author should comment on how the present approach would compare to these existing methods.
+
+
+\section*{Reviewer 2}
+
+
+This paper seeks to further develop parallel Markov chain Monte Carlo in the quantum computing hardware. The topic is very interesting. The author has a nice comprehensive review of multi-proposal parallel MCMC, and is very current in literature. The review of established quantum computing algorithms is also very helpful for statistician who might have limited knowledge in the area. 
+
+The key contribution is connecting parallel Markov chain Monte Carlo to the quantum computing. The key step is to employ Gumbel-max trick to transform the generalized accept-reject step (i.e., Dirichlet sampling) into a discrete optimization procedure, so that quantum optimization algorithm can be used for sampling. The idea is simple and elegant. It just connects the dots.
+
+I still have a few concerns, more generally related to the “bedrock” parallel Markov chain Monte Carlo:
+
+\begin{enumerate}
+	\item Although named as parallel MCMC, the algorithm is still MCMC, which relies on the back-bone Markov chain to achieve equilibrium. The algorithm still heavily relies on the long sequence for the Markov chain to reach equilibrium. The quantum part doesn’t seem to be able to solve this major drawback of parallel MCMC. 
+	
+	\item I see more potential of the Gumbel-max trick $+$ quantum computing in sequential Monte Carlo. Unlike MCMC, SMC only requires a handful of sequential chains, and mostly need to have a very large number of proposals for re-sampling, where your trick could have more impact.
+	
+	\item A last comment is on computer hardware structure. In the QPMCMC, the Markov chain for loop requires CPU, the evaluation of log-likelihood requires GPU, and the sample from Dirichlet requires quantum processor. Will there be I/O communication overhead for these steps on distinct processors?
+\end{enumerate}
+
+
+
+
+
+
+\section*{Associate Editor}
+
+
+
+The author proposes a quantum parallel MCMC algorithm that uses a Gumbel-max trick to quantum parallelize a multiple-proposal MCMC algorithm. The resulting algorithm drastically reduces the number evaluations of the target density. The manuscript is quite well written and motivated.
+
+
+The referees are relatively positive about the work, however, certain improvements are deemed necessary and the points raised by them are important. I highlight a few points here, and have some additional comments.
+
+
+The first referee highlights that more specific details about the quantum algorithm are required. The second referee asks an important question regarding the cost of the I/O communication. I would further add that in the displayed Algorithms, it would be useful to indicate which components are CPU parallelized, GPU parallelized, and quantum parallelized.
+
+
+The author has motivated the need for quantum algorithms for big-data problems where evaluation of the target is expensive. However, only data-less examples have been implemented. Implementation on a real example is warranted. Further, comparisons with other quantum methods (as suggested by referee) would be useful to understand the effectiveness of the proposed methodology. Finally, comparison with the non-quantum version of the multiple-proposal would be helpful to make the point that the mixing of the algorithm remains unaffected.
+
+\subsection*{Additional Comments}
+
+
+\begin{itemize}
+	\item (I am assuming the following is true.) It would be helpful to state clearly at some point that the resulting QPMCMC chain has the same transition kernel as the non-quantum version. That is, it remains exact.
+	
+	\item Equation (1): It is not clear to me how the ``a.s.'' applies to this definition of 1
+	stationarity.
+	
+	\item Algorithm 1: The algorithm of Tjelmeland (2004) is described here as ``Parallel MCMC'', but it is not immediately clear which part of the algorithm will be implemented in a parallelizable way. I would recommend changing the caption.
+	
+	\item page 4, line 10: I believe the citation for \citet{gelman1992inference} is incorrect. Did the author mean \citet{gelman1992inference}?
+	
+	\item Algorithm 5: Should the last step be ``return $\hat{p}$''.
+	
+	\item Section 3.1: The proof of the Gumbel-max trick can likely be either removed or
+	moved to the Appendix, since this is a fairly well-known result.
+	
+	\item Algorithm 6: I would recommend explicitly highlighting which parts of this algorithm are quantum parallelized.
+	
+	\item Figure 5: The caption here is confusing. It reads ``Total number of oracle evaluations required for each of 2000 parallel MCMC iterations''. Traditionally, this would imply there were 2000 independent chains runs. However, the text describing this Figure implies that there were 2000 Gaussian proposals.
+	
+	\item page 22: The authors tune to 50\% acceptance rate, but I believe the optimal in high- dimensions from the reference \citet{rosenthal2011optimal} is 23.4\%. Further, the tuning to 23.4\% acceptance rate is strictly for the Metropolis-Hastings acceptance function. In the multiple-proposal world, the acceptance function employed is completely different, implying different optimality results. See \citet{agrawal2021optimal}.
+	
+	
+	\item Figure 5: ``Over 99.4\% of the 10,000 MCMC iterations successfully sampled from the discrete distribution with probabilities of Equation (2)''. It’s unclear exactly how this number comes about and what it means. Once the quantum minimization returns a $\hat{p}$, the authors have shown that it follows the right distribution. How can then (1) .6\% not be from the right distribution, and (2) how does one even quantify this.
+	
+	\item Figure 6: Considering the target is known, burn-in seems incredibly wasteful. Once can just start from stationarity and remove the need to throw away samples.
+	
+	\item Table 1: In producing this table, what effective sample size is being used for this two-dimensional problem?
+	
+	\item Could the authors comment on the potential applicability of the algorithm on discrete state spaces? This may be useful for Bayesian record linkage, and variable selection problems \citep{zanella2020informed}.
+	
+	
+\end{itemize}
 
 
 %\section{Reviewer 1}
