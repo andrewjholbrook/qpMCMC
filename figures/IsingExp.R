@@ -259,7 +259,7 @@ for(nProps in c(4,8,16,32,64,128,256,512,1024,2048)) {
   for(i in 1:(nIts/thin)) {
     cat(nProps,distances[i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dDistances.txt")
   }
-  for(i in 1:nIts) {
+  for(i in 1:(nIts/(thin/10))) {
     cat(nProps,out[[5]][i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dLogProbs.txt")
   }
   
