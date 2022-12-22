@@ -167,12 +167,14 @@ multiProp <- function(L=1000,
                       beta=0.1,
                       nProps=100,
                       nIts=1000,
-                      thin=100) {
+                      chainThin=100,
+                      logProbThin=10) {
   worst  <- numeric()
   for (i in 1:L) {
     worst <- c(worst, (-1)^i * rep(c(-1,1),L/2) )
   }
-  logProb   <- rep(0,nIts)
+  logProbs   <- 0
+  logProb    <- 0
   state_0   <- matrix(worst,L,L)
   buffered  <- matrix(0,L+2,L+2)
   buffered[2:(L+1),2:(L+1)] <- state_0
@@ -186,7 +188,8 @@ multiProp <- function(L=1000,
   accept <- rep(0,nIts-1)
   oracleCalls <- 0
   for (i in 2:nIts) {
-    propIndices <- cbind(sample(x=2:(L+1),size=nProps,replace=TRUE),sample(2:(L+1),size=nProps,replace=TRUE))
+    propIndices <- cbind(sample(x=2:(L+1),size=nProps,replace=TRUE),
+                         sample(2:(L+1),size=nProps,replace=TRUE))
     
     targets <- rep(0,nProps+1)
     for(j in 1:nProps) {
@@ -208,7 +211,7 @@ multiProp <- function(L=1000,
     qmin            <- quantumMin(field=1:(nProps+1),y=rank1)
     propIndex       <- qmin[[1]]
     oracleCalls     <- oracleCalls + qmin[[2]]
-    logProb[i]      <- logProb[i-1] + targets[propIndex]
+    logProb         <- logProb + targets[propIndex]
     
     #chain[[i]] <- chain[[i-1]]
     currentState[currentAndProps[propIndex,1],currentAndProps[propIndex,2]] <-
@@ -222,12 +225,15 @@ multiProp <- function(L=1000,
     if(i %% 100 == 0){
       cat("Iteration: ",i,"\n")
     }
-    if(i %% thin == 0) {
+    if(i %% chainThin == 0) {
       l <- l + 1
       chain[[l]] <- currentState
     }
+    if(i %% logProbThin == 0) {
+      logProbs <- c(logProbs,logProb)
+    }
   }
-  return(list(chain,accept,currentIndices,oracleCalls,logProb))
+  return(list(chain,accept,currentIndices,oracleCalls,logProbs))
 }
 
 ################################################################################
@@ -237,11 +243,12 @@ multiProp <- function(L=1000,
 ####
 #
 set.seed(1)
-nIts <- 1000000 #10000
+nIts <- 10000000 #10000
 beta <- 1
-thin <- 1000
+thin <- 10000
 for(nProps in c(4,8,16,32,64,128,256,512,1024,2048)) {
-  out <- multiProp(L=500,nIts=nIts, beta=beta, nProps = nProps,thin=thin) 
+  out <- multiProp(L=500,nIts=nIts, beta=beta, nProps = nProps,
+                   chainThin=thin,logProbThin = thin/10) 
   distances <- rep(0,(nIts/thin))
   for(i in 1:(nIts/thin)) {
     distances[i] <- sum(out[[1]][[1]] != out[[1]][[i]] )
