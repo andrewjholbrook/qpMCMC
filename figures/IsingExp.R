@@ -172,7 +172,7 @@ multiProp <- function(L=1000,
   for (i in 1:L) {
     worst <- c(worst, (-1)^i * rep(c(-1,1),L/2) )
   }
-  #logProb   <- rep(0,nIts)
+  logProb   <- rep(0,nIts)
   state_0   <- matrix(worst,L,L)
   buffered  <- matrix(0,L+2,L+2)
   buffered[2:(L+1),2:(L+1)] <- state_0
@@ -187,7 +187,7 @@ multiProp <- function(L=1000,
   oracleCalls <- 0
   for (i in 2:nIts) {
     propIndices <- cbind(sample(x=2:(L+1),size=nProps,replace=TRUE),sample(2:(L+1),size=nProps,replace=TRUE))
-
+    
     targets <- rep(0,nProps+1)
     for(j in 1:nProps) {
       nbhdVls <- rep(0,4)
@@ -203,10 +203,12 @@ multiProp <- function(L=1000,
     lambdas         <- -selectionProbs + log(rexp(n=nProps+1))
     currentAndProps <- rbind(c(1,1),propIndices)
     currentAndProps <- currentAndProps[order(lambdas),]
+    targets         <- targets[order(lambdas)]
     rank1           <- rank(lambdas)[1]
     qmin            <- quantumMin(field=1:(nProps+1),y=rank1)
     propIndex       <- qmin[[1]]
     oracleCalls     <- oracleCalls + qmin[[2]]
+    logProb[i]      <- logProb[i-1] + targets[propIndex]
     
     #chain[[i]] <- chain[[i-1]]
     currentState[currentAndProps[propIndex,1],currentAndProps[propIndex,2]] <-
@@ -225,7 +227,7 @@ multiProp <- function(L=1000,
       chain[[l]] <- currentState
     }
   }
-  return(list(chain,accept,currentIndices,oracleCalls))
+  return(list(chain,accept,currentIndices,oracleCalls,logProb))
 }
 
 ################################################################################
@@ -235,7 +237,7 @@ multiProp <- function(L=1000,
 ####
 #
 set.seed(1)
-nIts <- 1000000
+nIts <- 1000000 #10000
 beta <- 1
 thin <- 1000
 for(nProps in c(4,8,16,32,64,128,256,512,1024,2048)) {
@@ -250,6 +252,10 @@ for(nProps in c(4,8,16,32,64,128,256,512,1024,2048)) {
   for(i in 1:(nIts/thin)) {
     cat(nProps,distances[i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dDistances.txt")
   }
+  for(i in 1:nIts) {
+    cat(nProps,out[[5]][i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dLogProbs.txt")
+  }
+  
 }
 
 
