@@ -1,6 +1,7 @@
 # 1D Ising model
 library(scales)
 
+nProps <- R.utils::cmdArg("nProps",42L)
 
 groverProbs <- function(N=2^10,M=1) {
   Iter  <- ceiling(pi*sqrt(N/M)/4)
@@ -208,6 +209,7 @@ multiProp <- function(L=1000,
     currentAndProps <- currentAndProps[order(lambdas),]
     targets         <- targets[order(lambdas)]
     rank1           <- rank(lambdas)[1]
+    if( i<(nIts/10) ) rank1 <- sample(1:(nProps+1),size=1) # don't warm start during burnin
     qmin            <- quantumMin(field=1:(nProps+1),y=rank1)
     propIndex       <- qmin[[1]]
     oracleCalls     <- oracleCalls + qmin[[2]]
@@ -243,27 +245,27 @@ multiProp <- function(L=1000,
 ####
 #
 set.seed(1)
-nIts <- 10000000 #10000
+nIts <- 20000000 #10000
 beta <- 1
 thin <- 10000
-for(nProps in c(4,8,16,32,64,128,256,512,1024,2048)) {
-  out <- multiProp(L=500,nIts=nIts, beta=beta, nProps = nProps,
+#for(nProps in c(4,8,16,32,64,128,256,512,1024,2048)) {
+  out <- multiProp(L=1000,nIts=nIts, beta=beta, nProps = nProps,
                    chainThin=thin,logProbThin = thin/10) 
   distances <- rep(0,(nIts/thin))
   for(i in 1:(nIts/thin)) {
     distances[i] <- sum(out[[1]][[1]] != out[[1]][[i]] )
   }
   esss <- coda::effectiveSize(distances[(nIts/(thin*2)+1):(nIts/thin)])
-  cat(nProps,esss,out[[4]],"\n",file="~/qpMCMC/Ising2D.txt",append=TRUE)
+  cat(nProps,esss,out[[4]],"\n",file="~/qpMCMC/Ising2D2.txt",append=TRUE)
   
   for(i in 1:(nIts/thin)) {
-    cat(nProps,distances[i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dDistances.txt")
+    cat(nProps,distances[i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dDistances2.txt")
   }
   for(i in 1:(nIts/(thin/10))) {
-    cat(nProps,out[[5]][i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dLogProbs.txt")
+    cat(nProps,out[[5]][i],"\n",append=TRUE,file = "~/qpMCMC/Ising2dLogProbs2.txt")
   }
   
-}
+#}
 
 
 
