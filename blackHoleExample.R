@@ -362,7 +362,7 @@ set.seed(1)
 nIts <- 20000000
 beta <- 1.2
 thin <- 40000
-out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 512,
+out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 1024,
                  chainThin=thin,logProbThin = thin/10)
 
 saveRDS(out,file="~/qpMCMC/blackHole.rds")
