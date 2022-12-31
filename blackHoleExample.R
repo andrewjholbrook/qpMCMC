@@ -344,20 +344,23 @@ multiPropGibbs <- function(Y=NULL,
 # ####
 # #
 
-library(ggplot2)
-library(reshape2)
-# import grayscale image flips vertically FSR
-img <- jpeg::readJPEG("~/qpMCMC/figures/eso2208-eht-mwa.jpg")
-img <- img[dim(img)[1]:1,,1] * 255 #> 100
+# library(ggplot2)
+# #library(reshape2)
+# # import grayscale image flips vertically FSR
+# img <- jpeg::readJPEG("~/qpMCMC/figures/eso2208-eht-mwa.jpg")
+# img <- img[dim(img)[1]:1,,1] * 255 #> 100
+# saveRDS(img, "~/qpMCMC/figures/blackHoleIntensity.rds")
 # imgLong <- melt(img)
 # ggplot(imgLong, aes(x = Var2, y = Var1)) +
 #   geom_raster(aes(fill=value))
 
 # implement for beta=1 
 
+img <- readRDS("~/qpMCMC/figures/blackHoleIntensity.rds")
+
 set.seed(1)
 nIts <- 20000000
-beta <- 1
+beta <- 1.2
 thin <- 40000
 out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 512,
                  chainThin=thin,logProbThin = thin/10)
