@@ -359,9 +359,9 @@ multiPropGibbs <- function(Y=NULL,
 img <- readRDS("~/qpMCMC/figures/blackHoleIntensity.rds")
 
 set.seed(1)
-nIts <- 20000000
+nIts <- 40000000
 beta <- 1.2
-thin <- 40000
+thin <- 80000
 out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 1024,
                  chainThin=thin,logProbThin = thin/10)
 
