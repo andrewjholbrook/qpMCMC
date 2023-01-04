@@ -186,15 +186,15 @@ multiPropGibbs <- function(Y=NULL,
   initial    <- (Y > 100) * 2 - 1
   
   precision0  <- 1/500
-  precision0s <- precision0
+#  precision0s <- precision0
   precision1  <- 1/500
-  precision1s <- precision1
+#  precision1s <- precision1
   
   mu0        <- 50
-  mu0s       <- mu0
+ # mu0s       <- mu0
   mu1        <- 200
-  mu1s       <- mu1
-  logProbs   <- 0
+#  mu1s       <- mu1
+ # logProbs   <- 0
   logProb    <- 0
   state_0   <- matrix(initial,L,L)
   buffered  <- matrix(0,L+2,L+2)
@@ -300,13 +300,13 @@ multiPropGibbs <- function(Y=NULL,
                                  a=0,b=255)
     
     #update precisions rarely because expensive
-    if(i %% logProbThin ==0) {
+    if(i %% logProbThin == 0) {
       sqrdRrr0 <- 0
       sqrdRrr1 <- 0
-      for(i in 1:dim(Y)[1]) {
+      for(m in 1:dim(Y)[1]) {
         for(j in 1:dim(Y)[2]) {
-          sqrdRrr0 <- sqrdRrr0 + (buffered[i,j]<0)*(Y[i,j]-mu0)^2 
-          sqrdRrr1 <- sqrdRrr1 + (buffered[i,j]>0)*(Y[i,j]-mu1)^2 
+          sqrdRrr0 <- sqrdRrr0 + (buffered[m,j]<0)*(Y[m,j]-mu0)^2 
+          sqrdRrr1 <- sqrdRrr1 + (buffered[m,j]>0)*(Y[m,j]-mu1)^2 
         }
       }
       precision0 <- rgamma(n=1,shape=(n0+1)/2,rate=(sqrdRrr0+1)/2)
@@ -325,16 +325,18 @@ multiPropGibbs <- function(Y=NULL,
       chain[[l]] <- currentState
     }
     if(i %% logProbThin == 0) {
-      logProbs <- c(logProbs,logProb)
-      #sqrdRrrs <- c(sqrdRrrs,sqrdRrr)
-      mu0s     <- c(mu0s,mu0)
-      mu1s     <- c(mu1s,mu1)
-      precision0s <- c(precision0s,precision0)
-      precision1s <- c(precision1s,precision1)
+      # logProbs <- c(logProbs,logProb)
+      # #sqrdRrrs <- c(sqrdRrrs,sqrdRrr)
+      # mu0s     <- c(mu0s,mu0)
+      # mu1s     <- c(mu1s,mu1)
+      # precision0s <- c(precision0s,precision0)
+      # precision1s <- c(precision1s,precision1)
+      cat(i, logProb, mu0, mu1, precision0, precision1,
+          oracleCalls, "\n", append=TRUE,
+          file="~/qpMCMC/blackHoleResults.txt")
     }
   }
-  return(list(chain,accept,currentIndices,oracleCalls,logProbs,
-              mu0s,mu1s,precision0s,precision1s))
+  return(list(chain,accept,currentIndices))
 }
 
 # ################################################################################
@@ -354,24 +356,25 @@ multiPropGibbs <- function(Y=NULL,
 # ggplot(imgLong, aes(x = Var2, y = Var1)) +
 #   geom_raster(aes(fill=value))
 
-# implement for beta=1 
+# implement for beta=1.2
 
 img <- readRDS("~/qpMCMC/figures/blackHoleIntensity.rds")
 
 set.seed(1)
-nIts <- 20000000
+nIts <- 100000000
 beta <- 1.2
-thin <- 40000
+thin <- 200000
 out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 1024,
-                 chainThin=thin,logProbThin = thin/10)
+                 chainThin=thin, logProbThin = thin/100)
 
 saveRDS(out,file="~/qpMCMC/blackHole.rds")
 
-# imgLong <- melt(out[[1]][[91]])
-# remove(out)
-# remove(img)
+# imgLong <- melt(out[[1]][[3]])
+# #remove(results)
 # ggplot(imgLong, aes(x = Var2, y = Var1)) +
 #   geom_raster(aes(fill=value))
+
+
 
 
 
