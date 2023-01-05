@@ -185,14 +185,14 @@ multiPropGibbs <- function(Y=NULL,
   if( is.null(Y) ) stop("Data required.")
   initial    <- (Y > 100) * 2 - 1
   
-  precision0  <- 1/500
+  precision0  <- 2/1000
 #  precision0s <- precision0
-  precision1  <- 1/500
+  precision1  <- 1/10000
 #  precision1s <- precision1
   
-  mu0        <- 50
+  mu0        <- 1
  # mu0s       <- mu0
-  mu1        <- 200
+  mu1        <- 254
 #  mu1s       <- mu1
  # logProbs   <- 0
   logProb    <- 0
@@ -300,7 +300,7 @@ multiPropGibbs <- function(Y=NULL,
                                  a=0,b=255)
     
     #update precisions rarely because expensive
-    if(i %% logProbThin == 0) {
+    if(i %% 50000 == 0) {
       sqrdRrr0 <- 0
       sqrdRrr1 <- 0
       for(m in 1:dim(Y)[1]) {
