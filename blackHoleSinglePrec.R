@@ -191,7 +191,7 @@ multiPropGibbs <- function(Y=NULL,
   
   mu0        <- 1
   # mu0s       <- mu0
-  mu1        <- 254
+  mu1        <- 255
   #  mu1s       <- mu1
   # logProbs   <- 0
   logProb    <- 0
@@ -295,8 +295,8 @@ multiPropGibbs <- function(Y=NULL,
     # update means
     mu0 <- truncnorm::rtruncnorm(n=1, mean=1/n0*sumY0,sd=1/sqrt(precision0*n0),
                                  a=0,b=255)
-    mu1 <- truncnorm::rtruncnorm(n=1, mean=1/n1*sumY1,sd=1/sqrt(precision0*n1),
-                                 a=0,b=255)
+    # mu1 <- truncnorm::rtruncnorm(n=1, mean=1/n1*sumY1,sd=1/sqrt(precision0*n1),
+    #                              a=0,b=255)
     
     #update precisions rarely because expensive
     if(i %% logProbThin == 0) {
@@ -333,7 +333,7 @@ multiPropGibbs <- function(Y=NULL,
       # mu1s     <- c(mu1s,mu1)
       # precision0s <- c(precision0s,precision0)
       # precision1s <- c(precision1s,precision1)
-      cat(i, logProb, mu0, mu1, precision0,
+      cat(i, logProb, mu0, precision0,
           oracleCalls, "\n", append=TRUE,
           file="~/qpMCMC/blackHoleResultsSinglePrec.txt")
     }
