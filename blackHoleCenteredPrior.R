@@ -294,12 +294,20 @@ multiPropGibbs <- function(Y=NULL,
     
     # update means
     # prior mean 255/2, prior sd=20 --> prior precision 1/400
-    mu0 <- truncnorm::rtruncnorm(n=1, mean=(1/400*255/2+precision0*sumY0)/(1/400+n0*precision0),
-                                 sd=1/sqrt(1/400+n0*precision0),
-                                 a=0,b=255)
-    mu1 <- truncnorm::rtruncnorm(n=1, mean=(1/400*255/2+precision0*sumY1)/(1/400+n1*precision0),
-                                 sd=1/sqrt(1/400+n1*precision0),
-                                 a=0,b=255)
+    mu0Prop <- 257
+    while(mu0Prop > 255 | mu0Prop < 0) {
+      mu0Prop <- rnorm(n=1, mean=(1/400*255/2+precision0*sumY0)/(1/400+n0*precision0),
+                       sd=1/sqrt(1/400+n0*precision0))
+    }
+    mu0 <- mu0Prop
+
+    mu1Prop <- 257
+    while(mu1Prop > 255 | mu1Prop < 0) {
+      mu1Prop <- rnorm(n=1, mean=(1/400*255/2+precision0*sumY1)/(1/400+n1*precision0),
+                       sd=1/sqrt(1/400+n1*precision0))
+    }
+    mu1 <- mu1Prop
+
     
     #update precisions rarely because expensive
     if(i %% logProbThin == 0) {
