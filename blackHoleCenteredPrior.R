@@ -296,15 +296,15 @@ multiPropGibbs <- function(Y=NULL,
     # prior mean 255/2, prior precision 83068.88 (half all divided by 100) 
     mu0Prop <- 257
     while(mu0Prop > 255 | mu0Prop < 0) {
-      mu0Prop <- rnorm(n=1, mean=(83068.88*255/2+precision0*sumY0)/(83068.88+n0*precision0),
-                       sd=1/sqrt(83068.88+n0*precision0))
+      mu0Prop <- rnorm(n=1, mean=(8306.888*255/2+precision0*sumY0)/(8306.888+n0*precision0),
+                       sd=1/sqrt(8306.888+n0*precision0))
     }
     mu0 <- mu0Prop
 
     mu1Prop <- 257
     while(mu1Prop > 255 | mu1Prop < 0) {
-      mu1Prop <- rnorm(n=1, mean=(83068.88*255/2+precision0*sumY1)/(83068.88+n1*precision0),
-                       sd=1/sqrt(83068.88+n1*precision0))
+      mu1Prop <- rnorm(n=1, mean=(8306.888*255/2+precision0*sumY1)/(8306.888+n1*precision0),
+                       sd=1/sqrt(8306.888+n1*precision0))
     }
     mu1 <- mu1Prop
 
