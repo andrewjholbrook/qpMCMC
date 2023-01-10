@@ -2,22 +2,26 @@ setwd("~/qpMCMC")
 
 library(readr)
 library(coda)
-
-df <- read_table2("blackHoleResults.txt",col_names = FALSE)
-df <- as.matrix(df[,1:7])
-# for(i in 1:7){
-#   df[,i] <- unlist(df[,i])
-# }
-#effectiveSize(df[4000:8000,4])
-plot(df[,6],type="l")
-
-df <- read_table2("blackHoleResultsSinglePrec.txt",col_names = FALSE)
+# 
+df <- read_table2("blackHoleResultsCenteredPrior.txt",col_names = FALSE)
 df <- as.matrix(df[,1:6])
 # for(i in 1:7){
 #   df[,i] <- unlist(df[,i])
 # }
 #effectiveSize(df[4000:8000,4])
-plot(df[,5],type="l")
+plot(df[,3],type="l")
+
+df <- read_table2("blackHoleResultsSinglePrec.txt",col_names = FALSE)
+df <- as.matrix(df[,1:5])
+# for(i in 1:7){
+#   df[,i] <- unlist(df[,i])
+# }
+#effectiveSize(df[4000:8000,4])
+plot(df[,4],type="l")
+
+
+
+
 
 # results <- readRDS("~/qpMCMC/blackHole.rds")
 # 
