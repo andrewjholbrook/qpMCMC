@@ -9,7 +9,7 @@ df <- as.matrix(df[,1:6])
 #   df[,i] <- unlist(df[,i])
 # }
 #effectiveSize(df[4000:8000,4])
-plot(df[,3],type="l")
+plot(df[,4],type="l")
 
 df <- read_table2("blackHoleResultsSinglePrec.txt",col_names = FALSE)
 df <- as.matrix(df[,1:5])
