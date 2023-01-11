@@ -319,8 +319,8 @@ multiPropGibbs <- function(Y=NULL,
       #     sqrdRrr1 <- sqrdRrr1 + (buffered[m,j]>0)*(Y[m,j]-mu1)^2 
       #   }
       # }
-      sqrdRrr0 <- sum((buffered<0)*(Y-mu0)^2)
-      sqrdRrr1 <- sum((buffered>0)*(Y-mu1)^2)
+      sqrdRrr0 <- sum((currentState<0)*(Y-mu0)^2)
+      sqrdRrr1 <- sum((currentState>0)*(Y-mu1)^2)
       
       precision0 <- rgamma(n=1,shape=(n0+n1+1)/2,
                            rate=(sqrdRrr0+sqrdRrr1+1)/2)
