@@ -367,7 +367,7 @@ nIts <- 100000000
 beta <- 1.2
 thin <- 200000
 out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 1024,
-                      chainThin=thin, logProbThin = thin/100)
+                      chainThin=thin, logProbThin = thin/10)
 
 saveRDS(out,file="~/qpMCMC/blackHoleSinglePrec.rds")
 
