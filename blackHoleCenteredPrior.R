@@ -296,15 +296,15 @@ multiPropGibbs <- function(Y=NULL,
     # prior mean 255/2, prior precision 1 # 83068.88 (half all divided by 100) 
     mu0Prop <- 257
     while(mu0Prop > 255 | mu0Prop < 0) {
-      mu0Prop <- rnorm(n=1, mean=(1*255/2+precision0*sumY0)/(1+n0*precision0),
-                       sd=1/sqrt(1+n0*precision0))
+      mu0Prop <- rnorm(n=1, mean=(10*255/2+precision0*sumY0)/(10+n0*precision0),
+                       sd=1/sqrt(10+n0*precision0))
     }
     mu0 <- mu0Prop
 
     mu1Prop <- 257
     while(mu1Prop > 255 | mu1Prop < 0) {
-      mu1Prop <- rnorm(n=1, mean=(1*255/2+precision0*sumY1)/(1+n1*precision0),
-                       sd=1/sqrt(1+n1*precision0))
+      mu1Prop <- rnorm(n=1, mean=(10*255/2+precision0*sumY1)/(10+n1*precision0),
+                       sd=1/sqrt(10+n1*precision0))
     }
     mu1 <- mu1Prop
 
@@ -378,7 +378,7 @@ nIts <- 100000000
 beta <- 1.2
 thin <- 200000
 out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 1024,
-                      chainThin=thin, logProbThin = thin/100)
+                      chainThin=thin, logProbThin = thin/10)
 
 saveRDS(out,file="~/qpMCMC/blackHoleCenteredPrior.rds")
 
