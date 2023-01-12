@@ -263,7 +263,7 @@ multiPropGibbs <- function(Y=NULL,
       sumY0   <- sumY0 - Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       n1      <- n1 + 1
       n0      <- n0 - 1
-    } else {
+    } else if(currentState[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]==-1) {
       sumY1   <- sumY1 - Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       sumY0   <- sumY0 + Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       n1      <- n1 - 1
