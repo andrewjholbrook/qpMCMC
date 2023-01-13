@@ -176,25 +176,24 @@ squaredError <- function(Y,X,mu0,mu1) {
 }
 
 multiPropGibbs <- function(Y=NULL,
-                      L=1000,
-                      beta=0.1,
-                      nProps=100,
-                      nIts=1000,
-                      chainThin=100,
-                      logProbThin=10) {
+                           L=1000,
+                           beta=0.1,
+                           nProps=100,
+                           nIts=1000,
+                           chainThin=100,
+                           logProbThin=10) {
   if( is.null(Y) ) stop("Data required.")
   initial    <- (Y > 100) * 2 - 1
   
-  precision0  <- 2/1000
-#  precision0s <- precision0
-  precision1  <- 1/10000
-#  precision1s <- precision1
+  precision0  <- 2/10000
+  #  precision0s <- precision0
+  #  precision1s <- precision1
   
   mu0        <- 1
- # mu0s       <- mu0
-  mu1        <- 254
-#  mu1s       <- mu1
- # logProbs   <- 0
+  # mu0s       <- mu0
+  mu1        <- 255
+  #  mu1s       <- mu1
+  # logProbs   <- 0
   logProb    <- 0
   state_0   <- matrix(initial,L,L)
   buffered  <- matrix(0,L+2,L+2)
@@ -203,23 +202,13 @@ multiPropGibbs <- function(Y=NULL,
   buffY                  <- matrix(0,L+2,L+2)
   buffY[2:(L+1),2:(L+1)] <- Y 
   Y                      <- buffY
-  
-  # precompute terms for mu updates
-  n0 <- 0
-  n1 <- 0
-  sumY1 <- 0
-  sumY0 <- 0
-  sqrdRrr0 <- 0
-  sqrdRrr1 <- 0
-  for(i in 1:dim(Y)[1]) {
-    for(j in 1:dim(Y)[2]) {
-      n0 <- n0 + (buffered[i,j]<0)
-      n1 <- n1 + (buffered[i,j]>0)
-      sumY1 <- sumY1 + (buffered[i,j]>0)*Y[i,j] 
-      sumY0 <- sumY0 + (buffered[i,j]<0)*Y[i,j] 
-    }
-  }
 
+    # precompute terms for mu updates
+  n0 <- sum(buffered<0)
+  n1 <- sum(buffered>0)
+  sumY1 <- sum((buffered>0)*Y)
+  sumY0 <- sum((buffered<0)*Y)
+  
   
   chain <- list()
   chain[[1]] <- buffered
@@ -246,11 +235,11 @@ multiPropGibbs <- function(Y=NULL,
       targets[j+1] <- beta*sum(prpsdVl*nbhdVls)
       if ( prpsdVl==1 ) {
         targets[j+1] <- targets[j+1] -
-          precision1/2*(Y[propIndices[j,1],propIndices[j,2]]- mu1)^2 +
+          precision0/2*(Y[propIndices[j,1],propIndices[j,2]]- mu1)^2 +
           precision0/2*(Y[propIndices[j,1],propIndices[j,2]]- mu0)^2
       } else {
         targets[j+1] <- targets[j+1] +
-          precision1/2*(Y[propIndices[j,1],propIndices[j,2]]- mu1)^2 -
+          precision0/2*(Y[propIndices[j,1],propIndices[j,2]]- mu1)^2 -
           precision0/2*(Y[propIndices[j,1],propIndices[j,2]]- mu0)^2
       }
     }
@@ -270,17 +259,11 @@ multiPropGibbs <- function(Y=NULL,
       - currentState[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
     
     if(currentState[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]==1) {
-      # sqrdRrr <- sqrdRrr +
-      #   (Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]- mu1)^2 -
-      #   (Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]- mu0)^2
       sumY1   <- sumY1 + Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       sumY0   <- sumY0 - Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       n1      <- n1 + 1
       n0      <- n0 - 1
-    } else {
-      # sqrdRrr <- sqrdRrr -
-      #   (Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]- mu1)^2 +
-      #   (Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]- mu0)^2
+    } else if(currentState[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]==-1) {
       sumY1   <- sumY1 - Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       sumY0   <- sumY0 + Y[currentAndProps[propIndex,1],currentAndProps[propIndex,2]]
       n1      <- n1 - 1
@@ -293,28 +276,42 @@ multiPropGibbs <- function(Y=NULL,
     }
     currentIndices[i,] <- currentIndex
     
-    # update means
-    mu0 <- truncnorm::rtruncnorm(n=1, mean=1/n0*sumY0,sd=1/sqrt(precision0*n0),
-                                 a=0,b=255)
-    mu1 <- truncnorm::rtruncnorm(n=1, mean=1/n1*sumY1,sd=1/sqrt(precision1*n1),
-                                 a=0,b=255)
+    # # update means
+    # # prior mean 255/2, prior precision 1 # 83068.88 (half all divided by 100) 
+    # mu0Prop <- 257
+    # while(mu0Prop > 255 | mu0Prop < 0) {
+    #   mu0Prop <- rnorm(n=1, mean=(10*255/2+precision0*sumY0)/(10+n0*precision0),
+    #                    sd=1/sqrt(10+n0*precision0))
+    # }
+    # mu0 <- mu0Prop
+    # 
+    # mu1Prop <- 257
+    # while(mu1Prop > 255 | mu1Prop < 0) {
+    #   mu1Prop <- rnorm(n=1, mean=(10*255/2+precision0*sumY1)/(10+n1*precision0),
+    #                    sd=1/sqrt(10+n1*precision0))
+    # }
+    # mu1 <- mu1Prop
+    # browser()
+    
+    mu0 <- truncnorm::rtruncnorm(n=1, mean=sumY0/n0,sd=1/sqrt(precision0*n0),
+                                 a=0,b=255.00001)
+    mu1 <- truncnorm::rtruncnorm(n=1, mean=sumY1/n1,sd=1/sqrt(precision0*n1),
+                                 a=0,b=255.00001)
+    if(sumY1/n1>255) stop("somethings wrong")
+
     
     #update precisions rarely because expensive
-    if(i %% 50000 == 0) {
-      sqrdRrr0 <- 0
-      sqrdRrr1 <- 0
-      for(m in 1:dim(Y)[1]) {
-        for(j in 1:dim(Y)[2]) {
-          sqrdRrr0 <- sqrdRrr0 + (buffered[m,j]<0)*(Y[m,j]-mu0)^2 
-          sqrdRrr1 <- sqrdRrr1 + (buffered[m,j]>0)*(Y[m,j]-mu1)^2 
-        }
-      }
-      precision0 <- rgamma(n=1,shape=(n0+1)/2,rate=(sqrdRrr0+1)/2)
-      precision1 <- rgamma(n=1,shape=(n1+1)/2,rate=(sqrdRrr0+1)/2)
+    if(i %% logProbThin == 0) {
+
+      sqrdRrr0 <- sum((currentState<0)*(Y-mu0)^2)
+      sqrdRrr1 <- sum((currentState>0)*(Y-mu1)^2)
+      
+      precision0 <- rgamma(n=1,shape=(n0+n1+1)/2,
+                           rate=(sqrdRrr0+sqrdRrr1+1)/2)
     }
-
     
-
+    
+    
     
     
     if(i %% 100 == 0){
@@ -325,13 +322,7 @@ multiPropGibbs <- function(Y=NULL,
       chain[[l]] <- currentState
     }
     if(i %% logProbThin == 0) {
-      # logProbs <- c(logProbs,logProb)
-      # #sqrdRrrs <- c(sqrdRrrs,sqrdRrr)
-      # mu0s     <- c(mu0s,mu0)
-      # mu1s     <- c(mu1s,mu1)
-      # precision0s <- c(precision0s,precision0)
-      # precision1s <- c(precision1s,precision1)
-      cat(i, logProb, mu0, mu1, precision0, precision1,
+      cat(i, logProb, mu0,mu1, precision0,
           oracleCalls, "\n", append=TRUE,
           file="~/qpMCMC/blackHoleResults.txt")
     }
@@ -361,15 +352,15 @@ multiPropGibbs <- function(Y=NULL,
 img <- readRDS("~/qpMCMC/figures/blackHoleIntensity.rds")
 
 set.seed(1)
-nIts <- 100000000
+nIts <- 20000000
 beta <- 1.2
-thin <- 200000
+thin <- 40000
 out <- multiPropGibbs(Y=img,L=4076,nIts=nIts, beta=beta, nProps = 1024,
-                 chainThin=thin, logProbThin = thin/100)
+                      chainThin=thin, logProbThin = thin/10)
 
-saveRDS(out,file="~/qpMCMC/blackHole.rds")
+saveRDS(out,file="~/qpMCMC/blackHoleResults.rds")
 
-# imgLong <- melt(out[[1]][[3]])
+# imgLong <- reshape2::melt(out[[1]][[3]])
 # #remove(results)
 # ggplot(imgLong, aes(x = Var2, y = Var1)) +
 #   geom_raster(aes(fill=value))
