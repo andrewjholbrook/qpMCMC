@@ -530,26 +530,32 @@ Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$,
 }
 \end{figure}
 
-\subsection{Continuously-valued targets}\label{sec:continu}
 
-\subsubsection{Symmetric proposals}\label{sec:sym}
+\subsection{Simplified acceptance probabilities}\label{sec:sym}
+
 \newcommand{\SSigma}{\boldsymbol{\Sigma}}
 
 Evaluation of the $P+1$ proposal density terms $q(\ttheta_{p},\Ttheta_{-p})$ can be computationally burdensome as $P$ grows large.  \citet{holbrook2021generating} proves that two specific proposal mechanisms enforce equality across all $P+1$ terms and thus enable the simplified acceptance probabilities
 \begin{align}\label{eq:probsSimp}
 	\pi_p = \frac{\pi(\ttheta_p) }{\sum_{p'=0}^P \pi(\ttheta_{p'})} \, , \quad p=0,\dots,P \, .
 \end{align}
-In the following, we opt for one of these proposal mechanisms, the centered Gaussian proposal of \citet{tjelmeland2004using}.  This strategy first generates a Gaussian random variable $\bar{\ttheta}$ centered at the current state $\ttheta_{0}$ and then generates $P$ proposals centered at $\bar{\ttheta}$:
+In Section \ref{sec:continu}, we opt for one of these proposal mechanisms, the centered Gaussian proposal of \citet{tjelmeland2004using}.  This strategy first generates a Gaussian random variable $\bar{\ttheta}$ centered at the current state $\ttheta_{0}$ and then generates $P$ proposals centered at $\bar{\ttheta}$:
 \begin{align}\label{eq:p1}
 	\ttheta_1,\dots,\ttheta_P \stackrel{\perp}{\sim} Normal_D(\bar{\ttheta},\SSigma) \, , \quad \bar{\ttheta} \sim Normal_D(\ttheta_{0},\SSigma) \, .
 \end{align}
 \citet{holbrook2021generating} shows that this strategy leads to the higher-order proposal symmetry
-\begin{align*}
+\begin{align}\label{eq:symmetry}
 	q(\ttheta_0,\Ttheta_{-0}) = q(\ttheta_{1},\Ttheta_{-1}) =\dots =q(\ttheta_{P},\Ttheta_{-P})  
-\end{align*}
+\end{align}
 and that the simplified acceptance probabilities \eqref{eq:probsSimp} maintain detailed balance.  In fact, other location scale families also suffice in the manner, but here we focus on Gaussian proposals without loss of generality.  Finally, the simplicial sampler \citep{holbrook2021generating} accomplishes the same simplified acceptance probabilities but incurs an $\mathcal{O}(D^3)$ computational cost.
 
-\subsection{QPMCMC}
+One may also use a more limited strategy to enforce \eqref{eq:symmetry}. \citet{glatt} show that the sampler using independence proposal $q(\ttheta_p,\Ttheta_{-p})=\prod_{p'\neq p} q(\ttheta_{p'})$, where $q(\cdot)$ is not a function of $\ttheta_p$, results in acceptance probabilities
+\begin{align}\label{eq:indepProb}
+	\pi_p = \frac{\pi(\ttheta_p) /q(\ttheta_p)}{\sum_{p'=0}^P \pi(\ttheta_{p'})/q(\ttheta_{p'})} \, , \quad p=0,\dots,P \, .
+\end{align}
+When $\pi(\cdot)$ and $q(\cdot)$ take continuous values on a topologically compact domain or discrete values on a finite domain, one may specify $q(\cdot)$ to be uniform and let \eqref{eq:indepProb} simplify to \eqref{eq:probsSimp}.  This strategy proves useful in Section \ref{sec:discrete}, in which we consider discrete-valued targets over Ising-type lattice models.
+
+\subsection{Continuously-valued targets}\label{sec:continu}
 
 
 \begin{figure}[!t]
@@ -642,6 +648,10 @@ Finally, we compare convergence speed for QPMCMC using 1,000, 5,000 and 10,000 p
 
 
 \subsection{Discrete-valued targets}\label{sec:discrete}
+
+
+\subsubsection{Uniform proposals}\label{sec:unif}
+
 
 \subsubsection{Ising model}
 
