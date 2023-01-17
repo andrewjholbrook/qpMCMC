@@ -504,7 +504,7 @@ With the rudiments of quantum minimization in hand, we present a quantum paralle
  
  In light of this dilemma, we propose to use the Gumbel-max trick \citep{papandreou2011perturb} to transform the generalized accept-reject step into a discrete optimization procedure (Section \ref{sec:gm}).  From there, we use quantum minimization to efficiently sample from $Discrete(\ppi)$. Crucially, we get away with quantum parallel evaluation of the target $\pi(\cdot)$ over all superposed states because the Gumbel-max trick does not rely on a normalization step: each superposed state requires no knowledge of any target evaluation other than its own.  
 
-Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$, the new computational bottleneck is the calculations required to obtain the $P+1$ proposal density terms $q(\ttheta_{p},\Ttheta_{-p})$, for $p=0,\dots,P$.  Under an independent proposal mechanism with a proposal distribution of the form $q(\ttheta_0,\Ttheta_{-0})=\prod_{p=1}^Pq(\ttheta_0,\ttheta_{p})$, the acceptance probabilities \eqref{eq:probs} require the $\order{P^2}$ evaluation of the $P+1\choose 2$ terms $q(\ttheta_{p},\ttheta_{p'})$.  To avoid such calculations, we follow \citet{holbrook2021generating} and use symmetric proposal distributions for which $q(\ttheta_{p},\Ttheta_{-p}) = q(\ttheta_{p'},\Ttheta_{-p'})$ for $p,p'=0,\dots,P$ (Section \ref{sec:sym}).
+Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$, the new computational bottleneck is the calculations required to obtain the $P+1$ proposal density terms $q(\ttheta_{p},\Ttheta_{-p})$, for $p=0,\dots,P$.  Under an independent proposal mechanism with a proposal distribution of the form $q(\ttheta_0,\Ttheta_{-0})=\prod_{p=1}^Pq(\ttheta_0,\ttheta_{p})$, the acceptance probabilities \eqref{eq:probs} require the $\order{P^2}$ evaluation of the $P+1\choose 2$ terms $q(\ttheta_{p},\ttheta_{p'})$.  To avoid such calculations, we follow \citet{holbrook2021generating} and use symmetric proposal distributions for which $q(\ttheta_{p},\Ttheta_{-p}) = q(\ttheta_{p'},\Ttheta_{-p'})$ for $p,p'=0,\dots,P$.
 
 
 \newcommand{\p}{\mbox{p}}
@@ -563,7 +563,7 @@ When $\pi(\cdot)$ and $q(\cdot)$ take continuous values on a topologically compa
 	\scalebox{0.9}{
 		\begin{minipage}{1\textwidth}
 			\begin{algorithm}[H]
-	\caption{Quantum parallel MCMC}\label{alg:qpMCMC}
+	\caption{Quantum parallel MCMC for a continuously-valued target}\label{alg:qpMCMC}
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from a $D$-dimensional multivariate Gaussian $Normal_D(\boldsymbol{\mu},\SSigma)$ and the standard Gumbel distribution $Gumbel(0,1)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
@@ -601,11 +601,11 @@ When $\pi(\cdot)$ and $q(\cdot)$ take continuous values on a topologically compa
 	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
 \end{figure}
 
-Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. 
+Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC for a continuously-valued target.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. 
 This sub-routine seeks to find the minimizer of the function
-\begin{align*}
+\begin{align}\label{eq:objective}
 f(p)= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big) \quad \mbox{over} \quad p=0,1,\dots, P,
-\end{align*} 
+\end{align} 
 which combines the numerators of \eqref{eq:probs}, the Gumbel-max trick and a trivial negation.  As discussed in Section \ref{sec:qmin}, the sub-routine requires only $\mathcal{O}(\sqrt{P})$ oracle evaluations and, therefore, only $\mathcal{O}(\sqrt{P})$ evaluations of the target density $\pi(\cdot)$ using a quantum circuit.  In theory, a quantum computer can perform the same computations as a classical computer, but the efficiency of the target evaluations would depend on a number of factors related to the structure of the density itself, the availability of fast quantum random access memory \citep{giovannetti2008quantum} and the ability of large numbers of quantum gates to act in concert with negligible noise \citep{kielpinski2002architecture,erhard2019characterizing}.
 
 
@@ -650,7 +650,8 @@ Finally, we compare convergence speed for QPMCMC using 1,000, 5,000 and 10,000 p
 \subsection{Discrete-valued targets}\label{sec:discrete}
 
 
-\subsubsection{Uniform proposals}\label{sec:unif}
+
+
 
 
 \subsubsection{Ising model}
@@ -658,7 +659,7 @@ Finally, we compare convergence speed for QPMCMC using 1,000, 5,000 and 10,000 p
  \begin{figure}[!t]
 	\centering
 	\includegraphics[width=0.7\linewidth]{Ising2dFig.pdf}
-	\caption{Convergence of log-posterior for a parallel MCMC sampler targeting an Ising model with uniform correlation $\lambda=1$ and no external field. All chains begin at minimal probability `checkerboard' state. Larger proposal counts allow discovery of higher probability configurations, albeit with diminishing returns.}\label{fig:ising2d}
+	\caption{Convergence of log-posterior for a parallel MCMC sampler targeting an Ising model with uniform correlation $\lambda=1$ and no external field. All chains begin at minimal probability `checkerboard' state. Larger proposal counts allow discovery of higher probability configurations.}\label{fig:ising2d}
 \end{figure}
 
 
@@ -667,22 +668,9 @@ Finally, we compare convergence speed for QPMCMC using 1,000, 5,000 and 10,000 p
  \begin{figure}[!t]
 	\centering
 	\includegraphics[width=0.9\linewidth]{blackHole.png}
-	\caption{The }\label{fig:blackHole}
+	\caption{On the left is a $4076\times4076$ intensity map of the shadow of supermassive black hole Sagittarius A*  \citep{akiyama2022first}.  On the right is the pixelwise posterior mode of a Bayesian image classification model fit to intensity data.  Within a Metropolis-in-Gibbs routine, quantum parallel MCMC requires less that one-tenth the posterior evaluations required by conventional parallel MCMC.}\label{fig:blackHole}
 \end{figure}
 
-\subsection{Note on simulations}
-
-We use \textsc{R} \citep{rlang}, \textsc{Python} \citep{vanrossum1995python} and \textsc{TensorFlow} \citep{abadi2016tensorflow}  in our simulations and the \textsc{ggplot2} package to generate all figures \citep{ggplot}.  All simulations rely on the fact that the Grover iterations of \eqref{eq:grov} manipulate the probability amplitudes in a deterministic manner. For example, the following \textsc{R} code specifies $N$ uniform probability amplitudes (\verb|sqrtProbs|), performs $I$ Grover iterations and measures a single state according to the resulting probabilities.
-\begin{minted}{R}
-sqrtProbs <- rep(1/sqrt(N),N); i <- 1
-while (i <= I) {
-	sqrtProbs  <- (1-2*marks)*sqrtProbs
-	sqrtProbs  <- -sqrtProbs + 2*mean(sqrtProbs)
-	i <- i + 1
-}
-measurement <- sample(size=1, x=1:N, prob=sqrtProbs^2)
-\end{minted}
-Of course, simulating these iterations on a classical computer requires precomputing the values of \verb|marks| beforehand.
 
 
 \section{Discussion}
@@ -816,6 +804,21 @@ Recalling that $\lambda_{p'}=\log \pi_{p'}$, we exponentiate the logarithms, and
 	&= \pi_p \int_{-\infty}^\infty \exp  (-\alpha_p ) \exp\big( -\exp(-\alpha_p)\big)  \, \dd \alpha_p  = \pi_p \, ,
 \end{align*}
 where the final equality follows easily from a change of variables. 
+
+\section{Note on simulations}
+
+We use \textsc{R} \citep{rlang}, \textsc{Python} \citep{vanrossum1995python} and \textsc{TensorFlow} \citep{abadi2016tensorflow}  in our simulations and the \textsc{ggplot2} package to generate all figures \citep{ggplot}.  All simulations rely on the fact that the Grover iterations of \eqref{eq:grov} manipulate the probability amplitudes in a deterministic manner. For example, the following \textsc{R} code specifies $N$ uniform probability amplitudes (\verb|sqrtProbs|), performs $I$ Grover iterations and measures a single state according to the resulting probabilities.
+\begin{minted}{R}
+	sqrtProbs <- rep(1/sqrt(N),N); i <- 1
+	while (i <= I) {
+		sqrtProbs  <- (1-2*marks)*sqrtProbs
+		sqrtProbs  <- -sqrtProbs + 2*mean(sqrtProbs)
+		i <- i + 1
+	}
+	measurement <- sample(size=1, x=1:N, prob=sqrtProbs^2)
+\end{minted}
+Of course, simulating these iterations on a classical computer requires precomputing the values of \verb|marks| beforehand.
+
 
 
 \bibliographystyle{sysbio}
