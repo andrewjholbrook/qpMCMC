@@ -671,7 +671,7 @@ Here, we are interested in an Ising-type lattice model over configurations $\tth
 \end{align}
 where $\rho>0$ is the interaction term and $\mathcal{E}$ is the lattice edge set.  We specify a two-dimensional 500-by-500 lattice with nearest neighbors connections and fix $\rho=1$.  Since this latter setting encourages neighboring spins to equal each other, we begin our QPMCMC trajectories at the lowest-probability `checkerboard' state for an initial configuration.  At each iteration, we generate collections of proposal states by uniformly flipping $P$ individual spins $\theta_p$, $p \in \{1,\dots,P\}$, and obtaining each proposal state $\ttheta_p$ by updating the current state $\ttheta_0$ at the single location corresponding to $\theta_p$. Figure \ref{fig:ising2d} shows results from 10 independent runs using $P\in \{4, 8, 16, \dots, 2048\}$ proposals.  Trace plots of unnormalized log-probabilities indicate that higher proposal counts enable discovery of higher probability configurations.  Interestingly, QPMCMC appears to be particularly beneficial in this large $P$ context, requiring less than one-tenth the target evaluations required using conventional computing when $P=2048$.  
 
-\subsubsection{Bayesian image something}\label{sec:bayesIm}
+\subsubsection{Bayesian image analysis}\label{sec:bayesIm}
 
  \begin{figure}[!t]
 	\centering
@@ -679,7 +679,13 @@ where $\rho>0$ is the interaction term and $\mathcal{E}$ is the lattice edge set
 	\caption{On the left is a 4,076-by-4,076 intensity map of the shadow of supermassive black hole Sagittarius A*  \citep{akiyama2022first}.  On the right is the pixelwise posterior mode of a Bayesian image classification model fit to intensity data.  Within a Metropolis-in-Gibbs routine, quantum parallel MCMC using 1,024 proposals requires less that one-tenth the posterior evaluations required by conventional parallel MCMC.}\label{fig:blackHole}
 \end{figure}
 
+We apply a Bayesian image analysis model from \citet{hurn1997difficulties} to an intensity map (Figure \ref{fig:blackHole}) of the newly imaged supermassive black hole, Sagittarius A*, located at the Galactic Center of the Milky Way \citep{akiyama2022first}.  Whereas one cannot see the black hole itself, one may see the shadow of the black hole cast by the hot, swirling cloud of gas surrounding it.  We use Bayesian image analysis to extract the black hole from the surrounding cloud.  
 
+\begin{itemize}
+	\item data in [1,255]
+	\item model
+	\item mcmc
+\end{itemize}
 
 \section{Discussion}
 
