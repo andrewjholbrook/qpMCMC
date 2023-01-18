@@ -31,7 +31,7 @@ gg <- ggplot(df,aes(x=Iterations,y=LogProbs,color=`Parallel\nMCMC\nproposals`)) 
   geom_line() +
   scale_color_manual(values = pal) +
   ylab("Unnormalized log-probabilities") + xlab("MCMC iterations") +
-  ggtitle("Convergence for a 2D Ising model on 500-by-500 lattice") +
+  ggtitle("Convergence for an Ising model on a 500-by-500 lattice") +
   geom_table(data = df2, 
                  label = list(df2),
                  x = 9000000, y = 400000,

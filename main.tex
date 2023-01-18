@@ -650,18 +650,23 @@ Finally, we compare convergence speed for QPMCMC using 1,000, 5,000 and 10,000 p
 \subsection{Discrete-valued targets}\label{sec:discrete}
 
 
+We wish to sample from a target distribution that has probability mass function $\pi(\cdot)$ defined over a discrete set $\{\ttheta_\alpha\}_{\alpha \in \mathcal{A}}$, for $\mathcal{A}$ some finite or countably infinite set of indices.  
 
 
 
-
-\subsubsection{Ising model}
+\subsubsection{Ising model on a 2-dimensional lattice}
 
  \begin{figure}[!t]
 	\centering
 	\includegraphics[width=0.7\linewidth]{Ising2dFig.pdf}
-	\caption{Convergence of log-posterior for a parallel MCMC sampler targeting an Ising model with uniform correlation $\lambda=1$ and no external field. All chains begin at minimal probability `checkerboard' state. Larger proposal counts allow discovery of higher probability configurations.}\label{fig:ising2d}
+	\caption{Convergence of log-posterior for a parallel MCMC sampler targeting an Ising model with uniform interaction $\rho=1$ and no external field. All chains begin at minimal probability `checkerboard' state. Larger proposal counts allow discovery of higher probability configurations.}\label{fig:ising2d}
 \end{figure}
 
+Here, we are interested in an Ising-type lattice model over $\ttheta \in \{-1,1\}^D$, where $D$ is the number of spins $\theta_d \in \{-1,1\}$ and $|\mathcal{A}|=2^D$. In particular, we consider targets of the form
+\begin{align}\label{eq:ising}
+	\pi (\ttheta | \rho) &\propto \exp \left( \rho \sum_{(d,d')\in \mathcal{E}} \theta_d \theta_{d'} \right)  \, ,
+\end{align}
+where $\rho>0$ is the interaction term and $\mathcal{E}$ is the lattice edge set.  We specify a two-dimensional 500-by-500 lattice with nearest neighbors connections and fix $\beta=1$.  Since this latter setting encourages neighboring spins to equal each other, we begin our QPMCMC trajectories at the lowest-probability `checkerboard' state as initial configuration.  At each iteration, we generate collections of proposal states by uniformly sampling $P$ individual spins $\theta_p$, $p \in \{1,\dots,P\}$, and obtaining each proposal state $\ttheta_p$ by updating the current state $\ttheta_0$ at the single location corresponding to $\theta_p$. Figure \ref{fig:ising2d} shows results from 10 independent runs using $P\in \{4, 8, 16, \dots, 2048\}$ proposals.  Trace plots of unnormalized log-probabilities indicate that higher proposal counts enable discovery of higher probability configurations.  Interestingly, QPMCMC appears to be particularly beneficial in this large $P$ context, requiring less than one-tenth the target evaluations required using conventional computing when $P=2048$.  
 
 \subsubsection{Bayesian image something}
 
