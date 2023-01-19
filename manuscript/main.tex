@@ -824,7 +824,9 @@ where the final equality follows easily from a change of variables.
 
 \section{Note on simulations}
 
-We use \textsc{R} \citep{rlang}, \textsc{Python} \citep{vanrossum1995python} and \textsc{TensorFlow} \citep{abadi2016tensorflow}  in our simulations and the \textsc{ggplot2} package to generate all figures \citep{ggplot}.  All simulations rely on the fact that the Grover iterations of \eqref{eq:grov} manipulate the probability amplitudes in a deterministic manner. For example, the following \textsc{R} code specifies $N$ uniform probability amplitudes (\verb|sqrtProbs|), performs $I$ Grover iterations and measures a single state according to the resulting probabilities.
+We use \textsc{R} \citep{rlang}, \textsc{Python} \citep{vanrossum1995python}, \textsc{TensorFlow} \citep{abadi2016tensorflow} and  \textsc{TensorFlow Probability MCMC} \citep{lao2020tfp} in our simulations and the \textsc{ggplot2} package to generate all figures \citep{ggplot}.   In \textsc{R}, we use the package \textsc{coda} \citep{coda} to calculate effective sample sizes.  In \textsc{Python}, we use a built in function from \textsc{TensorFlow Probability MCMC}.  The primary color palette comes from \citet{wes}.
+
+All simulations rely on the fact that the Grover iterations of \eqref{eq:grov} manipulate the probability amplitudes in a deterministic manner. For example, the following \textsc{R} code specifies $N$ uniform probability amplitudes (\verb|sqrtProbs|), performs $I$ Grover iterations and measures a single state according to the resulting probabilities.
 \begin{minted}{R}
 	sqrtProbs <- rep(1/sqrt(N),N); i <- 1
 	while (i <= I) {
@@ -834,7 +836,7 @@ We use \textsc{R} \citep{rlang}, \textsc{Python} \citep{vanrossum1995python} and
 	}
 	measurement <- sample(size=1, x=1:N, prob=sqrtProbs^2)
 \end{minted}
-Of course, simulating these iterations on a classical computer requires precomputing the values of \verb|marks| beforehand.
+Of course, simulating these iterations on a classical computer requires precomputing the values of \verb|marks| beforehand.   All code is available online at \url{https://github.com/andrewjholbrook/qpMCMC}.
 
 
 
