@@ -1,4 +1,4 @@
-# Repo associated with manuscript "A quantum parallel Markov chain Monte Carlo". 
+# Repo for manuscript "A quantum parallel Markov chain Monte Carlo". 
 
 ## Code/
 
