@@ -679,13 +679,15 @@ where $\rho>0$ is the interaction term and $\mathcal{E}$ is the lattice edge set
 	\caption{On the left is a 4,076-by-4,076 intensity map of the shadow of supermassive black hole Sagittarius A*  \citep{akiyama2022first}.  On the right is the pixelwise posterior mode of a Bayesian image classification model fit to intensity data.  Within a Metropolis-in-Gibbs routine, quantum parallel MCMC using 1,024 proposals requires less that one-tenth the posterior evaluations required by conventional parallel MCMC.}\label{fig:blackHole}
 \end{figure}
 
-We apply a Bayesian image analysis model from \citet{hurn1997difficulties} to an intensity map (Figure \ref{fig:blackHole}) of the newly imaged supermassive black hole, Sagittarius A*, located at the Galactic Center of the Milky Way \citep{akiyama2022first}.  Whereas one cannot see the black hole itself, one may see the shadow of the black hole cast by the hot, swirling cloud of gas surrounding it.  We use Bayesian image analysis to extract the black hole from the surrounding cloud.  
+We apply a Bayesian image classification model to an intensity map (Figure \ref{fig:blackHole}) of the newly imaged supermassive black hole, Sagittarius A*, located at the Galactic Center of the Milky Way \citep{akiyama2022first}.  Whereas one cannot see the black hole itself, one may see the shadow of the black hole cast by the hot, swirling cloud of gas surrounding it.  We extract the black hole from the surrounding cloud by modeling the intensity at each of the $D=$4,076$^2=$16,613,776 pixels as belonging to a mixture of two truncated normals with values $y_{d}$ restricted to the intensity range $[0,255]$.  Namely, we follow \citet{hurn1997difficulties} and specify the latent variable model
+\begin{align*}
+	y_d |(\mu_\ell, \sigma^2, \theta_d) &\stackrel{ind}{\sim} \mbox{Normal}(\mu_\ell,\sigma^2 ) \, ,\quad y_d \in [0,255] \, , \quad \theta_d=\ell \,,\quad d\in \{1,\dots,D\}\, ,\\
+	\mu_\ell &\stackrel{iid}{\sim} \mbox{Uniform} (0,255) \,  , \quad \ell \in \{-1,1\} \, , \\
+	\frac{1}{\sigma^2} &\sim  \mbox{Gamma}\left(\frac{1}{2}, \frac{1}{2} \right)  \, ,
+\end{align*}
+where $\ttheta=(\theta_1,\dots,\theta_D)$ share for a prior the Ising model \eqref{eq:ising} with edges joining neighboring pixels and interaction $\rho=1.2$. 
 
-\begin{itemize}
-	\item data in [1,255]
-	\item model
-	\item mcmc
-\end{itemize}
+We use a QPMCMC-within-Gibbs scheme to infer the join posterior of $\ttheta$ and the three mixture model parameters.  For the former, we use the same QPMCMC scheme as in Section \ref{sec:ising} with 1,024 proposals at each iteration. For the latter, we use the closed-form updates presented in \citet{hurn1997difficulties}.  We run this scheme for 20 million iterations, discarding the first 10 million as burnin.  We thin the remaining sample at a ratio of 1 to 40,000 for the latent memberships $\ttheta$ and 1 to 4,000 for the three parameters $\mu_{-1}$, $\mu_1$ and $\sigma^2$.  Using the \textsc{R} package \textsc{coda} \citep{coda}, we calculate effective sample sizes of the log-posterior (257.1), $\mu_{-1}$ (1,578.7), $\mu_1$ (257.6) and $\sigma^2$ (2,500.0), suggesting adequate convergence.   Figure \ref{fig:blackHole} shows both the intensity data and the pixelwise posterior mode of the latent membership vector $\ttheta$.  The QPMCMC requires only 1,977,553,608 target evaluations compared to the 1,024 $\times$ 20,000,000 $=$ 2.048$\times10^{10}$ evaluations required for the analogous parallel MCMC scheme implemented on a conventional computer, representing a 10.36-fold speedup.
 
 \section{Discussion}
 
