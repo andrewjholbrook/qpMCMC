@@ -1,0 +1,117 @@
+%%
+%% LaTeX source to reference manuscript changes in revision letters
+%%
+%% In the manuscript file:
+%% 1. Include this file 
+%%      \input{make-edits}
+%% 2. Define manuscript modifications as
+%%      \myedit{UniqueLabel}{Text to appear in manuscript and revision letter}
+%%
+%% In the revision letter file:
+%% 1. Include the automatically updated modifications file
+%%      \input{jobname.xtr}
+%% 2. Include modified text with
+%%      \myeditUniqueLabel
+%%
+%% Marc A. Suchard
+%% 24-Jul-2006
+%%
+
+\newwrite\XTR
+\AtBeginDocument{\immediate\openout\XTR\jobname.xtr}
+\AtEndDocument{\immediate\closeout\XTR}
+
+\newcommand{\myedit}[2]{ % first options is a label, second options is the text
+\parbox{0em}{
+\shipout\box1{
+  \def\mynamea{myedit#1}
+  \def\mynameb{\csname \mynamea\endcsname}
+\write\XTR{
+      \string\newcommand
+{\csname myedit#1\endcsname}
+}
+\write\XTR{
+         {``\expandafter\string#2''
+         (pg.\string~\thepage)}
+}
+%\write\XTR{
+%    (pg.\string~\thepage)
+%}
+}
+%\hspace*{-1in}
+}
+%
+%\def\thistext{\noexpand#2}
+%  \immediate\write\XTR{
+%   %     \begin{verbatim}
+%        \thistext
+%   %     \end{verbatim}
+%  }
+%\endgroup
+%}
+%\shipout\vbox{0}
+%        \label{\expand\mylabel}
+%        \thepage
+%  \mylabel
+%  \hspace*{-0em}
+%  {\bf#2}
+#2
+}
+
+\newcommand{\myeditblank}[2]{ % first options is a label, second options is the text
+\parbox{1em}{
+\shipout\box1{
+  \def\mynamea{myedit#1}
+  \def\mynameb{\csname \mynamea\endcsname}
+\write\XTR{
+      \string\newcommand
+{\csname myedit#1\endcsname}
+}
+\write\XTR{
+         {\expandafter\string#2
+         (pg.\string~\thepage)}
+}
+%\write\XTR{
+%    (pg.\string~\thepage)
+%}
+}
+%\hspace*{-1in}
+}
+%
+%\def\thistext{\noexpand#2}
+%  \immediate\write\XTR{
+%   %     \begin{verbatim}
+%        \thistext
+%   %     \end{verbatim}
+%  }
+%\endgroup
+%}
+%\shipout\vbox{0}
+%        \label{\expand\mylabel}
+%        \thepage
+%  \mylabel
+%  \hspace*{-1em}
+%  {\bf#2}
+}
+
+
+
+%\newlength{\strikewidth}
+%\newlength{\strikelength}
+%\setlength{\strikewidth}{1pt}
+
+%\newcommand{\remove}[1]{
+%    \settowidth{\strikelength}{#1}
+%    #1\hspace{-\strikelength}
+%    \rule[0.5ex]{\strikelength}{\strikewidth}
+%}
+
+%\usepackage{ulem}
+%\newcommand{\remove}[1]{\sout{#1}}
+\newcommand{\remove}[1]{\hspace*{-1em}}
+
+\newcommand{\add}[1]{
+%        {\bf #1}
+#1%\hspace*{0em}
+}
+
