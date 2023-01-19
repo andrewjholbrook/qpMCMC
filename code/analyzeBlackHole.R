@@ -5,7 +5,7 @@ library(coda)
 library(ggplot2)
 library(reshape2)
 # 
-df <- read_table2("blackHoleResults.txt",col_names = FALSE)
+df <- read_table2("data/blackHoleResults.txt",col_names = FALSE)
 df <- as.matrix(df[,1:6])
 
 effectiveSize(df[2501:5000,]) # remove first half as burning
@@ -25,7 +25,7 @@ effectiveSize(df[2501:5000,]) # remove first half as burning
 
 
 
-results <- readRDS("~/qpMCMC/blackHoleResults2.rds")
+results <- readRDS("~/qpMCMC/data/blackHoleResults2.rds")
 
 # get mode
 imgLong <- melt(results[[1]])
@@ -44,7 +44,7 @@ gg2 <- ggplot(imgLong, aes(x = Var2, y = Var1)) +
 gg2
 remove(imgLong)
 
-img <- readRDS("~/qpMCMC/figures/blackHoleIntensity.rds")
+img <- readRDS("~/qpMCMC/data/blackHoleIntensity.rds")
 imgLong <- melt(img)
 remove(img)
 gg1 <- ggplot(imgLong, aes(x = Var2, y = Var1)) +

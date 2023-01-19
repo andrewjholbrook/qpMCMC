@@ -2,7 +2,7 @@ setwd("~/qpMCMC/")
 library(ggplot2)
 library(ggpmisc)
 
-df <- readr::read_table2("~/qpMCMC/Ising2dLogProbs.txt", col_names = FALSE)
+df <- readr::read_table2("~/qpMCMC/data/Ising2dLogProbs.txt", col_names = FALSE)
 
 df <- df[,1:2]
 
@@ -18,7 +18,7 @@ df <- df[,3:6]
 
 pal <- wesanderson::wes_palette("Zissou1",10,type="continuous")
 
-df2 <- readr::read_table2("~/qpMCMC/Ising2D.txt", col_names = FALSE)
+df2 <- readr::read_table2("~/qpMCMC/data/Ising2D.txt", col_names = FALSE)
 df2 <- df2[,c(1,3)]
 colnames(df2) <- c("Proposals","Target evaluations")
 df2$Speedup   <- (df2$Proposals*10000000)/df2$`Target evaluations`

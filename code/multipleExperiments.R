@@ -574,8 +574,8 @@ for(d in D) {
   }
   if(i %% 100==0)   cat(i,"\n")
 }
-saveRDS(df,"~/qpMCMC/mcmcIsLessThan.rds")
-df <- readRDS("~/qpMCMC/mcmcIsLessThan.rds")
+saveRDS(df,"~/qpMCMC/data/mcmcIsLessThan.rds")
+df <- readRDS("~/qpMCMC/data/mcmcIsLessThan.rds")
 
 colnames(df) <- c("Iteration","Dimension","Rank","GroverIts")
 df$`Target dimension` <- factor(df$Dimension)
@@ -656,142 +656,14 @@ ggsave(gg,filename = "qqPlot.png",device = "png",path = "~/qpMCMC/figures/",dpi 
 
 
 ################################################################################
-# ess per evaluation 
 
-
-
-target <- function(X,B=0.1) { 
-  # B is bananicity constant
-  N <- length(X)
-  output <-  - X[2]^2/200 - 0.5*(X[1]+B*X[2]^2-100*B)^2 - 0.5*sum(X[3:N]^2)
-  return(output)
-}
-
-
-set.seed(1)
-nProps <- seq(from=100,to=1000,by=100)#,12800,25600)
-df  <- data.frame()
-nIts <- 10000
-#for (k in 1:10) {
-for(d in nProps) {
-  out <- qpMCMC(nIts=nIts,nProps = d, dims = 20,initial = 0, sigma=0.5)
-  df <- rbind(df,c(d,min(coda::effectiveSize(out[[1]][1001:nIts,])),out[[2]]))
-}
-
-rwm <- randomWalk(N=20,x0=rep(0,20),maxIt = nIts)
-df <- rbind(df,c(1,min(coda::effectiveSize(rwm[[1]][1001:nIts,])),nIts))
-#}
-df[,3] <- df[,3]*((nIts-1000)/nIts)
-df[,4] <- df[,3]/df[,2]
-colnames(df) <- c("Proposals", "ESS","Evaluations","EvalsPerESS")
-
-saveRDS(df,"~/qpMCMC/essPerEvalBanana.rds")
-df <- readRDS("~/qpMCMC/essPerEvalBanana.rds")
-
-df$Proposals <- factor(df$Proposals)
-
-df2 <- by(data=df$ESS,INDICES=list(df$Proposals),
-                        FUN=quantile,probs=c(0.5,0.05,0.95))
-df3 <- data.frame()
-for(i in 1:length(df2)) df3 <- rbind(df3,df2[[i]])
-
-df2 <- by(data=df$EvalsPerESS,INDICES=list(df$Proposals),
-          FUN=quantile,probs=c(0.5,0.05,0.95))
-df4 <- data.frame()
-for(i in 1:length(df2)) df4 <- rbind(df4,df2[[i]])
-
-df5 <- cbind(df3,df4)
-
-df6 <- data.frame()
-for(i in 1:11) df6 <- rbind(df6, df5[1,4:6]/df5[i,4:6])
-df <- cbind(df5,df6)
-
-print(xtable::xtable(df),booktabs=TRUE)
-
-##############################
-
-
-# target <- function(X,B=0.1) { 
-#   # B is bananicity constant
-#   N <- length(X)
-#   output <-  - X[2]^2/200 - 0.5*(X[1]+B*X[2]^2-100*B)^2 #- 0.5*sum(X[3:N]^2)
-#   return(output)
-# }
-# 
-# set.seed(1)
-# nProps <- seq(from=10,to=100,by=10)#,12800,25600)
-# df  <- data.frame()
-# nIts <- 1000000
-# for (k in 1:20) {
-# for(d in nProps) {
-#   out <- qpMCMC(nIts=nIts,nProps = d, dims = 2,initial = 0, sigma=0.5,earlyStop=TRUE)
-#   df <- rbind(df,c(d,out[[1]],out[[2]]))
-# }
-# 
-# rwm <- randomWalk(N=2,x0=rep(0,2),maxIt = 1000000,earlyStop = TRUE)
-# df <- rbind(df,c(1,rwm[[1]],rwm[[2]]))
-# }
-# 
-# 
-# colnames(df) <- c("Proposals", "Iterations","Evaluations")
-# 
-# saveRDS(df,"~/qpMCMC/essPerEvalBananaTimeTo.rds")
-# df <- readRDS("~/qpMCMC/essPerEvalBananaTimeTo.rds")
-# 
-# df$Proposals <- as.factor(df$Proposals)
-# by(data=df$Evaluations,INDICES=list(df$Proposals),FUN=quantile,probs=c(0.5,0.05,0.95))
-
-# target <- function(X,B=0.1) {
-#   # B is bananicity constant
-#     output <- log( exp( - X[2]^2/200 - 0.5*(X[1]+B*X[2]^2-100*B)^2) +
-#                      exp( - (X[1]-1000)^2/200 - 0.5*(X[2]+500+B*(X[1]-1000)^2-100*B)^2) +
-#                      exp( - (X[2])^2/200 - 0.5*(X[1]-2000-B*(X[2])^2-100*B)^2 ) +
-#                      exp( - (X[1]-500)^2/200 - 0.5*(X[2]-500 -B*(X[1]-500)^2-100*B)^2 ) +
-#                      exp( - (X[1]-1500)^2/200 - 0.5*(X[2]-500 -B*(X[1]-1500)^2-100*B)^2 ) )
-# 
-#   return(output)
-# }
-# 
-# set.seed(1)
-# nProps <- seq(from=2000,to=10000,by=2000)#,12800,25600)
-# df  <- data.frame()
-# nIts <- 100000
-#   for(d in nProps) {
-#     out <- qpMCMC(nIts=nIts,nProps = d, dims = 2,initial = 0, sigma=0.5)
-#     df <- rbind(df,c(d,mean(coda::effectiveSize(out[[1]][1001:nIts,])),out[[2]]))
-# }
-# df[,3] <- df[,3]*((nIts-1000)/nIts)
-# df[,4] <- df[,3]/df[,2]
-# colnames(df) <- c("Proposals", "ESS","Evaluations","EvalsPerESS")
-# 
-# saveRDS(df,"~/qpMCMC/essPerEvalMob.rds")
-# df <- readRDS("~/qpMCMC/essPerEvalMob.rds")
-# 
-# df$Proposals <- factor(df$Proposals)
-# 
-# df2 <- by(data=df$ESS,INDICES=list(df$Proposals),
-#           FUN=quantile,probs=c(0.5,0.05,0.95))
-# df3 <- data.frame()
-# for(i in 1:length(df2)) df3 <- rbind(df3,df2[[i]])
-# 
-# df2 <- by(data=df$EvalsPerESS,INDICES=list(df$Proposals),
-#           FUN=quantile,probs=c(0.5,0.05,0.95))
-# df4 <- data.frame()
-# for(i in 1:length(df2)) df4 <- rbind(df4,df2[[i]])
-# 
-# df5 <- cbind(df3,df4)
-# 
-# df6 <- data.frame()
-# for(i in 1:11) df6 <- rbind(df6, df5[1,4:6]/df5[i,4:6])
-# df <- cbind(df5,df6)
-# 
 
 # get number of evals
 set.seed(1)
 df <- data.frame("Proposals","Iterations","Evaluations","Speedup")
 nProps <- 10000
 for(k in 0:4){
-  ranks <- read_csv(paste0("qpMCMC/qpMCMC10KRanks",k,".txt"), 
+  ranks <- read_csv(paste0("qpMCMC/data/qpMCMC10KRanks",k,".txt"), 
                     col_names = FALSE)
   ranks <- unlist(ranks)
   ranks <- ranks + 1
@@ -813,7 +685,7 @@ set.seed(1)
 
 nProps <- 5000
 for(k in 0:4){
-  ranks <- read_csv(paste0("qpMCMC/qpMCMC5KRanks",k,".txt"), 
+  ranks <- read_csv(paste0("qpMCMC/data/qpMCMC5KRanks",k,".txt"), 
                     col_names = FALSE)
   ranks <- unlist(ranks)
   ranks <- ranks + 1
@@ -834,7 +706,7 @@ set.seed(1)
 
 nProps <- 1000
 for(k in 0:4){
-  ranks <- read_csv(paste0("qpMCMC/qpMCMC1KRanks",k,".txt"), 
+  ranks <- read_csv(paste0("qpMCMC/data/qpMCMC1KRanks",k,".txt"), 
                     col_names = FALSE)
   ranks <- unlist(ranks)
   ranks <- ranks + 1
@@ -851,7 +723,7 @@ for(k in 0:4){
 }
 
 
-saveRDS(df,"evalsTillResults.rds")
+saveRDS(df,"data/evalsTillResults.rds")
 
 colnames(df) <- c("Proposals","Iterations","Evaluations","Speedup")
 df <- df[-1,]
