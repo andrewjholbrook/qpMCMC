@@ -573,6 +573,7 @@ When $\pi(\cdot)$ and $q(\cdot)$ take continuous values on a topologically compa
 		\For{$p \in \{1,\dots,P\}$}{
 			$\ttheta_p \gets Normal_D(\bar{\ttheta},\SSigma)$\;
 			$z_{p} \gets Gumbel(0,1)$\;
+			$\ket{\theta_p} \gets \ttheta_p$; \hspace{5em} \Comment{      Load proposal onto quantum computer.}      
 		}
 		$\hat{p} \gets \argmin_{p=0,\dots,P}\Big(f(p):= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big)\Big)$\;  \hspace{10em}\Comment{\hspace{0.5em} $\order{\sqrt{P}}$ Alg \ref{alg:min} with warm-start at $p=0$.}
 		$\ttheta^{(s)} \gets \ttheta_{\hat{p}}$\;
