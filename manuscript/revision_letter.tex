@@ -199,6 +199,20 @@
 \newtheorem{clm}{Claim}
 
 
+\newcommand{\ttheta}{\boldsymbol{\theta}}
+\newcommand{\Ttheta}{\boldsymbol{\Theta}}
+\newcommand{\dd}{\mbox{d}}
+\newcommand{\ppsi}{\boldsymbol{\psi}}
+\newcommand{\U}{\mathbf{U}}
+\newcommand{\I}{\mathbf{I}}
+\renewcommand{\H}{\mathbf{H}}
+\newcommand{\A}{\mathbf{A}}
+\newcommand{\B}{\mathbf{B}}
+\newcommand{\G}{\mathbf{G}}
+\newcommand{\ppi}{\boldsymbol{\pi}}
+\newcommand{\llambda}{\boldsymbol{\lambda}}
+
+
 \begin{document}
 
 \input{main.xtr}
@@ -240,9 +254,28 @@ Andrew Holbrook
 
 This paper presented an interesting framework for large-scale MCMC. It leverages the quantum speedup of Grover's searching algorithm to accelerate the treatment of multi-proposals in MCMC. However, an implementation of a quantum algorithm involves nontrivial steps, which need to be explained before this paper can be accepted.
 
+\begin{reply}
+	I thank the Reviewer for taking the time to review the manuscript and for their positive reception.
+\end{reply}
+
 The author did not clarify whether this is a fully quantum algorithm, or a hybrid one. It is important to explain what is the input of the quantum computer and what to extract. For the input, one has to encode it coherently into a quantum state $\ket{\psi}$, and estimate the complexity associated with such preparation.
 
+
+
 To extract quantities from a quantum computer, one has to express it as an expectation (observable), and estimate the probability of obtaining the correct output. 
+
+\begin{reply}
+	I have clarified the hybrid nature of the QPMCMC computing scheme.  The first two sentences of the abstract now read:
+	\begin{quote}
+		We propose a novel hybrid quantum computing strategy for parallel MCMC algorithms that generate multiple proposals at each step. This strategy makes the rate-limiting step within parallel MCMC amenable to quantum parallelization by using the Gumbel-max trick to turn the generalized accept-reject step into a discrete optimization problem.
+	\end{quote}
+
+	In response to the Reviewer's important points regarding on-loading and off-loading data to and from the quantum machine, I have added the step $\ket{\theta_p} \leftarrow \ttheta_p$ within Algorithm \ref{alg:qpMCMC}, along with the comment ``\verb|Load proposal onto quantum computer.|''. Algorithm 4, which is nested within Algorithm 6, already addresses extraction.  Perhaps more importantly, I have added the following paragraph to the Discussion (Section \ref{sec:disc}):
+	
+	\begin{quote}
+		Quote
+	\end{quote}
+\end{reply}
 
 There have already been numerous quantum algorithms for MCMC, e.g.,
 \begin{enumerate}
