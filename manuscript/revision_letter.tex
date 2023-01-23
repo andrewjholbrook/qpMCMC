@@ -286,6 +286,17 @@ There have already been numerous quantum algorithms for MCMC, e.g.,
 \end{enumerate}
 The author should comment on how the present approach would compare to these existing methods.
 
+\begin{reply}
+I thank the Reviewer for the helpful suggestion.  To clarify the relationship between the proposed method and other quantum Monte Carlo algorithm, I have included the following paragraph in Section \ref{sec:disc}:
+\begin{quote}
+	Second, can QPMCMC be combined with established quantum algorithms that make use of `quantum walks' on graphs to sample from discrete target distributions?  \citet{szegedy2004quantum} presents a quantum analog to classical ergodic reversible Markov chains and shows that such quantum walks sometimes provide quadratic speedups over classical Markov chains.  \citet{szegedy2004quantum} also points out that Grover's search, a key component within QPMCMC, may be interpreted as performing just such a quantum walk on a complete graph.  \citet{wocjan2008speedup} accelerate the quantum walk by using ancillary Markov chains to improve mixing and apply their method to simulated annealing.  Given a quantum algorithm $\mathbb{A}$ for producing a discrete random sample with variance $\sigma^2$, \citet{montanaro} develops a quantum algorithm for estimating the mean of algorithm $\mathbb{A}$'s output with error $\epsilon$ by running algorithm $\mathbb{A}$ a mere $\widetilde{\mathcal{O}}(\sigma/\epsilon)$ times, where $\widetilde{\mathcal{O}}$ hides polylogarithmic terms. Importantly, this quadratic quantum speedup over classical Monte Carlo applies for quantum algorithms $\mathbb{A}$ that only feature a single measurement such as certain simple quantum walk algorithms. Unfortunately, this assumption fails for quantizations of Metropolis-Hastings, in general, and QPMCMC, in particular. More promising for QPMCMC, \citet{lemieux2020efficient} develop a quantum circuit that applies Metropolis-Hastings to the Ising model without the need for oracle calls.  An interesting question is whether similar non-oracular quantum circuits exist for the basic parallel MCMC backbone to QPMCMC.  In general, however, comparison between QPMCMC and other quantum Monte Carlo techniques is challenging because the foregoing literature (a) largely focuses on MCMC as a tool for discrete optimization, with algorithms that only ever return a single Monte Carlo sample or function thereof, and (b) restricts itself to a handfull of simple, stylized and discrete target distributions.  On the other hand, QPMCMC is a general inferential framework for sampling from general discrete and continuous distributions alike.
+\end{quote}
+\end{reply}
+
+\begin{reply}
+	Again, I'd like to thank the Reviewer for suggesting the above additions/edits, and I believe the manuscript is now much improved as a result.
+\end{reply}
+
 
 \section*{Reviewer 2}
 
