@@ -228,9 +228,9 @@ pMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5) {
     if (SampCount == SampBound) { 
       AcceptRatio <- Acceptances / SampBound
       if ( AcceptRatio > targetAccept ) {
-        sigma <- sigma * (1 + delta(batches))
+        sigma <- sigma * min(2,(1 + delta(batches)))
       } else {
-        sigma <- sigma * (1 - delta(batches))
+        sigma <- sigma * max(0.5,(1 - delta(batches)))
       }
       batches <- batches + 1
       cat("Acceptance ratio: ", AcceptRatio, ". sigma: ", sigma, "\n")
@@ -277,9 +277,9 @@ qpMCMC <- function (nIts=1000,nProps=2000,dims=10,sigma=3,targetAccept=0.5,
     if (SampCount == SampBound) { 
       AcceptRatio <- Acceptances / SampBound
       if ( AcceptRatio > targetAccept ) {
-        sigma <- sigma * (1 + delta(batches))
+        sigma <- sigma * min(2,(1 + delta(batches)))
       } else {
-        sigma <- sigma * (1 - delta(batches))
+        sigma <- sigma * max(0.5,(1 - delta(batches)))
       }
       batches <- batches + 1
     #  cat("Acceptance ratio: ", AcceptRatio, ". sigma: ", sigma, "\n")
@@ -620,8 +620,8 @@ system2(command = "pdfcrop",
 set.seed(1)
 out <- qpMCMC(nIts = 100000,nProps = 2000, dims = 100)
 out[[2]]/(100000*2000) # 0.07
-saveRDS(out,file="~/qpMCMC/qqplotExample.rds")
-out <- readRDS(file="~/qpMCMC/qqplotExample.rds")
+saveRDS(out,file="~/qpMCMC/data/qqplotExample.rds")
+out <- readRDS(file="~/qpMCMC/data/qqplotExample.rds")
 out[[1]] <- out[[1]][floor(seq(from=2000,to=100000,by=10)),]
 
 # qqnorm(out[[1]][2000:100000,3])
