@@ -273,7 +273,7 @@ To extract quantities from a quantum computer, one has to express it as an expec
 	In response to the Reviewer's important points regarding on-loading and off-loading data to and from the quantum machine, I have added the step $\ket{\theta_p} \leftarrow \ttheta_p$ within Algorithm \ref{alg:qpMCMC}, along with the comment ``\verb|Load proposal onto quantum computer.|''. Algorithm 4, which is nested within Algorithm 6, already addresses extraction.  Perhaps more importantly, I have added the following paragraph to the Discussion (Section \ref{sec:disc}):
 	
 	\begin{quote}
-Nonetheless, there are major technical barriers to the practical implementation of QPMCMC.  The framework, like other quantum machine learning (QML) schemes, requires on-loading and off-loading classical data to and from a quantum machine.  In the seminal review of QML, \citet{biamonte2017quantum} discuss what they call the `input problem'.  \citet{cortese2018loading} present a general purpose quantum circuit for loading $B$ classical bits into a quantum data structure comprising $\log_2 (B)$ qubits with circuit depth $\order{\log (B)}$.  For continuous targets, QPMCMC requires reading $\order{P}$ real vectors $\ttheta_p\in \mathbb{R}^D$ onto the quantum machine at each MCMC iteration.  If $b$ is the number of bits used to represent a single real value, then reading $B=\order{PDb}$ classical bits into the quantum machine requires time $\order{\log (PDb)}$.  This is true whether one opts for fixed-point \citep{jordan2005fast} or floating-point \citep{haener2018quantum} representations for real values.  The outlook can be better for discrete distributions.  For example, the QPMCMC scheme presented in Section \ref{sec:disc} only requires loading the entire configuration state once prior to sampling.  A $D$-spin Ising model requires $D$ classical bits to encode, and these bits load onto a quantum machine in time $\order{\log(D)}$.  Once one has encoded the entire system state, each QPMCMC iteration only requires loading the addresses of the $\order{P}$ proposal states. If one uses $b$ bits to encode each address, then the total time required to load data onto the quantum machine is $\order{\log(Pb)}$ for each QPMCMC iteration.  On the other hand, the speedup for discrete targets assumes the ability to hold an entire configuration in QRAM.
+There are major technical barriers to the practical implementation of QPMCMC.  The framework, like other quantum machine learning (QML) schemes, requires on-loading and off-loading classical data to and from a quantum machine.  In the seminal review of QML, \citet{biamonte2017quantum} discuss what they call the `input problem'.  \citet{cortese2018loading} present a general purpose quantum circuit for loading $B$ classical bits into a quantum data structure comprising $\log_2 (B)$ qubits with circuit depth $\order{\log (B)}$.  For continuous targets, QPMCMC requires reading $\order{P}$ real vectors $\ttheta_p\in \mathbb{R}^D$ onto the quantum machine at each MCMC iteration.  If $b$ is the number of bits used to represent a single real value, then reading $B=\order{PDb}$ classical bits into the quantum machine requires time $\order{\log (PDb)}$.  This is true whether one opts for fixed-point \citep{jordan2005fast} or floating-point \citep{haener2018quantum} representations for real values.  The outlook can be better for discrete distributions.  For example, the QPMCMC scheme presented in Section \ref{sec:disc} only requires loading the entire configuration state once prior to sampling.  A $D$-spin Ising model requires $D$ classical bits to encode, and these bits load onto a quantum machine in time $\order{\log(D)}$.  Once one has encoded the entire system state, each QPMCMC iteration only requires loading the addresses of the $\order{P}$ proposal states. If one uses $b$ bits to encode each address, then the total time required to load data onto the quantum machine is $\order{\log(Pb)}$ for each QPMCMC iteration.  On the other hand, the speedup for discrete targets assumes the ability to hold an entire configuration in QRAM.
 Conveniently, the `output problem' is less of an issue for QPMCMC, as only a single integer $\hat{p} \in \{0,\dots,P\}$ need be extracted within Algorithm \ref{alg:min}.
 	\end{quote}
 \end{reply}
@@ -289,7 +289,7 @@ The author should comment on how the present approach would compare to these exi
 \begin{reply}
 I thank the Reviewer for the helpful suggestion.  To clarify the relationship between the proposed method and other quantum Monte Carlo algorithm, I have included the following paragraph in Section \ref{sec:disc}:
 \begin{quote}
-	Second, can QPMCMC be combined with established quantum algorithms that make use of `quantum walks' on graphs to sample from discrete target distributions?  \citet{szegedy2004quantum} presents a quantum analog to classical ergodic reversible Markov chains and shows that such quantum walks sometimes provide quadratic speedups over classical Markov chains.  \citet{szegedy2004quantum} also points out that Grover's search, a key component within QPMCMC, may be interpreted as performing just such a quantum walk on a complete graph.  \citet{wocjan2008speedup} accelerate the quantum walk by using ancillary Markov chains to improve mixing and apply their method to simulated annealing.  Given a quantum algorithm $\mathbb{A}$ for producing a discrete random sample with variance $\sigma^2$, \citet{montanaro} develops a quantum algorithm for estimating the mean of algorithm $\mathbb{A}$'s output with error $\epsilon$ by running algorithm $\mathbb{A}$ a mere $\widetilde{\mathcal{O}}(\sigma/\epsilon)$ times, where $\widetilde{\mathcal{O}}$ hides polylogarithmic terms. Importantly, this quadratic quantum speedup over classical Monte Carlo applies for quantum algorithms $\mathbb{A}$ that only feature a single measurement such as certain simple quantum walk algorithms. Unfortunately, this assumption fails for quantizations of Metropolis-Hastings, in general, and QPMCMC, in particular. More promising for QPMCMC, \citet{lemieux2020efficient} develop a quantum circuit that applies Metropolis-Hastings to the Ising model without the need for oracle calls.  An interesting question is whether similar non-oracular quantum circuits exist for the basic parallel MCMC backbone to QPMCMC.  In general, however, comparison between QPMCMC and other quantum Monte Carlo techniques is challenging because the foregoing literature (a) largely focuses on MCMC as a tool for discrete optimization, with algorithms that only ever return a single Monte Carlo sample or function thereof, and (b) restricts itself to a handfull of simple, stylized and discrete target distributions.  On the other hand, QPMCMC is a general inferential framework for sampling from general discrete and continuous distributions alike.
+Second, can QPMCMC be combined with established quantum algorithms that make use of `quantum walks' on graphs to sample from discrete target distributions?  \citet{szegedy2004quantum} presents a quantum analog to classical ergodic reversible Markov chains and shows that such quantum walks sometimes provide quadratic speedups over classical Markov chains.  \citet{szegedy2004quantum} also points out that Grover's search, a key component within QPMCMC, may be interpreted as performing just such a quantum walk on a complete graph.  \citet{wocjan2008speedup} accelerate the quantum walk by using ancillary Markov chains to improve mixing and apply their method to simulated annealing.  Given a quantum algorithm $\mathbb{A}$ for producing a discrete random sample with variance $\sigma^2$, \citet{montanaro} develops a quantum algorithm for estimating the mean of algorithm $\mathbb{A}$'s output with error $\epsilon$ by running algorithm $\mathbb{A}$ a mere $\widetilde{\mathcal{O}}(\sigma/\epsilon)$ times, where $\widetilde{\mathcal{O}}$ hides polylogarithmic terms. Importantly, this quadratic quantum speedup over classical Monte Carlo applies for quantum algorithms $\mathbb{A}$ that only feature a single measurement such as certain simple quantum walk algorithms. Unfortunately, this assumption fails for quantizations of Metropolis-Hastings, in general, and QPMCMC, in particular. More promising for QPMCMC, \citet{lemieux2020efficient} develop a quantum circuit that applies Metropolis-Hastings to the Ising model without the need for oracle calls.  An interesting question is whether similar non-oracular quantum circuits exist for the basic parallel MCMC backbone to QPMCMC.  In general, however, comparison between QPMCMC and other quantum Monte Carlo techniques is challenging because the foregoing literature (\textcolor{red}{a}) largely focuses on MCMC as a tool for discrete optimization, with algorithms that only ever return a single Monte Carlo sample or function thereof, and (\textcolor{red}{b}) restricts itself to a handfull of simple, stylized and discrete target distributions.  On the other hand, QPMCMC is a general inferential framework for sampling from general discrete and continuous distributions alike.
 \end{quote}
 \end{reply}
 
@@ -305,18 +305,53 @@ This paper seeks to further develop parallel Markov chain Monte Carlo in the qua
 
 The key contribution is connecting parallel Markov chain Monte Carlo to the quantum computing. The key step is to employ Gumbel-max trick to transform the generalized accept-reject step (i.e., Dirichlet sampling) into a discrete optimization procedure, so that quantum optimization algorithm can be used for sampling. The idea is simple and elegant. It just connects the dots.
 
+\begin{reply}
+	I thank the Reviewer for their kind words and for taking the time to read the manuscript.
+\end{reply}
+
 I still have a few concerns, more generally related to the “bedrock” parallel Markov chain Monte Carlo:
 
 \begin{enumerate}
 	\item Although named as parallel MCMC, the algorithm is still MCMC, which relies on the back-bone Markov chain to achieve equilibrium. The algorithm still heavily relies on the long sequence for the Markov chain to reach equilibrium. The quantum part doesn’t seem to be able to solve this major drawback of parallel MCMC. 
+\end{enumerate}	
+
+\begin{reply}
+	I absolutely agree with the Reviewer's judgment.   To clarify that my method does not overcome this basic shortcoming of MCMC, I've included the following text in Section \ref{sec:disc}:
+	\begin{quote}
+		While the algorithm still must construct long Markov chains to reach equilibrium, generating each individual Markov chain state requires significantly fewer target evaluations.
+	\end{quote} 
+\end{reply}
 	
+	
+\begin{enumerate}
+	  \setcounter{enumi}{1}
 	\item I see more potential of the Gumbel-max trick $+$ quantum computing in sequential Monte Carlo. Unlike MCMC, SMC only requires a handful of sequential chains, and mostly need to have a very large number of proposals for re-sampling, where your trick could have more impact.
-	
+\end{enumerate}
+
+\begin{reply}
+	This is a good point.  I've added the following to the second-to-last paragraph of Section \ref{sec:disc}:
+	\begin{quote}
+		The trick may also find use within sequential Monte Carlo \citep{doucet2001sequential}.  For example, \citet{berzuini2001resample} present a sequential importance resampling algorithm that uses MCMC-type moves to encourage particle diversity and avoid the need for bootstrap resampling.  Multiproposals accelerated by the quantum Gumbel-max trick could add speed and robustness to such MCMC-resampling.
+	\end{quote}	
+\end{reply}
+
+\begin{enumerate}
+	  \setcounter{enumi}{2}
 	\item A last comment is on computer hardware structure. In the QPMCMC, the Markov chain for loop requires CPU, the evaluation of log-likelihood requires GPU, and the sample from Dirichlet requires quantum processor. Will there be I/O communication overhead for these steps on distinct processors?
 \end{enumerate}
 
+\begin{reply}
+	I thank the Reviewer for raising this possible point of confusion.  The multiproposal is generated on a CPU or GPU.  The quantum computer both (a) evaluates the log-posterior and (b) samples from the Dirichlet.  This is the nice thing about combining the Gumbel-max trick with quantum optimization.  The question about I/O is important, and I have added the following paragraph to Section \ref{sec:disc}:
+	\begin{quote}
+There are major technical barriers to the practical implementation of QPMCMC.  The framework, like other quantum machine learning (QML) schemes, requires on-loading and off-loading classical data to and from a quantum machine.  In the seminal review of QML, \citet{biamonte2017quantum} discuss what they call the `input problem'.  \citet{cortese2018loading} present a general purpose quantum circuit for loading $B$ classical bits into a quantum data structure comprising $\log_2 (B)$ qubits with circuit depth $\order{\log (B)}$.  For continuous targets, QPMCMC requires reading $\order{P}$ real vectors $\ttheta_p\in \mathbb{R}^D$ onto the quantum machine at each MCMC iteration.  If $b$ is the number of bits used to represent a single real value, then reading $B=\order{PDb}$ classical bits into the quantum machine requires time $\order{\log (PDb)}$.  This is true whether one opts for fixed-point \citep{jordan2005fast} or floating-point \citep{haener2018quantum} representations for real values.  The outlook can be better for discrete distributions.  For example, the QPMCMC scheme presented in Section \ref{sec:disc} only requires loading the entire configuration state once prior to sampling.  A $D$-spin Ising model requires $D$ classical bits to encode, and these bits load onto a quantum machine in time $\order{\log(D)}$.  Once one has encoded the entire system state, each QPMCMC iteration only requires loading the addresses of the $\order{P}$ proposal states. If one uses $b$ bits to encode each address, then the total time required to load data onto the quantum machine is $\order{\log(Pb)}$ for each QPMCMC iteration.  On the other hand, the speedup for discrete targets assumes the ability to hold an entire configuration in QRAM.
+Conveniently, the `output problem' is less of an issue for QPMCMC, as only a single integer $\hat{p} \in \{0,\dots,P\}$ need be extracted within Algorithm \ref{alg:min}.
+	\end{quote}
+\end{reply}
 
 
+\begin{reply}
+	Again, I'd like to thank the Reviewer for taking the time to review this manuscript and for their positive reception.  I hope that my edits have addressed their concerns.
+\end{reply}
 
 
 
