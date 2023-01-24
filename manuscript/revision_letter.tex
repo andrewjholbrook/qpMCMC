@@ -73,6 +73,10 @@
 
 \usepackage{todonotes}
 
+\usepackage[format=plain,
+labelfont={it,bf},
+textfont=it]{caption}
+
 \newcommand{\mb}{\mathbf}
 \newcommand{\mc}{\mathcal}
 \newcommand{\dx}{\mbox{d}}
@@ -386,6 +390,8 @@ I have also expanded the third paragraph of Section \ref{sec:intro} to help clar
 
 
 The author has motivated the need for quantum algorithms for big-data problems where evaluation of the target is expensive. However, only data-less examples have been implemented. Implementation on a real example is warranted. Further, comparisons with other quantum methods (as suggested by referee) would be useful to understand the effectiveness of the proposed methodology. Finally, comparison with the non-quantum version of the multiple-proposal would be helpful to make the point that the mixing of the algorithm remains unaffected.
+
+\setcounter{figure}{7}
  \begin{figure}[!t]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/blackHole.png}
@@ -409,7 +415,22 @@ The author has motivated the need for quantum algorithms for big-data problems w
 	\begin{quote}
 Second, can QPMCMC be combined with established quantum algorithms that make use of `quantum walks' on graphs to sample from discrete target distributions?  \citet{szegedy2004quantum} presents a quantum analog to classical ergodic reversible Markov chains and shows that such quantum walks sometimes provide quadratic speedups over classical Markov chains.  \citet{szegedy2004quantum} also points out that Grover's search, a key component within QPMCMC, may be interpreted as performing just such a quantum walk on a complete graph.  \citet{wocjan2008speedup} accelerate the quantum walk by using ancillary Markov chains to improve mixing and apply their method to simulated annealing.  Given a quantum algorithm $\mathbb{A}$ for producing a discrete random sample with variance $\sigma^2$, \citet{montanaro} develops a quantum algorithm for estimating the mean of algorithm $\mathbb{A}$'s output with error $\epsilon$ by running algorithm $\mathbb{A}$ a mere $\widetilde{\mathcal{O}}(\sigma/\epsilon)$ times, where $\widetilde{\mathcal{O}}$ hides polylogarithmic terms. Importantly, this quadratic quantum speedup over classical Monte Carlo applies for quantum algorithms $\mathbb{A}$ that only feature a single measurement such as certain simple quantum walk algorithms. Unfortunately, this assumption fails for quantizations of Metropolis-Hastings, in general, and QPMCMC, in particular. More promising for QPMCMC, \citet{lemieux2020efficient} develop a quantum circuit that applies Metropolis-Hastings to the Ising model without the need for oracle calls.  An interesting question is whether similar non-oracular quantum circuits exist for the basic parallel MCMC backbone to QPMCMC.  In general, however, comparison between QPMCMC and other quantum Monte Carlo techniques is challenging because the foregoing literature (\textcolor{red}{a}) largely focuses on MCMC as a tool for discrete optimization, with algorithms that only ever return a single Monte Carlo sample or function thereof, and (\textcolor{red}{b}) restricts itself to a handfull of simple, stylized and discrete target distributions.  On the other hand, QPMCMC is a general inferential framework for sampling from general discrete and continuous distributions alike.
 	\end{quote}
+Finally, I've added Section \ref{sec:mixing}, which ompares mixing between conventional parallel MCMC and QPMCMC:
+\begin{quote}
+	To ascertain whether QPMCMC mixes differently compared to conventional parallel MCMC, we run both algorithms for a range of proposal counts to sample from a 10-dimensional standard normal distribution. For each algorithm and proposal setting, we run 100 independent chains for 10,000 iterations and obtain effective sample sizes ESS$_d$ for $d \in \{1,\dots,10\}$.   We then calculate the relative differences between the means and minima of one chain generated using parallel MCMC and one chain generated using QPMCMC; for example:
+	\begin{align*}
+		\mbox{Relative difference between means} \: \overline{\mbox{ESS}}_{(\cdot)} = \frac{\left|\overline{\mbox{ESS}}_{pMCMC} - \overline{\mbox{ESS}}_{QPMCMC}\right| }{\overline{\mbox{ESS}}_{pMCMC} }
+	\end{align*}
+	Figure \ref{fig:mixing} shows results.  In general, the majority relative differences are small.  For both statistics, mean relative differences are less than 0.5, regardless of proposal count.  Again for both statistics, more than 75\% of the independent runs result in relative differences below 0.1.  We note that relative differences between means (blue) appear to decrease with the number of proposals, but the same does not hold for relative differences between minima (red).
+\end{quote}
 \end{reply}
+
+ \begin{figure}[!t]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/pMCMCvsQPMCMC.pdf}
+	\caption{Relative differences between effective sample sizes (ESS) for parallel MCMC (pMCMC) and quantum parallel MCMC (QPMCMC) across a range of proposal counts. We target a 10-dimensional standard normal distribution.  For each algorithm and each proposal setting, we generate 100 independent chains of length 10,000 and calculate the mean and minimum ESS across dimensions.}\label{fig:mixing} 
+\end{figure}
+
 
 \subsection*{Additional Comments}
 
