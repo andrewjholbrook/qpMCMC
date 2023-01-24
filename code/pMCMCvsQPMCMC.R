@@ -341,7 +341,7 @@ library(coda)
 seed <- R.utils::cmdArg("seed",42L)
 set.seed(seed=seed)
 
-for(props in c(4,8,16,32,64,128,256,512,1024,2048) ) {
+for(props in c(4,8,16,32,64,128) ) {
   pMCMC_Output <- pMCMC(nIts=10000,nProps=props, initial=0)
   qpMCMC_Output <- qpMCMC(nIts = 10000,nProps=props,initial=0)
   
