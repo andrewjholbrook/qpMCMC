@@ -190,6 +190,10 @@ d_{F}
 
 \graphicspath{{figures/}}
 
+
+\def\HiLi{\leavevmode\rlap{\hbox to \hsize{\color{trevorblue!15}\leaders\hrule height 0.9\baselineskip depth .5ex\hfill}}}
+
+
 \begin{document}
 
 
@@ -240,7 +244,7 @@ Taken together, these developments demonstrate the ability of parallel MCMC meth
 	\scalebox{0.9}{
 \begin{minipage}{1\textwidth}
 \begin{algorithm}[H]
-	\caption{Parallel MCMC \citep{tjelmeland2004using}}\label{alg:pMCMC}
+	\caption{Parallel (multiproposal) MCMC \citep{tjelmeland2004using}}\label{alg:pMCMC}
 	\KwData{Initial Markov chain state $\ttheta^{(0)}$; total length of Markov chain $S$; total number of proposals per iteration $P$; routine for evaluating target density $\pi(\cdot)$; routines for drawing random samples from the proposal distribution $Q(\ttheta^{(s)},\cdot)$ and from a $P+1$ discrete distribution $Discrete(\ppi)$ given some probability vector $\ppi=(\pi_0,\dots,\pi_P)$.}
 	\KwResult{A Markov chain $\ttheta^{(1)}, \dots, \ttheta^{(S)}$.}
 	\For{$s \in\{1,\dots,S\}$}{
@@ -267,7 +271,7 @@ One need not use parallel computing to implement Algorithm \ref{alg:pMCMC}, but 
 
 
 
-While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described in the previous paragraph.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{massive,holbrook2021scalable,holbrook2022bayesian,holbrook2022viral} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
+While parallel MCMC algorithms are increasingly well-suited for developing many-core computational architectures, there are trade-offs that need to be taken into account when choosing how to allocate computational resources.  On one end of the spectrum, \citet{gelman1992inference,gelman1992single} demonstrate the usefulness of generating, combining and comparing multiple independent Markov chains that target the same distribution, and one may perform this embarrassingly parallel task by assigning the operations for each individual chain to a separate central processing unit (CPU) core or GPU work-group.  In this multi-chain context, simultaneously running multiple parallel MCMC chains could limit resources available for the within-chain parallelization described in the previous paragraph.  On the other end of the spectrum, one may find it useful to allocate resources to overcome computational bottlenecks within a single Markov chain that uses a traditional accept-reject step. In big data contexts, \citet{massive,holbrook2021scalable,holbrook2022bayesian,holbrook2022viral} use multi- and many-core processing to accelerate log-likelihood and log-likelihood gradient calculations within single Metropolis-Hastings and Hamiltonian Monte Carlo \citep{neal2011mcmc} generated chains.  This big data strategy might again limit resources available for parallelization across proposals and target evaluations described above.
 
 In the presence of these trade-offs, it is worthwhile to develop additional parallel computing tools for parallel MCMC so that future scientists may be better able to flexibly assign sub-routines to different computing resources in a way that is tailored to their specific inference task.  In particular, we show that quantum parallelization can be a useful tool for parallel MCMC when evaluation of the target density represents the computational bottleneck.
 
@@ -524,7 +528,7 @@ Once one has effectively parallelized the target evaluations $\pi(\ttheta_{p})$,
 		$\alpha^*_{p} \gets \lambda_{p}^* + z_{p}$\;
 	}
 	$\hat{p} \gets \argmax_{p=0,\dots,P}\alpha^*_{p}$\;
-	\Return{p}\ .
+	\Return{$\hat{p}\,$}.
 	
 	\vspace{0.5em}
 \end{algorithm}
@@ -575,9 +579,9 @@ When $\pi(\cdot)$ and $q(\cdot)$ take continuous values on a topologically compa
 		\For{$p \in \{1,\dots,P\}$}{
 			$\ttheta_p \gets Normal_D(\bar{\ttheta},\SSigma)$\;
 			$z_{p} \gets Gumbel(0,1)$\;
-			$\ket{\theta_p} \gets \ttheta_p$; \hspace{5em} \Comment{      Load proposal onto quantum computer.}      
+		\HiLi	$\ket{\theta_p} \gets \ttheta_p$; \hspace{5em} \Comment{      Load proposal onto quantum computer.}      
 		}
-		$\hat{p} \gets \argmin_{p=0,\dots,P}\Big(f(p):= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big)\Big)$\;  \hspace{10em}\Comment{\hspace{0.5em} $\order{\sqrt{P}}$ Alg \ref{alg:min} with warm-start at $p=0$.}
+	\HiLi	$\hat{p} \gets \argmin_{p=0,\dots,P}\Big(f(p):= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big)\Big)$\;  \HiLi \hspace{10em}\Comment{\hspace{0.5em} $\order{\sqrt{P}}$ Alg \ref{alg:min} with warm-start at $p=0$.}
 		$\ttheta^{(s)} \gets \ttheta_{\hat{p}}$\;
 	}
 	\Return{$\ttheta^{(1)}, \dots, \ttheta^{(S)}$}\ .
@@ -604,7 +608,7 @@ When $\pi(\cdot)$ and $q(\cdot)$ take continuous values on a topologically compa
 	\caption{Empirical accuracy of quantum parallel MCMC (QPMCMC) for a 100 dimensional spherical Gaussian target.  We generate 100,000 samples using 2,000 proposals each iteration and remove the first 2,000 samples as burn-in.  The QQ (quantile-quantile) plot shows sample quantiles adhering closely to the theoretical quantiles.  Similar to the independent simulation shown in Figure \ref{fig:mcmcIterations}, here QPMCMC requires less than $7.2$\% of the usual number of target evaluations.}\label{fig:qq}
 \end{figure}
 
-Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC for a continuously-valued target.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding the one line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. 
+Algorithm \ref{alg:qpMCMC} presents the details of QPMCMC for a continuously-valued target.  The algorithm uses conventional (perhaps parallel) computing almost entirely, excluding two lines that are highlighted.  The first of these loads proposals onto the quantum machine, and the second line that calls the quantum minimization algorithm presented in Algorithm \ref{alg:min}. 
 This sub-routine seeks to find the minimizer of the function
 \begin{align}\label{eq:objective}
 f(p)= -\big(z_{p}+ \log\pi(\ttheta_{p}) \big) \quad \mbox{over} \quad p=0,1,\dots, P,
